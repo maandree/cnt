@@ -17,7 +17,7 @@ package cnt;
 public class Program
 {
     /**
-     * Non-contructor
+     * Non-constructor
      */
     private Program()
     {
