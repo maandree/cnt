@@ -52,6 +52,9 @@ public class MainFrame extends JFrame
     
     
     
+    /**
+     * Decorates the window
+     */
     private void decorate()
     {
 	this.setLayout(new BorderLayout());

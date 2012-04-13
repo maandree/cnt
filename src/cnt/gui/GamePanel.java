@@ -9,10 +9,12 @@
 package cnt.gui;
 
 import javax.swing.*;
-import javax.imageio.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import static java.awt.RenderingHints.*;
 
@@ -68,17 +70,41 @@ public class GamePanel extends JPanel
     
     
     
+    /**
+     * The number of columns in the game
+     */
     private final int width = 10;
+    
+    /**
+     * The number of rows in the game
+     */
     private final int height = 20;
     
+    /**
+     * Piece matrix
+     */
     private final Color[][] matrix;
     
+    /**
+     * The image printed on top of piece to make them look better
+     */
     private final BufferedImage pieceImage;
+    
+    /**
+     * The width of {@link #pieceImage}
+     */
     private final int pieceImageW;
+    
+    /**
+     * The height of {@link #pieceImage}
+     */
     private final int pieceImageH;
     
     
     
+    /**
+     * {@inheritDoc}
+     */
     public void paint(final Graphics g)
     {
 	super.paint(g);
