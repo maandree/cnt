@@ -56,11 +56,10 @@ public class MainFrame extends JFrame
     {
 	this.setLayout(new BorderLayout());
 	
-	final JPanel gamePanel   = new JPanel();
+	final JPanel gamePanel   = new GamePanel();
 	final JPanel playerPanel = new JPanel();
 	final JPanel chatPanel   = new JPanel();
 	
-	gamePanel.setBackground(Color.GREEN);
 	playerPanel.setBackground(Color.RED);
 	chatPanel.setBackground(Color.BLUE);
 	

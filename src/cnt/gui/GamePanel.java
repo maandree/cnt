@@ -1,0 +1,124 @@
+/**
+ * Coop Network Tetris — A cooperative tetris over the Internet.
+ * 
+ * Copyright Ⓒ 2012  Mattias Andrée, Peyman Eshtiagh,
+ *                   Calle Lejdbrandt, Magnus Lundberg
+ *
+ * Project for prutt12 (DD2385), KTH.
+ */
+package cnt.gui;
+
+import javax.swing.*;
+import javax.imageio.*;
+import java.awt.*;
+import java.awt.image.*;
+import java.io.*;
+
+import static java.awt.RenderingHints.*;
+
+
+/**
+ * This is the main window of the program
+ *
+ * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ */
+public class GamePanel extends JPanel
+{
+    /**
+     * Constructor
+     */
+    public GamePanel()
+    {
+	this.setBackground(new Color(16, 16, 100));
+	
+	this.matrix = new Color[this.height][this.width];
+	
+	
+	BufferedImage pimg = null;
+	try
+	{
+	    pimg = ImageIO.read(new File("piece.png"));
+	}
+	catch (final IOException err)
+	{
+	    //WARNING: Can't load piece image!
+	    //will be printed soon
+	}
+	this.pieceImage = pimg;
+	
+	if (this.pieceImage == null)
+	{
+	    System.err.println("WARNING: Can't load piece image!");
+	    this.pieceImageW = this.pieceImageH = 1; //initialising
+	}
+	else
+	{
+	    this.pieceImageW = (int)(this.pieceImage.getWidth());
+	    this.pieceImageH = (int)(this.pieceImage.getHeight());
+	}
+	
+	
+	this.matrix[19][0] = new Color(200, 20, 20);
+	this.matrix[19][1] = new Color(170, 170, 20);
+	this.matrix[19][2] = new Color(20, 200, 20);
+	this.matrix[19][3] = new Color(20, 170, 170);
+	this.matrix[19][4] = new Color(20, 20, 200);
+	this.matrix[19][5] = new Color(170, 20, 170);
+    }
+    
+    
+    
+    private final int width = 10;
+    private final int height = 20;
+    
+    private final Color[][] matrix;
+    
+    private final BufferedImage pieceImage;
+    private final int pieceImageW;
+    private final int pieceImageH;
+    
+    
+    
+    public void paint(final Graphics g)
+    {
+	super.paint(g);
+	
+	final Dimension screenDim = this.getSize();
+	final int screenW = (int)(screenDim.getWidth());
+	final int screenH = (int)(screenDim.getHeight());
+	
+	final BufferedImage offimg = new BufferedImage(screenW, screenH, BufferedImage.TYPE_INT_ARGB);
+	
+	final Graphics2D gg = offimg.createGraphics();
+	gg.setRenderingHint(KEY_ALPHA_INTERPOLATION, VALUE_ALPHA_INTERPOLATION_QUALITY);
+	gg.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+	gg.setRenderingHint(KEY_COLOR_RENDERING, VALUE_COLOR_RENDER_QUALITY);
+	gg.setRenderingHint(KEY_DITHERING, VALUE_DITHER_ENABLE); //if needed
+	gg.setRenderingHint(KEY_FRACTIONALMETRICS, VALUE_FRACTIONALMETRICS_OFF);
+	gg.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BICUBIC); //no implemention for sinc available
+	gg.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
+	gg.setRenderingHint(KEY_STROKE_CONTROL, VALUE_STROKE_PURE);
+	
+	int pieceW = screenW / this.width;
+	int pieceH = screenH / this.height;
+	
+	Color colour;
+	for (int y = 0; y < this.height; y++)
+	    for (int x = 0; x < this.width; x++)
+		if ((colour = this.matrix[y][x]) != null)
+		{
+		    final int px, py;
+		    
+		    gg.setColor(colour);
+		    gg.fillRect(px = x * pieceW, py = y * pieceH, pieceW, pieceH);
+		    
+		    if (this.pieceImage != null)
+			gg.drawImage(this.pieceImage, px, py, px + pieceW, py + pieceH,
+				     0, 0, this.pieceImageW, this.pieceImageH, null);
+		}
+	
+	g.drawImage(offimg, 0, 0, null);
+    }
+    
+}
+
