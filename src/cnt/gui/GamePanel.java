@@ -7,6 +7,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.gui;
+import cnt.control.*;
 
 import javax.swing.*;
 import javax.imageio.ImageIO;
@@ -23,7 +24,7 @@ import static java.awt.RenderingHints.*;
  *
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
-public class GamePanel extends JPanel
+public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 {
     /**
      * Constructor
@@ -59,12 +60,7 @@ public class GamePanel extends JPanel
 	}
 	
 	
-	this.matrix[19][0] = new Color(200, 20, 20);
-	this.matrix[19][1] = new Color(160, 160, 20);
-	this.matrix[19][2] = new Color(20, 175, 20);
-	this.matrix[19][3] = new Color(20, 175, 175);
-	this.matrix[19][4] = new Color(20, 20, 200);
-	this.matrix[19][5] = new Color(160, 20, 160);
+	Blackboard.registerObserver(this);
     }
     
     
@@ -147,6 +143,19 @@ public class GamePanel extends JPanel
     
     
     /**
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	if (message instanceof Blackboard.MatrixPatch)
+	{
+	    final Blackboard.MatrixPatch patch = (Blackboard.MatrixPatch)message;
+	    update(patch.erase, patch.blocks, patch.offY, patch.offX);
+	}
+    }
+    
+    
+    /**
      * Updates the game matrix and redraws the area
      * 
      * @param  erase   A matrix where <code>true</code> indicates removal of block
@@ -156,21 +165,23 @@ public class GamePanel extends JPanel
      */
     public void update(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX)
     {
-	for (int y = 0, h = erase.length; y < h; y++)
-	{
-	    final int Y = y + offY;
-	    for (int x = 0, w = erase[y].length; x < w; x++)
-		if (erase[y][x])
-		    this.matrix[Y][x + offX] = null;
-	}
+	if (erase != null)
+	    for (int y = 0, h = erase.length; y < h; y++)
+	    {
+		final int Y = y + offY;
+		for (int x = 0, w = erase[y].length; x < w; x++)
+		    if (erase[y][x])
+			this.matrix[Y][x + offX] = null;
+	    }
 	
-	for (int y = 0, h = blocks.length; y < h; y++)
-	{
-	    final int Y = y + offY;
-	    for (int x = 0, w = blocks[y].length; x < w; x++)
-		if (blocks[y][x] != null)
-		    this.matrix[Y][x + offX] = blocks[y][x];
-	}
+	if (blocks != null)
+	    for (int y = 0, h = blocks.length; y < h; y++)
+	    {
+		final int Y = y + offY;
+		for (int x = 0, w = blocks[y].length; x < w; x++)
+		    if (blocks[y][x] != null)
+			this.matrix[Y][x + offX] = blocks[y][x];
+	    }
 	
 	this.repaint();
     }

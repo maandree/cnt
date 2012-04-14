@@ -152,7 +152,7 @@ public class Blackboard
 	/**
 	 * This method is invoked when the a message is pinned on the blackboard
 	 */
-	public void messageBroadcasted(final BlackboardMessage message);
+	public void messageBroadcasted(final Blackboard.BlackboardMessage message);
     }
     
     /**
