@@ -19,7 +19,7 @@ import static java.awt.RenderingHints.*;
 
 
 /**
- * This is the main window of the program
+ * The game playing area panel
  *
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
