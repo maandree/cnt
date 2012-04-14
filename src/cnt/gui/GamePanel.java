@@ -31,7 +31,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      */
     public GamePanel()
     {
-	this.setBackground(new Color(16, 16, 100));
+	this.setBackground(Color.BLACK);
 	
 	this.matrix = new Color[this.height][this.width];
 	
@@ -76,6 +76,11 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
     private final int height = 20;
     
     /**
+     * The background of the game area
+     */
+    private final Color gameBackground = new Color(16, 16, 100);
+    
+    /**
      * Piece matrix
      */
     private final Color[][] matrix;
@@ -102,8 +107,6 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      */
     public void paint(final Graphics g)
     {
-	super.paint(g);
-	
 	final Dimension screenDim = this.getSize();
 	final int screenW = (int)(screenDim.getWidth());
 	final int screenH = (int)(screenDim.getHeight());
@@ -119,9 +122,18 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	gg.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BICUBIC); //no implemention for sinc available
 	gg.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
 	gg.setRenderingHint(KEY_STROKE_CONTROL, VALUE_STROKE_PURE);
+	super.paint(gg);
 	
 	int pieceW = screenW / this.width;
 	int pieceH = screenH / this.height;
+	if (pieceW > pieceH)  pieceW = pieceH;
+	if (pieceH > pieceW)  pieceH = pieceW;
+	
+	final int offX = (screenW - this.width * pieceW) >> 1;
+	final int offY = screenH - this.height * pieceH;
+	
+	gg.setColor(this.gameBackground);
+	gg.fillRect(offX, offY, this.width * pieceW, this.height * pieceH);
 	
 	Color colour;
 	for (int y = 0; y < this.height; y++)
@@ -131,7 +143,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 		    final int px, py;
 		    
 		    gg.setColor(colour);
-		    gg.fillRect(px = x * pieceW, py = y * pieceH, pieceW, pieceH);
+		    gg.fillRect(px = x * pieceW + offX, py = y * pieceH + offY, pieceW, pieceH);
 		    
 		    if (this.pieceImage != null)
 			gg.drawImage(this.pieceImage, px, py, px + pieceW, py + pieceH,
