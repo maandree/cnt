@@ -60,11 +60,11 @@ public class GamePanel extends JPanel
 	
 	
 	this.matrix[19][0] = new Color(200, 20, 20);
-	this.matrix[19][1] = new Color(170, 170, 20);
-	this.matrix[19][2] = new Color(20, 200, 20);
-	this.matrix[19][3] = new Color(20, 170, 170);
+	this.matrix[19][1] = new Color(160, 160, 20);
+	this.matrix[19][2] = new Color(20, 175, 20);
+	this.matrix[19][3] = new Color(20, 175, 175);
 	this.matrix[19][4] = new Color(20, 20, 200);
-	this.matrix[19][5] = new Color(170, 20, 170);
+	this.matrix[19][5] = new Color(160, 20, 160);
     }
     
     
@@ -143,6 +143,36 @@ public class GamePanel extends JPanel
 		}
 	
 	g.drawImage(offimg, 0, 0, null);
+    }
+    
+    
+    /**
+     * Updates the game matrix and redraws the area
+     * 
+     * @param  erase   A matrix where <code>true</code> indicates removal of block
+     * @param  blocks  A matrix where non-<code>null</code> indicates to add a block
+     * @param  offY    Top offset, where the first row in the matrices affect the game matrix
+     * @param  offX    Left offset, where the first column in the matrices affect the game matrix
+     */
+    public void update(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX)
+    {
+	for (int y = 0, h = erase.length; y < h; y++)
+	{
+	    final int Y = y + offY;
+	    for (int x = 0, w = erase[y].length; x < w; x++)
+		if (erase[y][x])
+		    this.matrix[Y][x + offX] = null;
+	}
+	
+	for (int y = 0, h = blocks.length; y < h; y++)
+	{
+	    final int Y = y + offY;
+	    for (int x = 0, w = blocks[y].length; x < w; x++)
+		if (blocks[y][x] != null)
+		    this.matrix[Y][x + offX] = blocks[y][x];
+	}
+	
+	this.repaint();
     }
     
 }
