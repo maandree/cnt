@@ -70,7 +70,7 @@ public class Blackboard
 		    {
 			final Thread thread = new Thread(runnable);
 			thread.setDaemon(false);
-			thread.setPriority(5);
+			thread.setPriority(5); //normal: 5 of 1..10; corresponding nice value: 0
 			return thread;
 		    }
 	        };
@@ -84,7 +84,7 @@ public class Blackboard
 		    {
 			final Thread thread = new Thread(runnable);
 			thread.setDaemon(true);
-			thread.setPriority(5);
+			thread.setPriority(5); //normal: 5 of 1..10; corresponding nice value: 0
 			return thread;
 		    }
 	        };
@@ -98,7 +98,7 @@ public class Blackboard
 		    {
 			final Thread thread = new Thread(runnable);
 			thread.setDaemon(false);
-			thread.setPriority(3);
+			thread.setPriority(2); //below normal: 2 of 1..10; corresponding nice value: 3
 			return thread;
 		    }
 	        };
@@ -112,7 +112,7 @@ public class Blackboard
 		    {
 			final Thread thread = new Thread(runnable);
 			thread.setDaemon(true);
-			thread.setPriority(3);
+			thread.setPriority(2); //below normal: 2 of 1..10; corresponding nice value: 3
 			return thread;
 		    }
 	        };
