@@ -5,11 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 
 
 public class chatt extends JFrame implements ActionListener{
@@ -20,7 +15,7 @@ public class chatt extends JFrame implements ActionListener{
 	scrollText ta;
 	chatt() throws IOException{
 		ta = new scrollText();
-		JTextField  da = new JTextField("Skriv här");
+		JTextField  da = new JTextField("Skriv hï¿½r");
 	    add(ta);
 	    add(da);
 	    this.setLayout(new GridLayout(2,1));
@@ -31,9 +26,9 @@ public class chatt extends JFrame implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		String temp = ((JTextField) e.getSource()).getText();			//Hämtar texten från området där användaren fyllt i
+		String temp = ((JTextField) e.getSource()).getText();			//Hï¿½mtar texten frï¿½n omrï¿½det dï¿½r anvï¿½ndaren fyllt i
 		ta.addText(temp, "Magnus", Color.red);
-		((JTextField) e.getSource()).setText("Skriv här");		//Återställer textområdet
+		((JTextField) e.getSource()).setText("Skriv hï¿½r");		//ï¿½terstï¿½ller textomrï¿½det
 	}
 	public static void main(String[] args) throws IOException{
 	    new chatt();
