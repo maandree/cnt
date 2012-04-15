@@ -1,3 +1,4 @@
+package cnt.gui;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -5,7 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 
 
-public class chatt extends JFrame implements ActionListener
+public class Chatt extends JFrame implements ActionListener
 {
     /**
      * Desired by  {@link Serializable}
