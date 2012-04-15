@@ -1,39 +1,46 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+/**
+ * Coop Network Tetris ‚Äì A cooperative tetris over the Internet.
+ * 
+ * Copyright ¬© 2012  Mattias Andr√©e, Peyman Eshtiagh,
+ *                   Calle Lejdbrandt, Magnus Lundberg
+ *
+ * Project for prutt12 (DD2385), KTH.
+ */
+package cnt.gui;
 
-import javax.swing.BorderFactory;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
+import javax.swing.*;
+import javax.swing.text.*;
+import java.awt.*;
 
 
-public class textField extends JTextPane{
-	textField(){
-	}
-	/**
-	 * addText l‰gger till texten den fÂr som parameter sist i TextPanen. Innan den l‰gger den till 
-	 * Spelarens namn som skrivs i f‰rgen den fÂr som tredje parameter
-	 * @param Text
-	 * @param Name
-	 * @param color
-	 */
-	void addText(String Text, String Name, Color color){
-	    StyleContext sc = StyleContext.getDefaultStyleContext();
-	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, color);	//Skapar textens attribut
-	    setCharacterAttributes(aset, false);
-	    setCaretPosition(getDocument().getLength());	//S‰ger att den ska skriva sist i dokumentet
-	    setEditable(true);
-	    replaceSelection(Name + ">");		//Skriver ut anv‰ndarens namn i r‰tt f‰rg
-	    aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, Color.black);	//ƒndrar textf‰rgen till svart
-	    setCharacterAttributes(aset, false);
-	    replaceSelection(Text + "\n");			//Skriver ut det anv‰ndaren skrev
-	    setEditable(false);
-		
-	}
+/**
+ * @author  Magnus Lundberg
+ */
+public class textField extends JTextPane
+{
+    //Has default constructor
+    
+    
+    /**
+     * addText l√§gger till texten den f√É¬•r som parameter sist i TextPanen. Innan den l√§gger den till 
+     * Spelarens namn som skrivs i f√§rgen den f√É¬•r som tredje parameter
+     * @param Text
+     * @param Name
+     * @param color
+     */
+    void addText(String Text, String Name, Color color)
+    {
+	StyleContext sc = StyleContext.getDefaultStyleContext();
+	AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, color);	//Skapar textens attribut
+	setCharacterAttributes(aset, false);
+	setCaretPosition(getDocument().getLength());	//S√§ger att den ska skriva sist i dokumentet
+	setEditable(true);
+	replaceSelection(Name + ">");		//Skriver ut anv√§ndarens namn i r√§tt f√§rg
+	aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, Color.black);	//√Ñndrar textf√§rgen till svart
+	setCharacterAttributes(aset, false);
+	replaceSelection(Text + "\n");			//Skriver ut det anv√§ndaren skrev
+	setEditable(false);	
+    }
 	
 }
+

@@ -1,3 +1,11 @@
+/**
+ * Coop Network Tetris — A cooperative tetris over the Internet.
+ * 
+ * Copyright Ⓒ 2012  Mattias Andrée, Peyman Eshtiagh,
+ *                   Calle Lejdbrandt, Magnus Lundberg
+ *
+ * Project for prutt12 (DD2385), KTH.
+ */
 package cnt.gui;
 import javax.swing.*;
 import java.awt.*;
@@ -41,3 +49,4 @@ public class Chatt extends JFrame implements ActionListener
 	new chatt();
     }
 }
+
