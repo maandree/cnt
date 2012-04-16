@@ -61,7 +61,7 @@ public class MainFrame extends JFrame
 	
 	final JPanel gamePanel   = new GamePanel();
 	final JPanel playerPanel = new JPanel();
-	final JPanel chatPanel   = new JPanel();
+	final JPanel chatPanel   = new ChatPanel();
 	
 	playerPanel.setBackground(Color.RED);
 	chatPanel.setBackground(Color.BLUE);
