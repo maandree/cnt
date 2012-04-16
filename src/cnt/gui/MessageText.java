@@ -25,6 +25,7 @@ public class MessageText extends JTextPane
      */
     public MessageText()
     {
+	this.setBackground(Color.BLACK);
 	this.setEditable(false);
     }
     
@@ -49,7 +50,7 @@ public class MessageText extends JTextPane
 	
 	this.replaceSelection(name + ": "); //Prints the player's name
 	
-	attrs = style.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, SystemColor.textText); //Switing to message style
+	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.WHITE); //Switing to message style
 	this.setCharacterAttributes(attrs, false);
 	
 	this.replaceSelection(text + "\n"); //Prints the player's message
