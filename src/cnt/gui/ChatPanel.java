@@ -7,6 +7,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.gui;
+import cnt.control.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +78,7 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
     {
 	final String msg = this.text.getText(); //Retrieves typed message
 	
-	messages.addText(msg, "Magnus", Color.RED);
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage("Magnus", Color.RED, msg));
 	
 	this.text.setText(INSTRUCTION); //Reset message field
     }

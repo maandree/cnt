@@ -39,6 +39,9 @@ public class GameMatrixDemo
     {
 	(new MainFrame()).setVisible(true);
 	
+	Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "New game started."));
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage("Mattias", Color.BLUE, "Hello World"));
+	
 	final Color[] colours = {
 	        /** /
 		new Color(192, 71, 81),   // NCS S 2060-R

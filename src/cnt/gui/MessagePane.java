@@ -25,38 +25,8 @@ public class MessagePane extends JPanel
      */
     public MessagePane()
     {
-	this.messageText = new MessageText();
-	this.scrollPane = new JScrollPane(messageText);
-	
 	this.setLayout(new BorderLayout());
-	
-	this.add(scrollPane, BorderLayout.CENTER);
-    }
-    
-    
-    
-    /**
-     * Message area
-     */
-    private final MessageText messageText;
-    
-    /**
-     * Scroll pane
-     */
-    private final JScrollPane scrollPane;
-    
-    
-    
-    /**
-     * Appends a text to the message area
-     * 
-     * @param  text    The message to append
-     * @param  name    The player whom sent the message
-     * @param  colour  The colour of the player
-     */
-    public void addText(final String text, final String name, final Color colour)
-    {
-	messageText.addText(text, name, colour);
+	this.add(new JScrollPane(new MessageText()), BorderLayout.CENTER);
     }
 
 }
