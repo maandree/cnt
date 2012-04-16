@@ -7,6 +7,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.gui;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -24,10 +25,12 @@ public class ChatPanel extends JPanel implements ActionListener
      */
     private static final long serialVersionUID = 1L;
     
-    scrollText ta;
+    
+    
+    
     public ChatPanel()
     {
-	ta = new scrollText();
+	ta = new MessagePane();
 	JTextField da = new JTextField("Type message here");
 	add(ta);
 	add(da);
@@ -35,11 +38,18 @@ public class ChatPanel extends JPanel implements ActionListener
 	da.addActionListener(this);
     }
     
+    
+    
+    MessagePane ta;
+    
+    
+    
     public void actionPerformed(ActionEvent e)
     {
 	String temp = ((JTextField) e.getSource()).getText(); //Retrieves typed message
 	ta.addText(temp, "Magnus", Color.red);
 	((JTextField) e.getSource()).setText("Type message here"); //Reset message field
     }
+    
 }
 

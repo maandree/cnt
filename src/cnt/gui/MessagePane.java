@@ -15,22 +15,26 @@ import javax.swing.*;
 /**
  * @author  Magnus Lundberg
  */
-public class scrollText extends JPanel
+public class MessagePane extends JPanel
 {
-    textField textPane;
-    JScrollPane scrollPane;
-    
-    scrollText()
+    MessagePane()
     {
-	textPane = new textField();
-	scrollPane = new JScrollPane(textPane);
+	messageText = new MessageText();
+	scrollPane = new JScrollPane(messageText);
 	scrollPane.setPreferredSize(new Dimension(250, 155));
 	add(scrollPane);
     }
     
+    
+    
+    MessageText messageText;
+    JScrollPane scrollPane;
+    
+    
+    
     public void addText(String Text, String Name, Color color)
     {
-	textPane.addText(Text, Name, color);
+	messageText.addText(Text, Name, color);
     }
 
 }

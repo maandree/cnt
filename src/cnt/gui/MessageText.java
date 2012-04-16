@@ -16,9 +16,10 @@ import java.awt.*;
 /**
  * @author  Magnus Lundberg
  */
-public class textField extends JTextPane
+public class MessageText extends JTextPane
 {
     //Has default constructor
+    
     
     
     /**
