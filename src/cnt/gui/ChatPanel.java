@@ -15,6 +15,8 @@ import java.io.*;
 
 
 /**
+ * The lower part of the main window, the panel with the message pane and message submitter
+ * 
  * @author  Magnus Lundberg
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
@@ -27,28 +29,47 @@ public class ChatPanel extends JPanel implements ActionListener
     
     
     
-    
+    /**
+     * Constructor
+     */
     public ChatPanel()
     {
-	ta = new MessagePane();
-	JTextField da = new JTextField("Type message here");
-	add(ta);
-	add(da);
-	this.setLayout(new GridLayout(2,1));
-	da.addActionListener(this);
+	this.messages = new MessagePane();
+	this.text = new JTextField("Type message here");
+	
+	this.setLayout(new GridLayout(2, 1));
+	add(this.messages);
+	add(this.text);
+	
+	this.text.addActionListener(this);
     }
     
     
     
-    MessagePane ta;
+    /**
+     * The message submission field
+     */
+    private final JTextField text;
+    
+    /**
+     * The message pane with all messages
+     */
+    private final MessagePane messages;
     
     
     
-    public void actionPerformed(ActionEvent e)
+    /**
+     * This method is invoked the player presses Enter/Return in {@link #text}
+     *
+     * @param  e  Event parameter (unused)
+     */
+    public void actionPerformed(final ActionEvent e)
     {
-	String temp = ((JTextField) e.getSource()).getText(); //Retrieves typed message
-	ta.addText(temp, "Magnus", Color.red);
-	((JTextField) e.getSource()).setText("Type message here"); //Reset message field
+	final String msg = this.text.getText(); //Retrieves typed message
+	
+	messages.addText(msg, "Magnus", Color.RED);
+	
+	this.text.setText("Type message here"); //Reset message field
     }
     
 }
