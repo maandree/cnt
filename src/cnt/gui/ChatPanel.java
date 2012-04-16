@@ -15,8 +15,9 @@ import java.io.*;
 
 /**
  * @author  Magnus Lundberg
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class Chatt extends JFrame implements ActionListener
+public class ChatPanel extends JPanel implements ActionListener
 {
     /**
      * Desired by {@link Serializable}
@@ -24,17 +25,14 @@ public class Chatt extends JFrame implements ActionListener
     private static final long serialVersionUID = 1L;
     
     scrollText ta;
-    public Chatt() throws IOException
+    public ChatPanel() throws IOException
     {
 	ta = new scrollText();
 	JTextField da = new JTextField("Type message here");
 	add(ta);
 	add(da);
 	this.setLayout(new GridLayout(2,1));
-	setVisible(true);
 	da.addActionListener(this);
-	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	pack();
     }
     
     public void actionPerformed(ActionEvent e)
@@ -42,11 +40,6 @@ public class Chatt extends JFrame implements ActionListener
 	String temp = ((JTextField) e.getSource()).getText(); //Retrieves typed message
 	ta.addText(temp, "Magnus", Color.red);
 	((JTextField) e.getSource()).setText("Type message here"); //Reset message field
-    }
-    
-    public static void main(String[] args) throws IOException
-    {
-	new Chatt();
     }
 }
 
