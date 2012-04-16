@@ -20,7 +20,7 @@ import java.io.*;
  * @author  Magnus Lundberg
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ChatPanel extends JPanel implements ActionListener
+public class ChatPanel extends JPanel implements ActionListener, MouseListener
 {
     /**
      * Desired by {@link Serializable}
@@ -30,18 +30,28 @@ public class ChatPanel extends JPanel implements ActionListener
     
     
     /**
+     * The message displayed when the player as not entered anything.<br/>
+     * Identity check is not possible becuase {@link JTextField#getText()} clones the text on call.
+     */
+    private static final String INSTRUCTION = "Type message here\u200c";
+    //U+200C is an invisible character used to recognised whether or not the message is inserted by the program
+    
+    
+    
+    /**
      * Constructor
      */
     public ChatPanel()
     {
 	this.messages = new MessagePane();
-	this.text = new JTextField("Type message here");
+	this.text = new JTextField(INSTRUCTION);
 	
 	this.setLayout(new BorderLayout());
 	this.add(this.text, BorderLayout.SOUTH);
 	this.add(this.messages, BorderLayout.CENTER);
 	
 	this.text.addActionListener(this);
+	this.text.addMouseListener(this);
     }
     
     
@@ -69,8 +79,45 @@ public class ChatPanel extends JPanel implements ActionListener
 	
 	messages.addText(msg, "Magnus", Color.RED);
 	
-	this.text.setText("Type message here"); //Reset message field
+	this.text.setText(INSTRUCTION); //Reset message field
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void mousePressed(final MouseEvent e)
+    {
+	if (e.getButton() != 1) //left button
+	    return;
+	
+	//Emptying the field when pressing the field
+	
+	if (this.text.getText().equals(INSTRUCTION))
+	    this.text.setText("");
+    }
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseExited(final MouseEvent e) { /* Nothing to do */ }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseEntered(final MouseEvent e) { /* Nothing to do */ }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseReleased(final MouseEvent e) { /* Nothing to do */ }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void mouseClicked(final MouseEvent e) { /* Nothing to do */ }
     
 }
 
