@@ -14,34 +14,48 @@ import java.awt.*;
 
 
 /**
+ * Text pane for message displaying
+ * 
  * @author  Magnus Lundberg
  */
 public class MessageText extends JTextPane
 {
-    //Has default constructor
+    /**
+     * Constructor
+     */
+    public MessageText()
+    {
+	this.setEditable(false);
+    }
     
     
     
     /**
-     * addText lägger till texten den fÃ¥r som parameter sist i TextPanen. Innan den lägger den till 
-     * Spelarens namn som skrivs i färgen den fÃ¥r som tredje parameter
-     * @param Text
-     * @param Name
-     * @param color
+     * Appends a message sent by a player
+     * 
+     * @param  text    The message to append
+     * @param  name    The player whom sent the message
+     * @param  colour  The colour of the player
      */
-    void addText(String Text, String Name, Color color)
+    public void addText(final String text, final String name, final Color colour)
     {
-	StyleContext sc = StyleContext.getDefaultStyleContext();
-	AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, color);	//Skapar textens attribut
-	setCharacterAttributes(aset, false);
-	setCaretPosition(getDocument().getLength());	//Säger att den ska skriva sist i dokumentet
-	setEditable(true);
-	replaceSelection(Name + ">");		//Skriver ut användarens namn i rätt färg
-	aset = sc.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, Color.black);	//Ändrar textfärgen till svart
-	setCharacterAttributes(aset, false);
-	replaceSelection(Text + "\n");			//Skriver ut det användaren skrev
-	setEditable(false);	
-    }
+	StyleContext style = StyleContext.getDefaultStyleContext();
+	AttributeSet attrs;
 	
+	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, colour); //Switching to player name style
+	this.setCharacterAttributes(attrs, false);
+	this.setCaretPosition(getDocument().getLength()); //Moving caret to end so the appended text is ended to the end
+	this.setEditable(true);
+	
+	this.replaceSelection(name + ": "); //Prints the player's name
+	
+	attrs = style.addAttribute(SimpleAttributeSet.EMPTY,StyleConstants.Foreground, SystemColor.textText); //Switing to message style
+	this.setCharacterAttributes(attrs, false);
+	
+	this.replaceSelection(text + "\n"); //Prints the player's message
+	
+	this.setEditable(false);
+    }
+    
 }
 

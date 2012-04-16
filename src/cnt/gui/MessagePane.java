@@ -49,10 +49,14 @@ public class MessagePane extends JPanel
     
     /**
      * Appends a text to the message area
+     * 
+     * @param  text    The message to append
+     * @param  name    The player whom sent the message
+     * @param  colour  The colour of the player
      */
-    public void addText(String Text, String Name, Color color)
+    public void addText(final String text, final String name, final Color colour)
     {
-	messageText.addText(Text, Name, color);
+	messageText.addText(text, name, colour);
     }
 
 }
