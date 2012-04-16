@@ -13,25 +13,43 @@ import javax.swing.*;
 
 
 /**
+ * The message viewer pane in the main frame
+ * 
  * @author  Magnus Lundberg
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class MessagePane extends JPanel
 {
-    MessagePane()
+    /**
+     * Constructor
+     */
+    public MessagePane()
     {
-	messageText = new MessageText();
-	scrollPane = new JScrollPane(messageText);
-	scrollPane.setPreferredSize(new Dimension(250, 155));
-	add(scrollPane);
+	this.messageText = new MessageText();
+	this.scrollPane = new JScrollPane(messageText);
+	
+	this.setLayout(new BorderLayout());
+	
+	this.add(scrollPane, BorderLayout.CENTER);
     }
     
     
     
-    MessageText messageText;
-    JScrollPane scrollPane;
+    /**
+     * Message area
+     */
+    private final MessageText messageText;
+    
+    /**
+     * Scroll pane
+     */
+    private final JScrollPane scrollPane;
     
     
     
+    /**
+     * Appends a text to the message area
+     */
     public void addText(String Text, String Name, Color color)
     {
 	messageText.addText(Text, Name, color);
