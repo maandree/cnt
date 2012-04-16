@@ -22,12 +22,17 @@ public class MainFrame extends JFrame
     /**
      * The default total frame width
      */
-    private static final int DEFAULT_WIDTH = 600;
+    private static final int DEFAULT_WIDTH = 640;
     
     /**
-     * The default total frame heigth
+     * The default total frame height
      */
-    private static final int DEFAULT_HEIGHT = 800;
+    private static final int DEFAULT_HEIGHT = 900;
+    
+    /**
+     * The default block width an height
+     */
+    private static final int DEFAULT_BLOCK_SIZE = 32;
     
     /**
      * Whether or not the views of the split panes are continuously
@@ -63,12 +68,14 @@ public class MainFrame extends JFrame
 	final JPanel playerPanel = new JPanel();
 	final JPanel chatPanel   = new ChatPanel();
 	
+	playerPanel.setBackground(Color.BLACK);
+	
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
 	
 	this.add(vSplit, BorderLayout.CENTER);
 	
-	gamePanel.setPreferredSize(new Dimension(DEFAULT_WIDTH >> 1, DEFAULT_HEIGHT >> 1));
+	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
     }
     
     
