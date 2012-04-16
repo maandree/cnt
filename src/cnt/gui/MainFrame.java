@@ -63,9 +63,6 @@ public class MainFrame extends JFrame
 	final JPanel playerPanel = new JPanel();
 	final JPanel chatPanel   = new ChatPanel();
 	
-	playerPanel.setBackground(Color.RED);
-	chatPanel.setBackground(Color.BLUE);
-	
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
 	
