@@ -298,5 +298,87 @@ public class Blackboard
 	
     }
     
+    
+    /**
+     * Chat message class
+     * 
+     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class ChatMessage implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  player   The player sending the message
+	 * @param  colour   The colour of the player
+	 * @param  message  The message
+	 */
+	public ChatMessage(final String player, final Color colour, final String message)
+	{
+	    this.player = player;
+	    this.colour = colour;
+	    this.message = message;
+	}
+	
+	
+	
+	/**
+	 * The player sending the message
+	 */
+	public final String player;
+	
+	/**
+	 * The colour of the player
+	 */
+	public final Color colour;
+	
+	/**
+	 * The message
+	 */
+	public final String message;
+	
+    }
+    
+    
+    /**
+     * System message class
+     * 
+     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class SystemMessage implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  player   The player associated with the message, <code>null</code> if none
+	 * @param  colour   The colour of the player, <code>null</code> iff <tt>player</tt> is <code>null</code>
+	 * @param  message  The message
+	 */
+	public SystemMessage(final String player, final Color colour, final String message)
+	{
+	    this.player = player;
+	    this.colour = colour;
+	    this.message = message;
+	}
+	
+	
+	
+	/**
+	 * The player associated with the message, <code>null</code> if none
+	 */
+	public final String player;
+	
+	/**
+	 * The colour of the player, <code>null</code> iff <tt>player</tt> is <code>null</code>
+	 */
+	public final Color colour;
+	
+	/**
+	 * The message
+	 */
+	public final String message;
+	
+    }
+    
 }
 
