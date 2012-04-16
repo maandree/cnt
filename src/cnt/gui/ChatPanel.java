@@ -37,9 +37,9 @@ public class ChatPanel extends JPanel implements ActionListener
 	this.messages = new MessagePane();
 	this.text = new JTextField("Type message here");
 	
-	this.setLayout(new GridLayout(2, 1));
-	add(this.messages);
-	add(this.text);
+	this.setLayout(new BorderLayout());
+	this.add(this.text, BorderLayout.SOUTH);
+	this.add(this.messages, BorderLayout.CENTER);
 	
 	this.text.addActionListener(this);
     }
