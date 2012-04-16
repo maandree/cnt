@@ -25,7 +25,7 @@ public class ChatPanel extends JPanel implements ActionListener
     private static final long serialVersionUID = 1L;
     
     scrollText ta;
-    public ChatPanel() throws IOException
+    public ChatPanel()
     {
 	ta = new scrollText();
 	JTextField da = new JTextField("Type message here");
