@@ -380,5 +380,32 @@ public class Blackboard
 	
     }
     
+    
+    /**
+     * Chat message sent by the local client's player
+     * 
+     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class UserMessage implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  message  The message
+	 */
+	public UserMessage(final String message)
+	{
+	    this.message = message;
+	}
+	
+	
+	
+	/**
+	 * The message
+	 */
+	public final String message;
+	
+    }
+    
 }
 
