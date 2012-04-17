@@ -7,7 +7,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt;
-import cnt.gui.*;
+import cnt.interfaces.gui.*;
 import cnt.control.*;
 
 import java.awt.Color;

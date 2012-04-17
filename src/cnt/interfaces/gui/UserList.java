@@ -20,22 +20,17 @@ public class UserList extends JPanel
 	model.addElement("Mattias");
 	
 	add(pane, BorderLayout.NORTH);
+	
+	this.setBackground(Color.BLACK);
+	pane.setBackground(Color.BLACK);
+	list.setBackground(Color.BLACK);
     }
+    
     
     
     JList list;
     
     DefaultListModel model;
     
-    
-    public static void main(final String... args)
-    {
-	JFrame frame = new JFrame("Spellista");
-	
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	frame.setContentPane(new Spellista());
-	frame.setSize(200, 300);
-	frame.setVisible(true);
-    }
 }
 
