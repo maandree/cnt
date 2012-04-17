@@ -9,32 +9,38 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class Spellista extends JPanel {
 
-  JList list;
-
-  DefaultListModel model;
-
-
-  public Spellista() {
-    setLayout(new BorderLayout());
-    model = new DefaultListModel();
-    list = new JList(model);
-    JScrollPane pane = new JScrollPane(list);
-    model.addElement("Peyman");
-    model.addElement("Calle");
-    model.addElement("Magnus");
-    model.addElement("Mattias");
-
-
-    add(pane, BorderLayout.NORTH);
-  }
-
-  public static void main(String s[]) {
-    JFrame frame = new JFrame("Spellista");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setContentPane(new Spellista());
-    frame.setSize(200, 300);
-    frame.setVisible(true);
-  }
+public class UserList extends JPanel
+{
+    public UserList()
+    {
+	setLayout(new BorderLayout());
+	model = new DefaultListModel();
+	list = new JList(model);
+	
+	JScrollPane pane = new JScrollPane(list);
+	model.addElement("Peyman");
+	model.addElement("Calle");
+	model.addElement("Magnus");
+	model.addElement("Mattias");
+	
+	add(pane, BorderLayout.NORTH);
+    }
+    
+    
+    JList list;
+    
+    DefaultListModel model;
+    
+    
+    public static void main(final String... args)
+    {
+	JFrame frame = new JFrame("Spellista");
+	
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	frame.setContentPane(new Spellista());
+	frame.setSize(200, 300);
+	frame.setVisible(true);
+    }
 }
+
