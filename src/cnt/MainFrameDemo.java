@@ -18,14 +18,14 @@ import java.awt.Color;
  *
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
-public class GameMatrixDemo
+public class MainFrameDemo
 {
     /**
      * Non-constructor
      */
-    private GameMatrixDemo()
+    private MainFrameDemo()
     {
-	assert false : "You may not create instances of this class [GameMatrixDemo].";
+	assert false : "You may not create instances of this class [MainFrameDemo].";
     }
     
     

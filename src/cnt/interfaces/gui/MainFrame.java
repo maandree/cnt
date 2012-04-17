@@ -76,17 +76,5 @@ public class MainFrame extends JFrame
 	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
     }
     
-    
-    
-    /**
-     * Test method for this class
-     * 
-     * @param  args  Start up arguments (unused)
-     */
-    public static void main(final String... args)
-    {
-	(new MainFrame()).setVisible(true);
-    }
-    
 }
 
