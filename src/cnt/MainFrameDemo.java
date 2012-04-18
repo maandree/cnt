@@ -39,8 +39,22 @@ public class MainFrameDemo
     {
 	(new MainFrame()).setVisible(true);
 	
+	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+		    {
+			if (message instanceof Blackboard.UserMessage)
+			{
+			    final String msg = ((Blackboard.UserMessage)message).message;
+			    Blackboard.broadcastMessage(new Blackboard.ChatMessage("Mattias", Color.BLUE, msg));
+			}
+		    }
+	        });
+	
 	Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "New game started."));
-	Blackboard.broadcastMessage(new Blackboard.ChatMessage("Mattias", Color.BLUE, "Hello World"));
 	
 	final Color[] colours = {
 	        /** /
