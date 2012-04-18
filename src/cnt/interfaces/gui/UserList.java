@@ -44,6 +44,35 @@ public class UserList extends JPanel
 	this.setBackground(Color.BLACK);
 	pane.setBackground(Color.BLACK);
 	this.list.setBackground(Color.BLACK);
+	this.list.setSelectionBackground(new Color(16, 16, 100));
+	
+	this.popup = new JPopupMenu();
+	this.popup.add(this.menuFriend = new JMenuItem("Add to friend list"));
+	
+	
+	this.list.addMouseListener(new MouseAdapter()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public void mouseReleased(final MouseEvent e)
+		    {
+			// e.isPopupTrigger() returns false
+			if (e.getButton() == 3 /*right*/)
+			    UserList.this.popup.show(e.getComponent(), e.getX(), e.getY());
+		    }
+	        });
+	
+	this.menuFriend.addActionListener(new ActionListener()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public void actionPerformed(final ActionEvent e)
+		    {
+			System.err.println("[Add to friend list] click");
+		    }
+	        });
     }
     
     
@@ -51,12 +80,22 @@ public class UserList extends JPanel
     /**
      * The list component
      */
-    private final JList list;
+    private final JList list; // Generics was added to JList in Java 7. We can not use it because CSC only have Java 6 installed.
     
     /**
      * The list's model
      */
     private final DefaultListModel model;
+    
+    /**
+     * The popup menu
+     */
+    private final JPopupMenu popup;
+    
+    /**
+     * The “Add to friend list” menu item
+     */
+    private final JMenuItem menuFriend;
     
 }
 
