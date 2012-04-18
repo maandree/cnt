@@ -37,13 +37,17 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
     private static final String INSTRUCTION = "Type message here\u200c";
     //U+200C is an invisible character used to recognised whether or not the message is inserted by the program
     
+    private String name;
     
+    private Color color;
     
     /**
      * Constructor
      */
     public ChatPanel(String name, Color color)
     {
+	this.name = name;
+	this.color = color;
 	this.messages = new MessagePane();
 	this.text = new JTextField(INSTRUCTION);
 	
@@ -78,7 +82,7 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
     {
 	final String msg = this.text.getText(); //Retrieves typed message
 	
-	Blackboard.broadcastMessage(new Blackboard.ChatMessage("Magnus", Color.RED, msg));
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage(name, color, msg));
 	
 	this.text.setText(INSTRUCTION); //Reset message field
     }
