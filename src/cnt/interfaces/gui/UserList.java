@@ -49,6 +49,8 @@ public class UserList extends JPanel
 	this.popup = new JPopupMenu();
 	this.popup.add(this.menuFriend = new JMenuItem("Add to friend list"));
 	
+	this.list.setPrototypeCellValue("X");
+	final int cellHeight = this.list.getFixedCellHeight();
 	
 	this.list.addMouseListener(new MouseAdapter()
 	        {
@@ -59,7 +61,17 @@ public class UserList extends JPanel
 		    {
 			// e.isPopupTrigger() returns false
 			if (e.getButton() == 3 /*right*/)
+			{
+			    final int listItemIndex = e.getY() / cellHeight;
+			    
+			    if (listItemIndex >= UserList.this.model.getSize())
+				return;
+			    
+			    System.err.println("Right clicking on index " + listItemIndex);
+			
+			    UserList.this.list.setSelectedIndex(listItemIndex);
 			    UserList.this.popup.show(e.getComponent(), e.getX(), e.getY());
+			}
 		    }
 	        });
 	
