@@ -6,10 +6,10 @@
  *
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.gui;
+package cnt.interfaces.gui;
+import cnt.control.*;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -28,14 +28,8 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
      */
     private static final long serialVersionUID = 1L;
     
-    /**
-     * The player name
-     */
-    private String name;
-    /**
-     * The player color
-     */
-    private Color color;
+    
+    
     /**
      * The message displayed when the player as not entered anything.<br/>
      * Identity check is not possible becuase {@link JTextField#getText()} clones the text on call.
@@ -50,8 +44,6 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
      */
     public ChatPanel(String name, Color color)
     {
-    this.name = name;
-    this.color = color;
 	this.messages = new MessagePane();
 	this.text = new JTextField(INSTRUCTION);
 	
@@ -86,7 +78,7 @@ public class ChatPanel extends JPanel implements ActionListener, MouseListener
     {
 	final String msg = this.text.getText(); //Retrieves typed message
 	
-	messages.addText(msg, name, color);
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage("Magnus", Color.RED, msg));
 	
 	this.text.setText(INSTRUCTION); //Reset message field
     }
