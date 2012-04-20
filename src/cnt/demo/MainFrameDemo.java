@@ -6,9 +6,9 @@
  *
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt;
-import cnt.interfaces.gui.*;
-import cnt.control.*;
+package cnt.demo;
+import cnt.interaction.gui.*;
+import cnt.*;
 
 import java.awt.Color;
 

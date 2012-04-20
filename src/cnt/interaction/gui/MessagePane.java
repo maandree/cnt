@@ -6,7 +6,7 @@
  *
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.interfaces.gui;
+package cnt.interaction.gui;
 
 import java.awt.*;
 import javax.swing.*;

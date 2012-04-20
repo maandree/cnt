@@ -6,7 +6,7 @@
  *
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.control;
+package cnt;
 
 import java.util.*;
 import java.awt.Color;
