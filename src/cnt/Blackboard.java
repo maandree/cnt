@@ -10,6 +10,7 @@ package cnt;
 
 import java.util.*;
 import java.awt.Color;
+import java.io.Serializable;
 
 
 /**
@@ -136,7 +137,7 @@ public class Blackboard
     /**
      * This interface is used for all event handled by the enclosing class
      */
-    public static interface BlackboardMessage
+    public static interface BlackboardMessage extends Serializable
     {
 	//Marker interface
     }
