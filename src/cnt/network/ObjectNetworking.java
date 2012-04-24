@@ -23,6 +23,8 @@ public class ObjectNetworking
      * 
      * @param  input   Stream for reading from the network
      * @param  output  Stream for writing to the network
+     *
+     * @throws  IOException  Thrown if the program fails to set up object input/output network streaming (unlikely)
      */
     public ObjectNetworking(final InputStream input, final OutputStream output) throws IOException
     {
@@ -44,18 +46,34 @@ public class ObjectNetworking
     
     
     
+    /**
+     * Sends an object
+     *
+     * @throws  IOException  Thrown if the program fails to send the message
+     */
     public void send(final Serializable object) throws IOException
     {
 	this.output.writeObject(object);
 	this.output.flush();
     }
     
+    /**
+     * Sends an object, but does to perform back-referencing
+     *
+     * @throws  IOException  Thrown if the program fails to send the message
+     */
     public void sendUnique(final Serializable object) throws IOException
     {
 	this.output.writeUnshared(object);
 	this.output.flush();
     }
     
+    /**
+     * Sends an object, but does to perform back-referencing
+     *
+     * @throws  IOException             Thrown if the program fails to receive data
+     * @throws  ClassNotFoundException  Thrown if the received object is not a part of the program
+     */
     public Serializable receive() throws IOException, ClassNotFoundException
     {
 	return (Serializable)(this.input.readObject());
