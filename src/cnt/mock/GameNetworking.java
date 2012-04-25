@@ -6,7 +6,8 @@
  *
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.network;
+package cnt.mock;
+import cnt.network.*;
 import cnt.*;
 
 import java.awt.*;
@@ -20,15 +21,28 @@ import java.io.*;
  */
 public class GameNetworking
 {
-    public void forward(final Serializable message)
+    public GameNetworking(final ObjectNetworking objectNetworking)
     {
-	System.out.println("forward: " + message.getClass().toString());
+	this.objectNetworking = objectNetworking;
+    }
+    
+    private final ObjectNetworking objectNetworking;
+    
+    public void forward(final Serializable message) throws IOException
+    {
+	System.out.println("forwarding: " + message.getClass().toString());
+	this.objectNetworking.send(message);
     }
     
     public void chat(final String message)
     {
 	System.out.println("local chat message: " + message);
 	Blackboard.broadcastMessage(new Blackboard.ChatMessage("You", Color.PINK, message));
+    }
+    
+    public Serializable receive() throws IOException, ClassNotFoundException
+    {
+        return this.objectNetworking.receive();
     }
     
 }

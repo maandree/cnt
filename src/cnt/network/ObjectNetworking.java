@@ -8,12 +8,13 @@
  */
 package cnt.network;
 
+import java.util.*;
 import java.io.*;
 
 
 /**
- * Object networking layer
- *
+ * <p>Object networking layer</p>
+ * 
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
 public class ObjectNetworking
@@ -26,8 +27,9 @@ public class ObjectNetworking
      */
     public ObjectNetworking(final InputStream input, final OutputStream output) throws IOException
     {
-	this.input  = new ObjectInputStream(input);
 	this.output = new ObjectOutputStream(output);
+	this.output.flush(); //Program freezes otherwise
+	this.input  = new ObjectInputStream(new BufferedInputStream(input));
     }
     
     
@@ -41,6 +43,11 @@ public class ObjectNetworking
      * Stream for writing to the network
      */
     private final ObjectOutputStream output;
+    
+    /**
+     * Received object queue
+     */
+    private final ArrayDeque<Serializable> objects = new ArrayDeque<Serializable>();
     
     
     

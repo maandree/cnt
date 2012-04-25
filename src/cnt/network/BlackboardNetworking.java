@@ -8,7 +8,9 @@
  */
 package cnt.network;
 import cnt.*;
+import cnt.mock.GameNetworking;
 
+import java.util.*;
 import java.io.*;
 
 
@@ -76,12 +78,20 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     }
     
     
+    public void receiveAndBroadcast() throws IOException, ClassNotFoundException
+    {
+        final Serializable object = this.gameNetworking.receive();
+	if (object instanceof Blackboard.BlackboardMessage)
+	    broadcastMessage((Blackboard.BlackboardMessage)object);
+    }
+    
+    
     /**
      * Broadcasts a message
      * 
      * @param  message  The message to broadcast
      */
-    public void broadcastMessage(final Blackboard.BlackboardMessage message)
+    protected void broadcastMessage(final Blackboard.BlackboardMessage message) throws IOException, ClassNotFoundException
     {
 	synchronized (this.ignore)
 	{
@@ -94,7 +104,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    
 	    Blackboard.broadcastMessage(message);
 	}
-    }	
+    }
 
 }
 
