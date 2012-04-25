@@ -26,7 +26,7 @@ public class UDPServer
 	final int localport = Integer.parseInt(args[0]);
 	final DatagramSocket socket = new DatagramSocket(localport);
 	
-	final byte buffer[] = new byte[512];
+	final byte[] buffer = new byte[512];
 	
 	final HashMap<InetSocketAddress, String> clients = new HashMap<InetSocketAddress, String>();
 	int colour = 0;
