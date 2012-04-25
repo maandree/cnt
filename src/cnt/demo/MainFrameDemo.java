@@ -14,7 +14,7 @@ import java.awt.Color;
 
 
 /**
- * Game matrix demo class
+ * Main frame demo class
  *
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
