@@ -172,7 +172,7 @@ public class TCPPeer
 			}
 			catch (final IOException err)
 			{
-			    synchronized (Peer.class)
+			    synchronized (TCPPeer.class)
 			    {
 				System.err.print("\033[31m");
 				System.err.println("error: IOException");
@@ -206,14 +206,14 @@ public class TCPPeer
 			}
 			catch (final InterruptedException err)
 			{
-			    synchronized (Peer.class)
+			    synchronized (TCPPeer.class)
 			    {
 				System.err.println("error: InterruptedException");
 			    }
 			}
 			catch (final IOException err)
 			{
-			    synchronized (Peer.class)
+			    synchronized (TCPPeer.class)
 			    {
 				System.err.print("\033[33m");
 				System.err.println("error: IOException");
