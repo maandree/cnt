@@ -13,7 +13,7 @@ import java.io.*;
 
 
 /**
- * <p>Object networking layer</p>
+ * Object networking layer
  * 
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
@@ -45,11 +45,6 @@ public class ObjectNetworking
      * Stream for writing to the network
      */
     private final ObjectOutputStream output;
-    
-    /**
-     * Received object queue
-     */
-    private final ArrayDeque<Serializable> objects = new ArrayDeque<Serializable>();
     
     
     

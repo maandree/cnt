@@ -21,25 +21,59 @@ import java.io.*;
  */
 public class GameNetworking
 {
+    /**
+     * Constructor
+     * 
+     * @param  objectNetworking  The next layer in the protocol stack
+     */
     public GameNetworking(final ObjectNetworking objectNetworking)
     {
 	this.objectNetworking = objectNetworking;
     }
     
+    
+    
+    /**
+     * The next layer in the protocol stack
+     */
     private final ObjectNetworking objectNetworking;
     
+    
+    
+    /**
+     * Forward a message to the next layer in the protocol stack
+     * 
+     * @param  message  The message
+     * 
+     * @throws  IOException  On networking exception
+     */
     public void forward(final Serializable message) throws IOException
     {
 	System.out.println("forwarding: " + message.getClass().toString());
 	this.objectNetworking.send(message);
     }
     
+    
+    /**
+     * Invoke if the local user is sending a chat message
+     * 
+     * @param  message  The message
+     */
     public void chat(final String message)
     {
 	System.out.println("local chat message: " + message);
 	Blackboard.broadcastMessage(new Blackboard.ChatMessage("You", Color.PINK, message));
     }
     
+    
+    /**
+     * Wait for and receive a message
+     * 
+     * @return  The next message
+     * 
+     * @throws  IOException             On networking exception
+     * @throws  ClassNotFoundException  If the message type is not a part of the program
+     */
     public Serializable receive() throws IOException, ClassNotFoundException
     {
         return this.objectNetworking.receive();

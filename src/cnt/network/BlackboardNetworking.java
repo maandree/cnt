@@ -78,6 +78,12 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     }
     
     
+    /**
+     * Wait for, receive, and local broadcast a message
+     * 
+     * @throws  IOException             On networking exception
+     * @throws  ClassNotFoundException  In the message type is not a part of the program
+     */
     public void receiveAndBroadcast() throws IOException, ClassNotFoundException
     {
         final Serializable object = this.gameNetworking.receive();
@@ -90,6 +96,9 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
      * Broadcasts a message
      * 
      * @param  message  The message to broadcast
+     * 
+     * @throws  IOException             On networking exception
+     * @throws  ClassNotFoundException  In the message type is not a part of the program
      */
     protected void broadcastMessage(final Blackboard.BlackboardMessage message) throws IOException, ClassNotFoundException
     {
