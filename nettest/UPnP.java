@@ -47,12 +47,26 @@ public class UPnP implements Runnable
 			upnpService.getRegistry().addListener( createIgdListener(upnpService) );
 
 			// Define the service we are looking for on the network (InternetGatewayDevices with WANIPConnection services)
-			System.out.println("Setting service to look for");
 			UDAServiceType igdService = new UDAServiceType("WANIPConnection");
-			
+			System.out.println("Setting service to look for: " + igdService);
+
 			// Start the search for devices that has the type of service we are looking for
 			System.out.println("Starting search of devices");
 			upnpService.getControlPoint().search( new UDAServiceTypeHeader(igdService) );
+
+			//sleeping 30 sec, if no devices are present in registry, exit
+			System.out.println("Sleeping 30 sec to let devices aknowledge themselves");
+			Thread.sleep(30000);
+			
+			if (upnpService.getRegistry().getDevices().size() == 0) 
+			{
+				System.out.println("No devices discovered in 30 sec, exiting");
+				upnpService.shutdown();
+			} else 
+			{
+				System.out.println("Devices discovered");
+			}
+			
 		} catch (Exception e)
 		{
 			// Print error message and exit
