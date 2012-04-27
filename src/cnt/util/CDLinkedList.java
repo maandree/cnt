@@ -177,6 +177,17 @@ public class CDLinkedList<T> implements Iterable<T>
     
     
     /**
+     * Rotates the list to another node by jumping to it
+     * 
+     * @param  node  The node
+     */
+    public void jump(final ListNode<T> node)
+    {
+	this.head = node;
+    }
+    
+    
+    /**
      * Returns an enumeration of the elements. Use the {@link Enumeration}
      * methods on the returned object to fetch the elements sequentially.
      * 
