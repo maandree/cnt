@@ -102,8 +102,9 @@ public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
      */
     public void remove()
     {
-	final ListNode<T> next = cursor.next;
+	final ListNode<T> next = cursor.previous;
 	this.list.remove(cursor);
+	this.first = true;
 	
 	cursor = (next == cursor) ? null : next;
     }
