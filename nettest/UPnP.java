@@ -10,6 +10,7 @@ import org.teleal.cling.registry.*;
 import org.teleal.cling.support.igd.*;
 import org.teleal.cling.support.igd.callback.*;
 import org.teleal.cling.support.model.*;
+import org.teleal.cling.controlpoint.*;
 
 /**
 * Handles portforwarding for gameclients - testclass
@@ -40,32 +41,29 @@ public class UPnP implements Runnable
 		{
 			// Set up the default Upnp Stack Service (implemented by Cling)
 			System.out.println("Createing new Service");
-			UpnpService upnpService = new UpnpServiceImpl();
+			UpnpService upnpService = new UpnpServiceImpl()
+			{
+				public void finalize() 
+				{
+					this.shutdown();
+				}
+			};
 		
 			// Add our custom made listener (defined below)
 			System.out.println("Adding listener");
 			upnpService.getRegistry().addListener( createIgdListener(upnpService) );
 
-			// Define the service we are looking for on the network (InternetGatewayDevices with WANIPConnection services)
-			UDAServiceType igdService = new UDAServiceType("WANIPConnection");
-			System.out.println("Setting service to look for: " + igdService);
-
 			// Start the search for devices that has the type of service we are looking for
 			System.out.println("Starting search of devices");
-			upnpService.getControlPoint().search( new UDAServiceTypeHeader(igdService) );
-
-			//sleeping 30 sec, if no devices are present in registry, exit
-			System.out.println("Sleeping 30 sec to let devices aknowledge themselves");
-			Thread.sleep(30000);
+			upnpService.getControlPoint().search( new STAllHeader() );
 			
-			if (upnpService.getRegistry().getDevices().size() == 0) 
+			try
 			{
-				System.out.println("No devices discovered in 30 sec, exiting");
-				upnpService.shutdown();
-			} else 
-			{
-				System.out.println("Devices discovered");
+				Thread.sleep((5000));
+			} catch (Exception e) {
 			}
+			
+			upnpService.shutdown();
 			
 		} catch (Exception e)
 		{
@@ -86,17 +84,24 @@ public class UPnP implements Runnable
 		// Create and return a new listener
 		return new DefaultRegistryListener() {
 			// The service we want to work with
-			ServiceId _WICService = new UDAServiceId("WANIPConnection");
+			ServiceType _service = new UDAServiceType("WANIPConnection");
+			
+			Service service = null;
 
 			@Override
 			public void remoteDeviceAdded(Registry registry, RemoteDevice device)
 			{
-				Service portMap;
-				if ((portMap = device.findService(_WICService)) != null)
+				Service portMap = device.findService(_service);
+				this.service = portMap;
+				if (portMap != null)
 				{
-					System.out.println("Correct service discovered: " + portMap);
+					System.out.println("Correct service discovered: " + device.getRoot().getDetails().getFriendlyName());
 					// Execute the action that makes the portmapping happend. executeAction defined below
 					executeAction(upnpService, portMap);
+
+				} else 
+				{
+					registry.removeDevice(device);
 				}
 			}
 
@@ -104,7 +109,7 @@ public class UPnP implements Runnable
 			public void remoteDeviceRemoved(Registry registry, RemoteDevice device)
 			{
 				Service portMap;
-				if ((portMap = device.findService(_WICService)) != null)
+				if ((portMap = device.findService(_service)) != null)
 				{
 					System.out.println("Serivice is disappering: " + portMap);
 				}
@@ -116,7 +121,7 @@ public class UPnP implements Runnable
 			* @param upnpService The UPnP Service stack used
 			* @param portMap The service we want to use to set our portmapping
 			*/
-			void executeAction(UpnpService upnpService, Service portMapService)
+			synchronized void executeAction(UpnpService upnpService, Service portMapService)
 			{
 				// Set up portmap
 				PortMapping cntPort = new PortMapping(45000, "192.168.0.44", PortMapping.Protocol.TCP, "CNT testport");
@@ -131,7 +136,12 @@ public class UPnP implements Runnable
 						public void success(ActionInvocation invocation)
 						{
 							
- 							System.out.println("Successfully made a portforward: " + invocation.getOutput());
+ 							System.out.println("Successfully made a portforward: " + portMapping);
+							try
+							{
+								Thread.sleep((1200));
+							} catch (Exception e) {
+							}
 						}
 						
 						@Override
@@ -143,10 +153,11 @@ public class UPnP implements Runnable
 					}
 				);
 				
-				System.out.println("Sleeping 10 seconds before removeing portmap");
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
+				updatePortMappings(portMapService);
+				try
+				{
+					Thread.sleep((2200));
+				} catch (Exception e) {
 				}
 				
 				// Execute de-mapping on router
@@ -159,7 +170,12 @@ public class UPnP implements Runnable
                                                 public void success(ActionInvocation invocation)
                                                 {
 
-                                                        System.out.println("Successfully removed forwarded port: " + invocation.getOutput());
+                                                        System.out.println("Successfully removed forwarded port: " + portMapping);
+							try
+							{
+								Thread.sleep((1200));
+							} catch (Exception e) {
+							}
                                                 }
 
                                                 @Override
@@ -170,7 +186,92 @@ public class UPnP implements Runnable
                                                 }
                                         }
                                 );
+				
+				updatePortMappings(portMapService);
+
 			} // end executeAction
+
+			/**
+			* Get all Portforwards. Code mostly copy/pasted from Wokrbench source
+			*
+			*/
+	
+			protected void updatePortMappings(final Service service) 
+			{
+			       // Don't block the EDT
+				upnpService.getConfiguration().getAsyncProtocolExecutor().execute(new Runnable() 
+				{
+					public void run()
+					{
+		
+		                		for (int i = 0; i < 65535; i++) 
+						{ 
+							// You can't have more than 65535 port mappings
+		                    			// Synchronous execution! And we stop when we hit a 713 response code because there
+	       		             			// is no other way to retrieve all mappings.
+							GetGenericPortMappingCallback invocation = new GetGenericPortMappingCallback(i, upnpService, service);
+	               		     			invocation.run();
+		
+	        	            			if (invocation.isStopRetrieval()) break;
+		
+	        	            			if (invocation.getMapping() != null) 
+							{
+	                        				System.out.println(invocation.getMapping());
+	                    				}
+	                			}
+	            			}
+	        		});
+	    		}
+	
+	    		class GetGenericPortMappingCallback extends ActionCallback 
+			{
+	
+	        		int index;
+	        		PortMapping mapping;
+	        		boolean stopRetrieval = false;
+	
+	        		GetGenericPortMappingCallback(int index, UpnpService upnpService, final Service service) 
+				{
+	           			super(new ActionInvocation(service.getAction("GetGenericPortMappingEntry")), upnpService.getControlPoint());
+	            			this.index = index;
+	            			getActionInvocation().setInput("NewPortMappingIndex", new UnsignedIntegerTwoBytes(index));
+	        		}
+	
+	        		public PortMapping getMapping() 
+				{
+	            			return mapping;
+	        		}
+	
+	        		@Override
+	        		public void success(ActionInvocation invocation) 
+				{
+	            			mapping = new PortMapping(invocation.getOutputMap());
+	        		}
+	
+	        		@Override
+				public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) 
+				{
+	
+	            			stopRetrieval = true;
+	
+	            			if (invocation.getFailure().getErrorCode() == 713) 
+					{
+	                			// This is the _only_ way how we can know that we have retrieved an almost-up-to-date
+	                			// list of all port mappings! Yes, the designer of this API was and probably still is
+	                			// a moron.
+	
+	            			} else 
+					{
+	             				System.out.println("Error occured getting Portforward Tabel");
+	            			}
+	        		}
+	
+	        		public boolean isStopRetrieval() 
+				{
+	            			return stopRetrieval;
+	        		}
+    			}
+	
 		}; // end custom listener
 	} // end listener invocation
 } // end class		
