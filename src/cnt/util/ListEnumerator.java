@@ -50,7 +50,7 @@ public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
     /**
      * Whether the first invokation of {@link #nextElement()} has been made
      */
-    private boolean first = false;
+    private boolean first = true;
     
     
     

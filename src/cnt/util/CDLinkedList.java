@@ -124,10 +124,13 @@ public class CDLinkedList<T> implements Iterable<T>
      */
     public void remove(final ListNode<T> node)
     {
-	if (node.previous == node.next) //== node
+	if ((node.previous == node.next) && (node.next == node))
 	    this.clear();
 	else
 	{
+	    if (this.head == node)
+		this.head = node.previous;
+	    
 	    node.previous.next = node.next;
 	    node.next.previous = node.previous;
 	}
@@ -145,12 +148,15 @@ public class CDLinkedList<T> implements Iterable<T>
 	if (this.isEmpty())
 	    throw new NoSuchElementException();
 	
-	ListNode<T> current = this.head;
+	 ListNode<T> current = this.head;
+	
+	 if (current.item.equals(item))
+	     return current;
 	
 	while (current.next != this.head) // There are still elements to be inspected
 	{
 	    current = current.next;
-	    if (current.item == item)
+	    if (current.item.equals(item))
 		return current;
 	}
 	
@@ -163,7 +169,8 @@ public class CDLinkedList<T> implements Iterable<T>
      */
     public void next()
     {
-	this.head = this.head.next;
+	if (this.head != null)
+	    this.head = this.head.next;
     }
     
     
@@ -172,7 +179,8 @@ public class CDLinkedList<T> implements Iterable<T>
      */
     public void previous()
     {
-	this.head = this.head.previous;
+	if (this.head != null)
+	    this.head = this.head.previous;
     }
     
     
@@ -184,6 +192,72 @@ public class CDLinkedList<T> implements Iterable<T>
     public void jump(final ListNode<T> node)
     {
 	this.head = node;
+    }
+    
+    
+    /**
+     * Gets the current item
+     * 
+     * @return  The current item
+     */
+    public T get()
+    {
+	return this.getNode().item;
+    }
+    
+    
+    /**
+     * Gets the current node
+     * 
+     * @return  The current node
+     */
+    public ListNode<T> getNode()
+    {
+	return this.head;
+    }
+    
+    
+    /**
+     * Gets the next item
+     * 
+     * @return  The next item
+     */
+    public T getNext()
+    {
+	return this.getNextNode().item;
+    }
+    
+    
+    /**
+     * Gets the next node
+     * 
+     * @return  The next node
+     */
+    public ListNode<T> getNextNode()
+    {
+	return this.head.next;
+    }
+    
+    
+    /**
+     * Gets the previous item
+     * 
+     * @return  The previous item
+     */
+    public T getPrevious()
+    {
+	return this.getPreviousNode().item;
+    }
+    
+    
+    /**
+     * Gets the previous node
+     * 
+     * @return  The previous node
+     */
+    public ListNode<T> getPreviousNode()
+    {
+	return this.head.previous;
     }
     
     
