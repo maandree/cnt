@@ -64,16 +64,23 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    }
 	}
 	
-	if      (message instanceof Blackboard.MatrixPatch)    this.gameNetworking.forward(message);
-	else if (message instanceof Blackboard.ChatMessage)    this.gameNetworking.forward(message);
-	else if (message instanceof Blackboard.SystemMessage)  this.gameNetworking.forward(message);
-	else if (message instanceof Blackboard.UserMessage)
-	{
-	    Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
-	    this.gameNetworking.chat(msg.message);
+	try
+        {
+	    if      (message instanceof Blackboard.MatrixPatch)    this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.ChatMessage)    this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.SystemMessage)  this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.UserMessage)
+	    {
+		Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
+		this.gameNetworking.chat(msg.message);
+	    }
+	    else
+		assert false : "Update message types in BlackboardNetworking";
 	}
-	else
-	    assert false : "Update message types in BlackboardNetworking";
+	catch (final IOException err)
+	{
+	    //FIXME error!
+	}
     }
     
     

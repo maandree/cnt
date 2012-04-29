@@ -27,8 +27,8 @@ public class UserList extends JPanel
     {
 	this.setLayout(new BorderLayout());
 	
-	this.model = new DefaultListModel();
-	this.list = new JList(model);
+	this.model = new DefaultListModel<String>();
+	this.list = new JList<String>(model);
 	
 	final JScrollPane pane = new JScrollPane(this.list);
 	this.model.addElement("<html><span style=\"color: rgb(0, 255, 0);\">Peyman</span></html>");
@@ -91,12 +91,12 @@ public class UserList extends JPanel
     /**
      * The list component
      */
-    private final JList list; // Generics was added to JList in Java 7. We can not use it because CSC only have Java 6 installed.
+    private final JList<String> list;
     
     /**
      * The list's model
      */
-    private final DefaultListModel model;
+    private final DefaultListModel<String> model;
     
     /**
      * The popup menu

@@ -54,8 +54,8 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	}
 	else
 	{
-	    this.pieceImageW = (int)(this.pieceImage.getWidth());
-	    this.pieceImageH = (int)(this.pieceImage.getHeight());
+	    this.pieceImageW = this.pieceImage.getWidth();
+	    this.pieceImageH = this.pieceImage.getHeight();
 	}
 	
 	
