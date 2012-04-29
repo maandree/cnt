@@ -13,6 +13,8 @@ import java.io.*;
 
 /**
  * Player class
+ * 
+ * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
 public class Player implements Serializable
 {
@@ -24,7 +26,21 @@ public class Player implements Serializable
      */
     public Player(final String name, final Color colour)
     {
+	this.name = name;
+	this.colour = colour;
     }
+    
+    
+    
+    /**
+     * The name of the player
+     */
+    protected String name;
+    
+    /**
+     * The colour and ID of the player
+     */
+    protected Color colour;
     
     
     
@@ -33,7 +49,14 @@ public class Player implements Serializable
      */
     public boolean equals(final Object object)
     {
-	return false;
+	if (object == this)  return true;
+	if (object == null)  return false;
+	if (object instanceof Player == false)
+	    return false;
+	
+	final Player p = (Player)object;
+	
+	return this.name.equals(p.name) && this.colour.equals(p.colour);
     }
     
     
@@ -42,7 +65,7 @@ public class Player implements Serializable
      */
     public int hashCode()
     {
-	return 0;
+	return this.name.hashCode() ^ this.colour.hashCode();
     }
     
     
@@ -53,7 +76,7 @@ public class Player implements Serializable
      */
     public String getName()
     {
-	return null;
+	return this.name;
     }
     
     
@@ -64,7 +87,7 @@ public class Player implements Serializable
      */
     public Color getColour()
     {
-	return null;
+	return this.colour;
     }
     
     
@@ -75,6 +98,7 @@ public class Player implements Serializable
      */
     public void setColour(final Color value)
     {
+	this.colour = value;
     }
     
 }
