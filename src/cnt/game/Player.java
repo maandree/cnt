@@ -29,6 +29,24 @@ public class Player implements Serializable
     
     
     /**
+     * {@inheritDoc}
+     */
+    public boolean equals(final Object object)
+    {
+	return false;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode()
+    {
+	return 0;
+    }
+    
+    
+    /**
      * Gets the name of the player
      * 
      * @return  The name of the player
@@ -37,6 +55,7 @@ public class Player implements Serializable
     {
 	return null;
     }
+    
     
     /**
      * Gets the colour and ID of the player
@@ -47,6 +66,7 @@ public class Player implements Serializable
     {
 	return null;
     }
+    
     
     /**
      * Sets the colour and ID of the player
