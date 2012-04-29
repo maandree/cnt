@@ -56,7 +56,7 @@ public class Shape implements Cloneable, Serializable
      * Shape:
      * <pre>
      *     XX.
-y     *     .XX
+     *     .XX
      * </pre>
      */
     public static final Shape Z_SHAPE = new Shape(null);
