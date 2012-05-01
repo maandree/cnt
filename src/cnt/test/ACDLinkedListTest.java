@@ -18,7 +18,7 @@ public class ACDLinkedListTest
 {
     public static void main(final String... args)
     {
-	ACDLinkedList linkedList = new ACDLinkedList();
+	ACDLinkedList<String> linkedList = new ACDLinkedList<String>();
 	
 	String P = "Peyman";
 	String C = "Calle";
