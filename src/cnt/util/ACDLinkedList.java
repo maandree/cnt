@@ -37,6 +37,7 @@ public class ACDLinkedList<T> extends CDLinkedList<T>
     @Override
     public void clear()
     {
+	super.clear();
 	this.nodeMap.clear();
     }
     
