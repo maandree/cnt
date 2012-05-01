@@ -12,11 +12,11 @@ import java.util.Iterator;
 
 
 /**
- * Linked list classes test
+ * Test class for {@link CDLinkedList}
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class LinkedListTest
+public class CDLinkedListTest
 {
     public static void main(final String... args)
     {
