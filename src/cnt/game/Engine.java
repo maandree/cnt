@@ -11,9 +11,19 @@ import cnt.*;
 
 /**
  * Game engine main class
+ * 
+ * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
 public class Engine implements Blackboard.BlackboardObserver
 {
+    /**
+     * The possible, initial, shapes
+     */
+    private static final Shape[] POSSIBLE_SHAPES = {Shape.T_SHAPE, Shape.PIPE_SHAPE, Shape.SQUARE_SHAPE,
+						    Shape.L_SHAPE, Shape.J_SHAPE, Shape.S_SHAPE, Shape.Z_SHAPE};
+    
+    
+    
     /**
      * <p>Constructor</p>
      * <p>
@@ -28,10 +38,39 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
+     * The current board with all stationed blocks
+     */
+    private static Board board = null;
+    
+    /**
+     * The current falling shape
+     */
+    private static Shape fallingShape = null;
+    
+    /**
+     * The current player
+     */
+    private static Player currentPlayer = null;
+    
+    /**
+     * The momento of the falling shape at the beginning of the move
+     */
+    private static Shape.Momento moveInitialMomento = null;
+    
+    /**
+     * The momento of the falling shape at the end of the move
+     */
+    private static Shape.Momento moveAppliedMomento = null;
+    
+    
+    
+    /**
      * Starts the engine
      */
     public static void start()
     {
+	board = new Board();
+	//FIXME: next turn                              #########################################################################################################
     }
     
     
@@ -41,6 +80,13 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void playerDropped(final Player player)
     {
+	if (player.equals(currentPlayer))
+	{
+	    currentPlayer = null;
+	    //FIXME: patch away falling shape               #########################################################################################################
+	    fallingShape = null;
+	    //FIXME: next turn                              #########################################################################################################
+	}
     }
     
     
@@ -51,6 +97,17 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void newTurn(final Player player)
     {
+	try
+	{
+	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone();
+	}
+	catch (final CloneNotSupportedException err)
+	{
+	    throw new Error("Shape.clone() is not implemented");
+	}
+	
+	fallingShape.setPlayer(currentPlayer = player);
+	moveAppliedMomento = moveInitialMomento = fallingShape.store();
     }
     
     
@@ -59,6 +116,17 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void fall()
     {
+	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
+	
+	fallingShape.setY(fallingShape.getY() + 1);
+	
+	if (board.canPut(fallingShape, false) == false)
+	{
+	    fallingShape.restore(moveInitialMomento);
+	    reaction();
+	}
+	else
+	    ; //FIXME: timer
     }
     
     
@@ -67,6 +135,20 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void drop()
     {
+
+	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
+	
+	for (int i = 1;; i++)
+	{
+	    fallingShape.setY(fallingShape.getY() + i);
+	    
+	    if (board.canPut(fallingShape, false) == false)
+	    {
+		fallingShape.restore(moveInitialMomento);
+		reaction();
+		return;
+	    }
+	}
     }
     
     
@@ -77,6 +159,14 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void rotate(final boolean clockwise)
     {
+	fallingShape.rotate(clockwise);
+	
+	if (board.canPut(fallingShape, false))
+	    moveAppliedMomento = fallingShape.store();
+	else
+	    moveAppliedMomento = moveInitialMomento;
+	
+	fallingShape.restore(moveInitialMomento);
     }
     
     
@@ -87,6 +177,14 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void move(final int incrX)
     {
+	fallingShape.setX(fallingShape.getX() + incrX);
+	
+	if (board.canPut(fallingShape, false))
+	    moveAppliedMomento = fallingShape.store();
+	else
+	    moveAppliedMomento = moveInitialMomento;
+	
+	fallingShape.restore(moveInitialMomento);
     }
     
     
