@@ -92,10 +92,8 @@ public class Engine implements Blackboard.BlackboardObserver
     
     /**
      * Stations the falling block and deletes empty rows
-     * 
-     * @param  chainReaction  Whether to use the chain reaction rule
      */
-    private static void reaction(final boolean chainReaction)
+    private static void reaction()
     {
     }
     
@@ -108,7 +106,5 @@ public class Engine implements Blackboard.BlackboardObserver
     }
     
     
-    
-
 }
 
