@@ -193,6 +193,12 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void reaction()
     {
+	board.put(fallingShape);
+	fallingShape = null;
+	
+	final int[] full = board.getFullRows();
+	
+	//FIXME  next turn #################################################################################################################
     }
     
     
