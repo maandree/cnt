@@ -17,6 +17,11 @@ import cnt.*;
 public class Engine implements Blackboard.BlackboardObserver
 {
     /**
+     * The initial interval between falls;
+     */
+    private static final int INITIAL_SLEEP_TIME = 1000;
+    
+    /**
      * The possible, initial, shapes
      */
     private static final Shape[] POSSIBLE_SHAPES = {Shape.T_SHAPE, Shape.PIPE_SHAPE, Shape.SQUARE_SHAPE,
@@ -62,6 +67,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static Shape.Momento moveAppliedMomento = null;
     
+    /**
+     * The interval between falls
+     */
+    private static int sleepTime = INITIAL_SLEEP_TIME;
+    
     
     
     /**
@@ -69,8 +79,9 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public static void start()
     {
+	sleepTime = INITIAL_SLEEP_TIME;
 	board = new Board();
-	//FIXME: next turn                              #########################################################################################################
+	nextTurn();
     }
     
     
@@ -85,7 +96,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    currentPlayer = null;
 	    //FIXME: patch away falling shape               #########################################################################################################
 	    fallingShape = null;
-	    //FIXME: next turn                              #########################################################################################################
+	    nextTurn();
 	}
     }
     
@@ -135,7 +146,6 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void drop()
     {
-
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
 	for (int i = 1;; i++)
@@ -198,6 +208,41 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	final int[] full = board.getFullRows();
 	
+	if (full.length > 0)
+	{
+	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
+	    for (int x = 0; x < Board.WIDTH; x++)
+		fullLine[0][x] = true;
+	    
+	    for (final int row : full)
+		board.delete(fullLine, 0, row);
+	}
+	
+	final Block[][] matrix = board.getMatrix();
+	
+	int sub = 0;
+	for (final int row : full)
+	{
+	    Thread.sleep(sleepTime);
+	    
+	    final Block[][] move = new Block[row - sub][]:
+		
+	    for (int y = 0, n = row - sub; y < n; y++)
+		move[y] = matrix[y + sub];
+	    
+	    sub++;
+	    
+	    board.put(move, 0, sub);
+	}
+	
+	Thread.sleep(sleepTime);
+	
+	nextTurn();
+    }
+    
+    
+    private static void nextTurn()
+    {
 	//FIXME  next turn #################################################################################################################
     }
     
