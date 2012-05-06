@@ -14,7 +14,7 @@ import cnt.*;
  * 
  * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
  */
-public class Engine implements Blackboard.BlackboardObserver
+public class Engine implements Blackboard.BlackboardObserver, Runnable
 {
     /**
      * The initial interval between falls;
@@ -72,6 +72,16 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static int sleepTime = INITIAL_SLEEP_TIME;
     
+    /**
+     * Help monitor for the game thread, used to notify when a player has been found
+     */
+    private static Object threadingMonitor = new Object();
+    
+    /**
+     * The game thread
+     */
+    private static Thread thread = null;
+    
     
     
     /**
@@ -81,6 +91,46 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	sleepTime = INITIAL_SLEEP_TIME;
 	board = new Board();
+	
+	//FIXME register on blackboard with threading  ################################################################################
+	
+	thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			for (;;)
+			{
+			    synchronized (Engine.threadingMonitor)
+			    {
+				Engine.threadingMonitor.wait();
+			    }
+			
+			    for (;;)
+			    {
+				try
+				{
+				    Thread.sleep(Engine.sleepTime);
+				}
+				catch (final InterruptedException err)
+				{
+				    if (Engine.currentPlayer == null)
+					break;
+				    continue;
+				}
+				
+				if (Engine.fall() == false)
+				    break;
+			    }
+			}
+		    }
+	        };
+	
+	thread.start();
+	
 	nextTurn();
     }
     
@@ -94,6 +144,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	if (player.equals(currentPlayer))
 	{
 	    currentPlayer = null;
+	    thread.interrupt();
 	    //FIXME: patch away falling shape               #########################################################################################################
 	    fallingShape = null;
 	    nextTurn();
@@ -119,13 +170,20 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	fallingShape.setPlayer(currentPlayer = player);
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
+	
+	synchronized (threadingMonitor)
+	{
+	    threadingMonitor.notify();
+	}
     }
     
     
     /**
      * Makes the falling block drop on step and apply the, if any, registrered modification
+     * 
+     * @param  return  Whether the fall was not interrupted
      */
-    private static void fall()
+    private static boolean fall()
     {
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -135,9 +193,10 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    fallingShape.restore(moveInitialMomento);
 	    reaction();
+	    return false;
 	}
-	else
-	    ; //FIXME: timer
+	
+	return true;
     }
     
     
@@ -235,23 +294,29 @@ public class Engine implements Blackboard.BlackboardObserver
 	    board.put(move, 0, sub);
 	}
 	
-	Thread.sleep(sleepTime);
-	
 	nextTurn();
     }
     
     
     private static void nextTurn()
     {
-	//FIXME  next turn #################################################################################################################
+	//REQUEST NEXT PLAYER
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
+	//NEXT PLAYER         newTurn(Player);
+	//PLAYER DROP         playerDropped(Player);
+	//LEFT                move(-1);
+	//RIGHT               move(1);
+	//DOWN                if (fall() == false)  thread.interrupt();
+	//DROP                drop();
+	//CLOCKWISE           rotate(true);
+	//ANTI-CLOCKWISE      rotate(false);
     }
     
     
