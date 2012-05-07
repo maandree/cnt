@@ -12,9 +12,9 @@ import cnt.*;
 /**
  * Game engine main class
  * 
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class Engine implements Blackboard.BlackboardObserver, Runnable
+public class Engine implements Blackboard.BlackboardObserver
 {
     /**
      * The initial interval between falls;
@@ -92,7 +92,9 @@ public class Engine implements Blackboard.BlackboardObserver, Runnable
 	sleepTime = INITIAL_SLEEP_TIME;
 	board = new Board();
 	
-	//FIXME register on blackboard with threading  ################################################################################
+	final Engine blackboardObserver = new Engine();
+	Blackboard.registerObserver(blackboardObserver);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.GamePlayMessage.class, Blackboard.DAEMON_THREADING);
 	
 	thread = new Thread()
 	        {
@@ -284,7 +286,7 @@ public class Engine implements Blackboard.BlackboardObserver, Runnable
 	{
 	    Thread.sleep(sleepTime);
 	    
-	    final Block[][] move = new Block[row - sub][]:
+	    final Block[][] move = new Block[row - sub][];
 		
 	    for (int y = 0, n = row - sub; y < n; y++)
 		move[y] = matrix[y + sub];
@@ -298,6 +300,9 @@ public class Engine implements Blackboard.BlackboardObserver, Runnable
     }
     
     
+    /**
+     * Sends a request for letting the next player start
+     */
     private static void nextTurn()
     {
 	//REQUEST NEXT PLAYER
@@ -309,14 +314,27 @@ public class Engine implements Blackboard.BlackboardObserver, Runnable
      */
     public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
+	if (message instanceof Blackboard.GamePlayMessage)
+	{
+	    switch (((Blackboard.GamePlayMessage)message).move)
+	    {
+	        case LEFT:           move(-1);       break;
+	        case RIGHT:          move(1);        break;
+		case DROP:           drop();         break;
+	        case CLOCKWISE:      rotate(true);   break;
+	        case ANTICLOCKWISE:  rotate(false);  break;
+		case DOWN:
+		    if (fall() == false)
+			thread.interrupt();
+		    break;
+		
+	        default:
+		    throw new Error("Unrecognised GamePlayMessage.");
+	    }
+	}
+	
 	//NEXT PLAYER         newTurn(Player);
 	//PLAYER DROP         playerDropped(Player);
-	//LEFT                move(-1);
-	//RIGHT               move(1);
-	//DOWN                if (fall() == false)  thread.interrupt();
-	//DROP                drop();
-	//CLOCKWISE           rotate(true);
-	//ANTI-CLOCKWISE      rotate(false);
     }
     
     
