@@ -15,6 +15,7 @@ import java.io.*;
  * Player class
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  */
 public class Player implements Serializable
 {
@@ -22,15 +23,13 @@ public class Player implements Serializable
      * Constructor
      * 
      * @param  name    The name of the player
-     * @param  colour  The colour and ID of the player
+     * @param  color  The color and ID of the player
      */
-    public Player(final String name, final Color colour)
+    public Player(final String name, final int color)
     {
 	this.name = name;
-	this.colour = colour;
+	this.color = color;
     }
-    
-    
     
     /**
      * The name of the player
@@ -38,9 +37,9 @@ public class Player implements Serializable
     protected String name;
     
     /**
-     * The colour and ID of the player
+     * The color and ID of the player
      */
-    protected Color colour;
+    protected int color;
     
     
     
@@ -56,7 +55,7 @@ public class Player implements Serializable
 	
 	final Player p = (Player)object;
 	
-	return this.name.equals(p.name) && this.colour.equals(p.colour);
+	return this.name.equals(p.name) && (this.color == p.color);
     }
     
     
@@ -65,7 +64,7 @@ public class Player implements Serializable
      */
     public int hashCode()
     {
-	return this.name.hashCode() ^ this.colour.hashCode();
+	return this.name.hashCode() ^ this.color;
     }
     
     
@@ -81,24 +80,24 @@ public class Player implements Serializable
     
     
     /**
-     * Gets the colour and ID of the player
+     * Gets the color and ID of the player
      * 
-     * @return  The colour and ID of the player
+     * @return  The color and ID of the player
      */
-    public Color getColour()
+    public int getColor()
     {
-	return this.colour;
+	return this.color;
     }
     
     
     /**
-     * Sets the colour and ID of the player
+     * Sets the color and ID of the player
      * 
-     * @param  value  The new colour and ID of the player
+     * @param  value  The new color and ID of the player
      */
-    public void setColour(final Color value)
+    public void setColor(final int value)
     {
-	this.colour = value;
+	this.color = value;
     }
     
 }

@@ -7,8 +7,9 @@
  */
 package cnt.game;
 
-// Added this for clearety
+// Added this for clarity
 import cnt.game.Board;
+import cnt.game.Block;
 
 import java.io.*;
 
@@ -23,31 +24,116 @@ public abstract class Shape implements Cloneable, Serializable
 	/**
 	* The shape that we want
 	*/
-	public Shape[][] shape;
+	public Block[][] shape;
 
 	/**
 	* Current offsets from top-left corner
 	*/
-	public int x, y;
+	public int x = 0, y = 0;
+	
+	/**
+	* The last state the shape was in
+	*/	
+	private Shape old_state;
+
+	/**
+	* Player owning the shape
+	*/
+	public Player player;
 
 	/**
 	* Returns the current Shape
 	* 
 	* @return The Shape object
 	*/
-	public getShape()
+	public Shape getShape()
 	{
 		return this;
 	}
 	
 	/**
-	* Move the shape x and y steps. Positive integers are right, and up. Negative vice versa.
-	* preforms colition checking
+	* returns the Blockmatrix that makes up a shape
 	*
-	* @param x number of steps to move along x-axis
-	* @param y number of steps to move along y-axis
+	* @return shape a Block[][] matrix that makes up the shape in the current position
 	*/
-	private move(final int x, final int y)
+	public Block[][] getShapeMatrix()
 	{
-		Board boardCopy = Board.getMatrix();
+		return this.shape;
+	}
+	
+	/**
+	* Return current left position of shape
+	*
+	* @return x the current left position for shape
+	*/
+	public int getX()
+	{
+		return this.x;
+	}
+	
+	/**
+	* Return current top position
+	*
+	* @return y current top position
+	*/
+	public int getY()
+	{
+		return this.y;
+	}
+	
+	/**
+	* Saves a copy of the shapes state, then modifies it's left position
+	*
+	* @param x amount to move in left-right direction
+	*/
+	public void setX(final int x)
+	{
+		try
+		{
+			this.old_state = (Shape)this.clone();
+			this.x = x;
+		} catch (CloneNotSupportedException err)
+		{
+			System.out.println("Something went wrong cloneing a shape");
+		}
+	}
+	
+	/**
+	* Saves a copy of the shapes state, then modifies it's top position
+	*
+	* @param y amount to move in up-down direction
+	*/
+	public void setY(final int y)
+	{
+		try
+		{
+			this.old_state = (Shape)this.clone();
+			this.y = y;
+		} catch (CloneNotSupportedException err)
+		{
+			System.out.println("Something went wrong cloneing a shape");
+		}
+	}
+	
+	/**
+	* Restore and return the previous state the shape was in
+	*
+	* @return the shape object in it's last state
+	*/
+	public Shape restore()
+	{
+		this.x = this.old_state.getX();
+		this.y = this.old_state.getY();
+		this.shape = this.old_state.getShapeMatrix();
 		
+		return this.old_state;
+	}
+	
+	/**
+	* Rotate the shape around its center.
+	* 
+	* @param clockwise if <code>true</code> we rotate clockwise (i.e. right), if <code>false</code> we rotate counterclockwise (i.e. left)
+	*/
+	public abstract void rotate(final boolean clockwise);
+	
+}
