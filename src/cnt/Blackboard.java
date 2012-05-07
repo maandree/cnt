@@ -409,21 +409,21 @@ public class Blackboard
     
     
     /**
-     * <p>Message sent when the player whats to make a move.</p>
+     * <p>Command sent when the player whats to make a move.</p>
      * <p>
-     *   Do not broadcast this message if it is not your turn.
+     *   Do not broadcast this command if it is not your turn.
      * </p>
      * 
      * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
      */
-    public static final class GamePlayMessage implements BlackboardMessage
+    public static final class GamePlayCommand implements BlackboardMessage
     {
 	/**
 	 * Constructor
 	 * 
 	 * @param  The move  The move
 	 */
-	public GamePlayMessage(final Move move)
+	public GamePlayCommand(final Move move)
 	{
 	    this.move = move;
 	}
