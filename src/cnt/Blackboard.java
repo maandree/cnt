@@ -15,7 +15,7 @@ import java.io.Serializable;
 /**
  * Overall game blackboard
  *
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class Blackboard
 {
@@ -254,7 +254,7 @@ public class Blackboard
     /**
      * Game matrix patch class
      * 
-     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
      */
     public static final class MatrixPatch implements BlackboardMessage
     {
@@ -302,7 +302,7 @@ public class Blackboard
     /**
      * Chat message class
      * 
-     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
      */
     public static final class ChatMessage implements BlackboardMessage
     {
@@ -343,7 +343,7 @@ public class Blackboard
     /**
      * System message class
      * 
-     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
      */
     public static final class SystemMessage implements BlackboardMessage
     {
@@ -384,7 +384,7 @@ public class Blackboard
     /**
      * Chat message sent by the local client's player
      * 
-     * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
      */
     public static final class UserMessage implements BlackboardMessage
     {
@@ -404,6 +404,75 @@ public class Blackboard
 	 * The message
 	 */
 	public final String message;
+	
+    }
+    
+    
+    /**
+     * <p>Message sent when the player whats to make a move.</p>
+     * <p>
+     *   Do not broadcast this message if it is not your turn.
+     * </p>
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class GamePlayMessage implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  The move  The move
+	 */
+	public GamePlayMessage(final Move move)
+	{
+	    this.move = move;
+	}
+	
+	
+	
+	/**
+	 * The move
+	 */
+	public final Move move;
+	
+	
+	
+	/**
+	 * The possible moves
+	 */
+	public static enum Move
+	{
+	    /**
+	     * Move the block one step left
+	     */
+	    LEFT,
+	    
+	    /**
+	     * Move the block one step right
+	     */
+	    RIGHT,
+	    
+	    /**
+	     * Move the block one step down
+	     */
+	    DOWN,
+	    
+	    /**
+	     * Drop the block all the way down
+	     */
+	    DROP,
+	    
+	    /**
+	     * Rotate the block 90° clockwise
+	     */
+	    CLOCKWISE,
+	    
+	    /**
+	     * Rotate the block 90° anti-clockwise
+	     */
+	    ANTICLOCKWISE,
+	    
+	}
 	
     }
     
