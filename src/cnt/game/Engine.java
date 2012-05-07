@@ -31,9 +31,9 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
-     * <p>Constructor</p>
+     * <p>Constructor.</p>
      * <p>
-     *   Used for {@link Blackboard} listening
+     *   Used for {@link Blackboard} listening.
      * </p>
      */
     private Engine()
@@ -95,7 +95,9 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	final Engine blackboardObserver = new Engine();
 	Blackboard.registerObserver(blackboardObserver);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.GamePlayMessage.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.GamePlayCommand.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.PlayerDropped.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NextPlayer.class, Blackboard.DAEMON_THREADING);
 	
 	thread = new Thread()
 	        {
@@ -164,7 +166,14 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    currentPlayer = null;
 	    thread.interrupt();
-	    //FIXME: patch away falling shape               #########################################################################################################
+	    
+	    // patch away falling shape
+	    final int offX = fallingShape.getX();
+	    final int offY = fallingShape.getY();
+	    final boolean[][] blocks = fallingShape.getMatrix();
+	    final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
+	    Blackboard.broadcastMessage(patch);
+	    
 	    fallingShape = null;
 	    nextTurn();
 	}
@@ -328,7 +337,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void nextTurn()
     {
-	//REQUEST NEXT PLAYER
+	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
     }
     
     
@@ -339,9 +348,9 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	try
 	{
-	    if (message instanceof Blackboard.GamePlayMessage)
+	    if (message instanceof Blackboard.GamePlayCommand)
 	    {
-		switch (((Blackboard.GamePlayMessage)message).move)
+		switch (((Blackboard.GamePlayCommand)message).move)
 		{
 		    case LEFT:           move(-1);       break;
 		    case RIGHT:          move(1);        break;
@@ -354,12 +363,11 @@ public class Engine implements Blackboard.BlackboardObserver
 			break;
 		    
 		    default:
-			throw new Error("Unrecognised GamePlayMessage.");
+			throw new Error("Unrecognised GamePlayCommand.");
 		}
 	    }
-	    
-	    //NEXT PLAYER         newTurn(Player);
-	    //PLAYER DROP         playerDropped(Player);
+	    else if (message instanceof Blackboard.NextPlayer)     newTurn(((Blackboard.NextPlayer)message).player);
+	    else if (message instanceof Blackboard.PlayerDropped)  playerDropped(((Blackboard.PlayerDropped)message).player);
 	}
 	catch (final InterruptedException err)
 	{
