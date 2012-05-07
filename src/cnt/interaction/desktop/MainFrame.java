@@ -14,7 +14,7 @@ import java.awt.*;
 /**
  * This is the main window of the program
  *
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class MainFrame extends JFrame
 {

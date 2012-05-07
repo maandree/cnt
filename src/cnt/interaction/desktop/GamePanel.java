@@ -21,7 +21,7 @@ import static java.awt.RenderingHints.*;
 /**
  * The game playing area panel
  *
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 {
