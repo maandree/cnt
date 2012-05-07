@@ -7,6 +7,7 @@
  */
 package cnt.game;
 import cnt.*;
+import cnt.mock.Board;
 
 
 /**
@@ -108,7 +109,15 @@ public class Engine implements Blackboard.BlackboardObserver
 			{
 			    synchronized (Engine.threadingMonitor)
 			    {
-				Engine.threadingMonitor.wait();
+				try
+				{
+				    Engine.threadingMonitor.wait();
+				}
+				catch (final InterruptedException err)
+			        {
+				    System.err.println("Are you leaving?");
+				    return;
+				}
 			    }
 			
 			    for (;;)
@@ -124,8 +133,16 @@ public class Engine implements Blackboard.BlackboardObserver
 				    continue;
 				}
 				
-				if (Engine.fall() == false)
-				    break;
+				try
+				{
+				    if (Engine.fall() == false)
+					break;
+				}
+				catch (final InterruptedException err)
+			        {
+				    System.err.println("Are you leaving?");
+				    return;
+				}
 			    }
 			}
 		    }
@@ -183,9 +200,11 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * Makes the falling block drop on step and apply the, if any, registrered modification
      * 
-     * @param  return  Whether the fall was not interrupted
+     * @param   return  Whether the fall was not interrupted
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static boolean fall()
+    private static boolean fall() throws InterruptedException
     {
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -204,8 +223,10 @@ public class Engine implements Blackboard.BlackboardObserver
     
     /**
      * Drops the falling block to the bottom
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void drop()
+    private static void drop() throws InterruptedException
     {
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -261,8 +282,10 @@ public class Engine implements Blackboard.BlackboardObserver
     
     /**
      * Stations the falling block and deletes empty rows
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void reaction()
+    private static void reaction() throws InterruptedException
     {
 	board.put(fallingShape);
 	fallingShape = null;
@@ -314,29 +337,36 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	if (message instanceof Blackboard.GamePlayMessage)
+	try
 	{
-	    switch (((Blackboard.GamePlayMessage)message).move)
+	    if (message instanceof Blackboard.GamePlayMessage)
 	    {
-	        case LEFT:           move(-1);       break;
-	        case RIGHT:          move(1);        break;
-		case DROP:           drop();         break;
-	        case CLOCKWISE:      rotate(true);   break;
-	        case ANTICLOCKWISE:  rotate(false);  break;
-		case DOWN:
-		    if (fall() == false)
-			thread.interrupt();
-		    break;
-		
-	        default:
-		    throw new Error("Unrecognised GamePlayMessage.");
+		switch (((Blackboard.GamePlayMessage)message).move)
+		{
+		    case LEFT:           move(-1);       break;
+		    case RIGHT:          move(1);        break;
+		    case DROP:           drop();         break;
+		    case CLOCKWISE:      rotate(true);   break;
+		    case ANTICLOCKWISE:  rotate(false);  break;
+		    case DOWN:
+			if (fall() == false)
+			    thread.interrupt();
+			break;
+		    
+		    default:
+			throw new Error("Unrecognised GamePlayMessage.");
+		}
 	    }
+	    
+	    //NEXT PLAYER         newTurn(Player);
+	    //PLAYER DROP         playerDropped(Player);
 	}
-	
-	//NEXT PLAYER         newTurn(Player);
-	//PLAYER DROP         playerDropped(Player);
+	catch (final InterruptedException err)
+	{
+	    System.err.println("Are you leaving?");
+	    return;
+	}
     }
-    
     
 }
 
