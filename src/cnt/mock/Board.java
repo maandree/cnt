@@ -5,7 +5,7 @@
  * 
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.game;
+package cnt.mock;
 
 
 /**
