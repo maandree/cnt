@@ -205,11 +205,22 @@ public class Shape implements Cloneable, Serializable
     
     
     /**
-     * Gets a matrix of the shapes block positions
+     * Gets a matrix of the shape's block positions
      * 
      * @return  A matrix where <code>true</code> represents a block
      */
     public boolean[][] getMatrix()
+    {
+	return null;
+    }
+    
+    
+    /**
+     * Gets a matrix of the shape's blocks
+     * 
+     * @return  A matrix with the shapes's blocks
+     */
+    public Block[][] getBlocks()
     {
 	return null;
     }
