@@ -45,6 +45,17 @@ public class Board
     }
     
     /**
+     * Puts blocks on the board
+     * 
+     * @param  blocks  The blocks
+     * @param  offX    Offset on the x-axis on the board
+     * @param  offY    Offset on theyx-axis on the board
+     */
+    public void put(final Block[][] blocks, final int offX, final int offY)
+    {
+    }
+    
+    /**
      * Generates an array of the indices (y-position) of all full rows
      * 
      * @return  An array of the indices (y-position) of all full rows
