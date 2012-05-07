@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt;
+import cnt.game.*;
 
 import java.util.*;
 import java.awt.Color;
@@ -473,6 +474,58 @@ public class Blackboard
 	    ANTICLOCKWISE,
 	    
 	}
+	
+    }
+    
+    /**
+     * This message is broadcasted when a player has dropped out
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class PlayerDropped implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  player  The player
+	 */
+	public PlayerDropped(final Player player)
+	{
+	    this.player = player;
+	}
+	
+	
+	
+	/**
+	 * The player
+	 */
+	public final Player player;
+	
+    }
+    
+    /**
+     * This message is broadcasted when the next player is request, and as a response
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class NextPlayer implements BlackboardMessage
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  player  The player, <code>null</code> if requested
+	 */
+	public NextPlayer(final Player player)
+	{
+	    this.player = player;
+	}
+	
+	
+	
+	/**
+	 * The player, <code>null</code> if requested
+	 */
+	public final Player player;
 	
     }
     
