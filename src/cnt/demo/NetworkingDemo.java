@@ -19,7 +19,7 @@ import java.net.*;
 /**
  * Networking demo class
  *
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class NetworkingDemo
 {

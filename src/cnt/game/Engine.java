@@ -7,15 +7,21 @@
  */
 package cnt.game;
 import cnt.*;
+import cnt.mock.Board;
 
 
 /**
  * Game engine main class
  * 
- * @author  Mattias Andrée, <a href="maandree@kth.se">maandree@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class Engine implements Blackboard.BlackboardObserver
 {
+    /**
+     * The initial interval between falls;
+     */
+    private static final int INITIAL_SLEEP_TIME = 1000;
+    
     /**
      * The possible, initial, shapes
      */
@@ -25,9 +31,9 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
-     * <p>Constructor</p>
+     * <p>Constructor.</p>
      * <p>
-     *   Used for {@link Blackboard} listening
+     *   Used for {@link Blackboard} listening.
      * </p>
      */
     private Engine()
@@ -62,6 +68,21 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static Shape.Momento moveAppliedMomento = null;
     
+    /**
+     * The interval between falls
+     */
+    private static int sleepTime = INITIAL_SLEEP_TIME;
+    
+    /**
+     * Help monitor for the game thread, used to notify when a player has been found
+     */
+    private static Object threadingMonitor = new Object();
+    
+    /**
+     * The game thread
+     */
+    private static Thread thread = null;
+    
     
     
     /**
@@ -69,8 +90,69 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public static void start()
     {
+	sleepTime = INITIAL_SLEEP_TIME;
 	board = new Board();
-	//FIXME: next turn                              #########################################################################################################
+	
+	final Engine blackboardObserver = new Engine();
+	Blackboard.registerObserver(blackboardObserver);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.GamePlayCommand.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.PlayerDropped.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NextPlayer.class, Blackboard.DAEMON_THREADING);
+	
+	thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			for (;;)
+			{
+			    synchronized (Engine.threadingMonitor)
+			    {
+				try
+				{
+				    Engine.threadingMonitor.wait();
+				}
+				catch (final InterruptedException err)
+			        {
+				    System.err.println("Are you leaving?");
+				    return;
+				}
+			    }
+			
+			    for (;;)
+			    {
+				try
+				{
+				    Thread.sleep(Engine.sleepTime);
+				}
+				catch (final InterruptedException err)
+				{
+				    if (Engine.currentPlayer == null)
+					break;
+				    continue;
+				}
+				
+				try
+				{
+				    if (Engine.fall() == false)
+					break;
+				}
+				catch (final InterruptedException err)
+			        {
+				    System.err.println("Are you leaving?");
+				    return;
+				}
+			    }
+			}
+		    }
+	        };
+	
+	thread.start();
+	
+	nextTurn();
     }
     
     
@@ -83,9 +165,17 @@ public class Engine implements Blackboard.BlackboardObserver
 	if (player.equals(currentPlayer))
 	{
 	    currentPlayer = null;
-	    //FIXME: patch away falling shape               #########################################################################################################
+	    thread.interrupt();
+	    
+	    // patch away falling shape
+	    final int offX = fallingShape.getX();
+	    final int offY = fallingShape.getY();
+	    final boolean[][] blocks = fallingShape.getMatrix();
+	    final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
+	    Blackboard.broadcastMessage(patch);
+	    
 	    fallingShape = null;
-	    //FIXME: next turn                              #########################################################################################################
+	    nextTurn();
 	}
     }
     
@@ -108,13 +198,22 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	fallingShape.setPlayer(currentPlayer = player);
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
+	
+	synchronized (threadingMonitor)
+	{
+	    threadingMonitor.notify();
+	}
     }
     
     
     /**
      * Makes the falling block drop on step and apply the, if any, registrered modification
+     * 
+     * @param   return  Whether the fall was not interrupted
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void fall()
+    private static boolean fall() throws InterruptedException
     {
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -124,18 +223,20 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    fallingShape.restore(moveInitialMomento);
 	    reaction();
+	    return false;
 	}
-	else
-	    ; //FIXME: timer
+	
+	return true;
     }
     
     
     /**
      * Drops the falling block to the bottom
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void drop()
+    private static void drop() throws InterruptedException
     {
-
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
 	for (int i = 1;; i++)
@@ -190,25 +291,90 @@ public class Engine implements Blackboard.BlackboardObserver
     
     /**
      * Stations the falling block and deletes empty rows
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void reaction()
+    private static void reaction() throws InterruptedException
     {
 	board.put(fallingShape);
 	fallingShape = null;
 	
 	final int[] full = board.getFullRows();
 	
-	//FIXME  next turn #################################################################################################################
+	if (full.length > 0)
+	{
+	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
+	    for (int x = 0; x < Board.WIDTH; x++)
+		fullLine[0][x] = true;
+	    
+	    for (final int row : full)
+		board.delete(fullLine, 0, row);
+	}
+	
+	final Block[][] matrix = board.getMatrix();
+	
+	int sub = 0;
+	for (final int row : full)
+	{
+	    Thread.sleep(sleepTime);
+	    
+	    final Block[][] move = new Block[row - sub][];
+		
+	    for (int y = 0, n = row - sub; y < n; y++)
+		move[y] = matrix[y + sub];
+	    
+	    sub++;
+	    
+	    board.put(move, 0, sub);
+	}
+	
+	nextTurn();
+    }
+    
+    
+    /**
+     * Sends a request for letting the next player start
+     */
+    private static void nextTurn()
+    {
+	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
     }
     
     
     /**
      * {@inheritDoc}
      */
-    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
+	try
+	{
+	    if (message instanceof Blackboard.GamePlayCommand)
+	    {
+		switch (((Blackboard.GamePlayCommand)message).move)
+		{
+		    case LEFT:           move(-1);       break;
+		    case RIGHT:          move(1);        break;
+		    case DROP:           drop();         break;
+		    case CLOCKWISE:      rotate(true);   break;
+		    case ANTICLOCKWISE:  rotate(false);  break;
+		    case DOWN:
+			if (fall() == false)
+			    thread.interrupt();
+			break;
+		    
+		    default:
+			throw new Error("Unrecognised GamePlayCommand.");
+		}
+	    }
+	    else if (message instanceof Blackboard.NextPlayer)     newTurn(((Blackboard.NextPlayer)message).player);
+	    else if (message instanceof Blackboard.PlayerDropped)  playerDropped(((Blackboard.PlayerDropped)message).player);
+	}
+	catch (final InterruptedException err)
+	{
+	    System.err.println("Are you leaving?");
+	    return;
+	}
     }
-    
     
 }
 
