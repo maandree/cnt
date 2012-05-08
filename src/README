@@ -1,0 +1,7 @@
+The package cnt.demo contains demos for test a subset of the program.
+
+cnt.Program contains the main method.
+
+Resources (located in this catalogue) should be linked or copied to
+your bin/, where the class files are put on compilation.
+
