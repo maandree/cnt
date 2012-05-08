@@ -220,7 +220,7 @@ public class Shape implements Cloneable, Serializable
      * 
      * @return  A matrix with the shapes's blocks
      */
-    public Block[][] getBlocksMatrix()
+    public Block[][] getBlockMatrix()
     {
 	return null;
     }
