@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;
@@ -174,7 +175,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      * @param  offY    Top offset, where the first row in the matrices affect the game matrix
      * @param  offX    Left offset, where the first column in the matrices affect the game matrix
      */
-    public void update(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX)
+    public void update(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
     {
 	if (erase != null)
 	    for (int y = 0, h = erase.length; y < h; y++)
@@ -191,7 +192,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 		final int Y = y + offY;
 		for (int x = 0, w = blocks[y].length; x < w; x++)
 		    if (blocks[y][x] != null)
-			this.matrix[Y][x + offX] = blocks[y][x];
+			this.matrix[Y][x + offX] = new Color(blocks[y][x].getColor());
 	    }
 	
 	this.repaint();

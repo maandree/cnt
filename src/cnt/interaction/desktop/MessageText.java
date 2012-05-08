@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;
@@ -45,7 +46,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	    if (message instanceof Blackboard.ChatMessage)
 	    {
 		final Blackboard.ChatMessage msg = (Blackboard.ChatMessage)message;
-		addText(msg.message, msg.player, msg.colour);
+		addText(msg.message, msg.player.getName(), msg.player.getColour());
 	    }
 	}
     }

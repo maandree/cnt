@@ -7,6 +7,7 @@
  */
 package cnt.demo;
 import cnt.mock.*;
+import cnt.game.*;
 import cnt.network.*;
 import cnt.*;
 
@@ -65,16 +66,16 @@ public class NetworkingDemo
 			    
 			    
 			    System.out.println("network0: sending message: ChatMessage");
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage("Mattias", Color.RED, "sending a message"));
+			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED), "sending a message"));
 			    
 			    System.out.println("network0: sending message: SystemMessage");
-			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "system message"));
+			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "system message"));
 			    
 			    System.out.println("network0: sending message: UserMessage");
 			    Blackboard.broadcastMessage(new Blackboard.UserMessage("local user chat message"));
 			    
 			    System.out.println("network0: sending message: MatrixPatch");
-			    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(new boolean[2][2], new Color[2][2], 0, 0));
+			    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(new boolean[2][2], new Block[2][2], 0, 0));
 			}
 			catch (final Throwable err)
 			{
