@@ -7,6 +7,7 @@
  */
 package cnt.mock;
 import cnt.network.*;
+import cnt.game.*;
 import cnt.*;
 
 import java.awt.*;
@@ -61,7 +62,7 @@ public class GameNetworking
     public void chat(final String message)
     {
 	System.out.println("local chat message: " + message);
-	Blackboard.broadcastMessage(new Blackboard.ChatMessage("You", Color.PINK, message));
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("You", Color.PINK), message));
     }
     
     

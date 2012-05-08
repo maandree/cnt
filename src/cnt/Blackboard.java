@@ -285,17 +285,10 @@ public class Blackboard
 	 * @param  offY    Top offset, where the first row in the matrices affect the game matrix
 	 * @param  offX    Left offset, where the first column in the matrices affect the game matrix
 	 */
-	public MatrixPatch(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX) //FIXME We do not use Color!
-	{
-	    this.erase = erase;
-	    this.blocks = blocks;
-	    this.offY = offY;
-	    this.offX = offX;
-	}
 	public MatrixPatch(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
 	{
 	    this.erase = erase;
-	    this.blocks = null;
+	    this.blocks = blocks;
 	    this.offY = offY;
 	    this.offX = offX;
 	}
@@ -310,7 +303,7 @@ public class Blackboard
 	/**
 	 * A matrix where non-<code>null</code> indicates to add a block
 	 */
-	public final Color[][] blocks;
+	public final Block[][] blocks;
 	
 	/**
 	 * Top offset, where the first row in the matrices affect the game matrix
@@ -336,13 +329,11 @@ public class Blackboard
 	 * Constructor
 	 * 
 	 * @param  player   The player sending the message
-	 * @param  colour   The colour of the player
 	 * @param  message  The message
 	 */
-	public ChatMessage(final String player, final Color colour, final String message)
+	public ChatMessage(final Player player, final String message)
 	{
 	    this.player = player;
-	    this.colour = colour;
 	    this.message = message;
 	}
 	
@@ -351,12 +342,7 @@ public class Blackboard
 	/**
 	 * The player sending the message
 	 */
-	public final String player;
-	
-	/**
-	 * The colour of the player
-	 */
-	public final Color colour;
+	public final Player player;
 	
 	/**
 	 * The message
@@ -377,13 +363,11 @@ public class Blackboard
 	 * Constructor
 	 * 
 	 * @param  player   The player associated with the message, <code>null</code> if none
-	 * @param  colour   The colour of the player, <code>null</code> iff <tt>player</tt> is <code>null</code>
 	 * @param  message  The message
 	 */
-	public SystemMessage(final String player, final Color colour, final String message)
+	public SystemMessage(final Player player, final String message)
 	{
 	    this.player = player;
-	    this.colour = colour;
 	    this.message = message;
 	}
 	
@@ -392,12 +376,7 @@ public class Blackboard
 	/**
 	 * The player associated with the message, <code>null</code> if none
 	 */
-	public final String player;
-	
-	/**
-	 * The colour of the player, <code>null</code> iff <tt>player</tt> is <code>null</code>
-	 */
-	public final Color colour;
+	public final Player player;
 	
 	/**
 	 * The message

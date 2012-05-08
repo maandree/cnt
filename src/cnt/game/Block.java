@@ -87,12 +87,10 @@ public class Block implements Serializable
 		try 
 		{
 			number = Integer.valueOf(strNum, 16).intValue();
-		} catch (NumberFormatException e) 
+		}
+		catch (Exception err)
 		{
-			Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Error: Trying to parse non-hexadecimal string as a color."));
-		} catch (Exception err)
-		{
-			Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Error: Trying to parse String into a color failed for unknown reason."));
+		    throw new Error("Trying to parse String into a color failed for unknown reason.");
 		}
 		
 		return number;
