@@ -199,8 +199,24 @@ public class Blackboard
      * @param  observer     The observer
      * @param  messageType  The message type
      * @param  policy       The threading policy
+     * 
+     * @deprecated  Use overloading {@link #registerThreadingPolicy(BlackboardObserver, ThreadingPolicy, Class<? extends BlackboardMessage>...)} instead
      */
+    @Deprecated
     public static void registerThreadingPolicy(final BlackboardObserver observer, final Class<? extends BlackboardMessage> messageType, final ThreadingPolicy policy)
+    {
+	registerThreadingPolicy(observer, policy, messageType);
+    }
+    
+    /**
+     * Registers a threading policy for an observer and some message types
+     * 
+     * @param  observer      The observer
+     * @param  policy        The threading policy
+     * @param  messageTypes  The message types, must be <code>Class<? extends BlackboardMessage></code>
+     */
+    @SuppressWarnings("unchecked")
+    public static void registerThreadingPolicy(final BlackboardObserver observer, final ThreadingPolicy policy, final Class... messageTypes)
     {
 	HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
 	if (map == null)
@@ -208,8 +224,10 @@ public class Blackboard
 	    map = new HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>();
 	    observationThreading.put(observer, map);
 	}
-	map.put(messageType, policy);
+	for (final Class<? extends BlackboardMessage> messageType : messageTypes)
+	    map.put(messageType, policy);
     }
+
     
     /**
      * Broadcasts a message to all observers
@@ -267,10 +285,17 @@ public class Blackboard
 	 * @param  offY    Top offset, where the first row in the matrices affect the game matrix
 	 * @param  offX    Left offset, where the first column in the matrices affect the game matrix
 	 */
-	public MatrixPatch(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX)
+	public MatrixPatch(final boolean[][] erase, final Color[][] blocks, final int offY, final int offX) //FIXME We do not use Color!
 	{
 	    this.erase = erase;
 	    this.blocks = blocks;
+	    this.offY = offY;
+	    this.offX = offX;
+	}
+	public MatrixPatch(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
+	{
+	    this.erase = erase;
+	    this.blocks = null;
 	    this.offY = offY;
 	    this.offX = offX;
 	}

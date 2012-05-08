@@ -30,7 +30,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setEditable(false);
 	
 	Blackboard.registerObserver(this);
-	Blackboard.registerThreadingPolicy(this, Blackboard.ChatMessage.class, Blackboard.NICE_DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(this, Blackboard.NICE_DAEMON_THREADING, Blackboard.ChatMessage.class);
     }
     
     

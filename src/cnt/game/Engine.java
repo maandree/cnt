@@ -91,6 +91,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static Thread thread = null;
     
+    /**
+     * Whether the game is over
+     */
+    private static boolean gameOver = true;
+    
     
     
     /**
@@ -98,14 +103,16 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public static void start()
     {
+	gameOver = false;
 	sleepTime = (int)(INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER); //the division will be nullified when the games starts by nextTurn()
 	board = new Board();
 	
 	final Engine blackboardObserver = new Engine();
 	Blackboard.registerObserver(blackboardObserver);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.GamePlayCommand.class, Blackboard.DAEMON_THREADING);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.PlayerDropped.class, Blackboard.DAEMON_THREADING);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NextPlayer.class, Blackboard.DAEMON_THREADING);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
+					   Blackboard.GamePlayCommand.class,
+					   Blackboard.PlayerDropped.class,
+					   Blackboard.NextPlayer.class);
 	
 	thread = new Thread()
 	        {
@@ -128,6 +135,9 @@ public class Engine implements Blackboard.BlackboardObserver
 				    System.err.println("Are you leaving?");
 				    return;
 				}
+				
+				if (Engine.gameOver)
+				    {}
 			    }
 			    
 			    for (;;)
@@ -188,9 +198,9 @@ public class Engine implements Blackboard.BlackboardObserver
      * @param  offX    Offset on the x-axis
      * @param  offY    Offset on the y-axis
      */
-    private static void patchAway(final boolean[][] blocks, final int offX, final int offX)
+    private static void patchAway(final boolean[][] blocks, final int offX, final int offY)
     {
-	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
+	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, (Block[][])null, offY, offX);
 	Blackboard.broadcastMessage(patch);
     }
     
@@ -216,7 +226,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * @param  offX    Offset on the x-axis
      * @param  offY    Offset on the y-axis
      */
-    private static void patchIn(final Block[][] blocks, final int offX, final int offX)
+    private static void patchIn(final Block[][] blocks, final int offX, final int offY)
     {
 	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(null, blocks, offY, offX);
 	Blackboard.broadcastMessage(patch);
@@ -259,6 +269,12 @@ public class Engine implements Blackboard.BlackboardObserver
 	}
 	
 	fallingShape.setPlayer(currentPlayer = player);
+	
+	gameOver = board.canPut(fallingShape, false) == false;
+	if (gameOver)
+	    do  fallingShape.setY(fallingShape.getY() - 1);
+	      while (board.canPut(fallingShape, true) == false);
+	
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
 	
 	synchronized (threadingMonitor)
@@ -407,7 +423,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void nextTurn()
     {
-	sleeptime = (int)(sleeptime * SLEEP_TIME_MULTIPLER);
+	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
 	
 	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
     }
