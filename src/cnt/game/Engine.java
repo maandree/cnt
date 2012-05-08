@@ -137,7 +137,10 @@ public class Engine implements Blackboard.BlackboardObserver
 				}
 				
 				if (Engine.gameOver)
-				    {}
+				{
+				    Blackboard.broadcastMessage(new Blackboard.GameOver());
+				    return;
+				}
 			    }
 			    
 			    for (;;)
