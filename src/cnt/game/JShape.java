@@ -34,10 +34,10 @@ public class JShape extends Shape
 		int[][] placement = new int[][] {{1,0},{1,1},{1,2},{0,2}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getID());
+			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
 		
-		this.states[0] = this.shape
+		this.states[0] = this.shape;
 		
 		int[][][] coords = new int[3][4][2];
 
@@ -45,13 +45,13 @@ public class JShape extends Shape
 		coords[1] = new int[][] {{2,0},{1,0},{1,1},{1,2}};
 		coords[2] = new int[][] {{2,2},{0,1},{1,1},{2,1}};
 		
-		int i = 0;
+		int i = 1;
 		for (int[][] coord : coords)
 		{
 			Block[][] matrix = new Block[3][3];
 			for (int[] place : coord)
 			{
-				matrix[place[0]][place[1]] = new Block(this.player.getID());
+				matrix[place[0]][place[1]] = new Block(this.player.getColor());
 			}
 			
 			this.states[i++] = matrix;
@@ -68,7 +68,7 @@ public class JShape extends Shape
 			this.currState = (this.currState + 1) % 3;
 		} else
 		{
-			this.currState = (this.currState - 1) % 3;
+			this.currState = (this.currState - 1) < 0 ? (this.currState + 2) : (this.currState - 1) ;
 		}
 		
 		this.shape = this.states[this.currState];

@@ -34,7 +34,7 @@ public class ZShape extends Shape
 		int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getID());
+			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
 		
 	}
@@ -48,7 +48,7 @@ public class ZShape extends Shape
 			matrix[2][1] = this.shape[2][1];
 			matrix[1][1] = this.shape[1][1];
 			matrix[1][2] = this.shape[1][0];
-			matrix[3][0] = this.shape[0][0];
+			matrix[2][0] = this.shape[0][0];
 			
 			this.shape = matrix;
 		} else
@@ -57,7 +57,7 @@ public class ZShape extends Shape
 			matrix[2][1] = this.shape[2][1];
 			matrix[1][1] = this.shape[1][1];
 			matrix[1][0] = this.shape[1][2];
-			matrix[0][0] = this.shape[3][0];
+			matrix[0][0] = this.shape[2][0];
 			
 			this.shape = matrix;
 
