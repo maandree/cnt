@@ -7,244 +7,133 @@
  */
 package cnt.game;
 
+// Added this for clarity
+import cnt.game.Board;
+import cnt.game.Block;
+
 import java.io.*;
 
 
 /**
- * Block shape class
- */
-public class Shape implements Cloneable, Serializable
+* Shape class representing a shape of objects
+* 
+* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+*/
+public abstract class Shape implements Cloneable, Serializable
 {
-    /**
-     * Shape:
-     * <pre>
-     *     XXX
-     *     .X.
-     * </pre>
-     */
-    public static final Shape T_SHAPE = new Shape(null);
-    
-    /**
-     * Shape:
-     * <pre>
-     *     X..
-     *     XXX
-     * </pre>
-     */
-    public static final Shape L_SHAPE = new Shape(null);
-    
-    
-    /**
-     * Shape:
-     * <pre>
-     *     ..X
-     *     XXX
-     * </pre>
-     */
-    public static final Shape J_SHAPE = new Shape(null);
-    
-    /**
-     * Shape:
-     * <pre>
-     *     .XX
-     *     XX.
-     * </pre>
-     */
-    public static final Shape S_SHAPE = new Shape(null);
-    
-    /**
-     * Shape:
-     * <pre>
-     *     XX.
-     *     .XX
-     * </pre>
-     */
-    public static final Shape Z_SHAPE = new Shape(null);
-    
-    /**
-     * Shape:
-     * <pre>
-     *     XX
-     *     XX
-     * </pre>
-     */
-    public static final Shape SQUARE_SHAPE = new Shape(null);
-    
-    
-    /**
-     * Shape:
-     * <pre>
-     *     X
-     *     X
-     *     X
-     *     X
-     * </pre>
-     */
-    public static final Shape PIPE_SHAPE = new Shape(null);
-    
-    
-    
-    /**
-     * <p>Constructor</p>
-     * <p>
-     *     The shape is placed in the top center of the board
-     * </p>
-     * 
-     * @param  matrix  The block's positions in the shape
-     */
-    public Shape(final boolean[][] matrix)
-    {
-	this.setX((Board.WIDTH - matrix[0].length) / 2);
-	this.setY(0);
-    }
-    
-    
-    
-    /**
-     * Momento class for {@link Shape}
-     */
-    public static class Momento
-    {
-    }
-    
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Shape clone() throws CloneNotSupportedException
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Splits the shape into multiple shapes, while deleting some rows
-     * 
-     * @param   deleteRows  The rows to delete
-     * @return              The resulting shapes
-     */
-    public Shape[] split(final int[] deleteRows)
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Gets the left position of the shape
-     * 
-     * @return  The left position of the shape
-     */
-    public int getX()
-    {
-	return 0;
-    }
-    
-    
-    /**
-     * Sets the left position of the shape
-     * 
-     * @param  value  The new left position of the shape
-     */
-    public void setX(final int value)
-    {
-    }
-    
-    
-    /**
-     * Gets the top position of the shape
-     * 
-     * @return  The top position of the shape
-     */
-    public int getY()
-    {
-	return 0;
-    }
-    
-    
-    /**
-     * Sets the top position of the shape
-     * 
-     * @param  value  The new top position of the shape
-     */
-    public void setY(final int value)
-    {
-    }
-    
-    
-    /**
-     * Gets the player whom is playing or played the shape
-     * 
-     * @return  The player whom is playing or played the shape
-     */
-    public Player getPlayer()
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Sets the player whom is playing the shape
-     * 
-     * @param  value  The player whom is playing the shape
-     */
-    public void setPlayer(final Player value)
-    {
-    }
-    
-    
-    /**
-     * Rotates the shape
-     * 
-     * @param  clockwise  <code>true</code> for clockwise rotation, <code>false</code> for anti-clockwise rotation
-     */
-    public void rotate(final boolean clockwise)
-    {
-    }
-    
-    
-    /**
-     * Gets a matrix of the shape's block positions
-     * 
-     * @return  A matrix where <code>true</code> represents a block
-     */
-    public boolean[][] getBooleanMatrix()
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Gets a matrix of the shape's blocks
-     * 
-     * @return  A matrix with the shapes's blocks
-     */
-    public Block[][] getBlockMatrix()
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Stores the shape's current state to a {@link Momento}
-     * 
-     * @return  The state
-     */
-    public Momento store()
-    {
-	return null;
-    }
-    
-    
-    /**
-     * Restores the shape's state from a {@link Momento}
-     * 
-     * @param  momento  The state
-     */
-    public void restore(final Momento momento)
-    {
-    }
-    
-}
+	/**
+	* The shape that we want
+	*/
+	public Block[][] shape;
 
+	/**
+	* Current offsets from top-left corner
+	*/
+	public int x = 0, y = 0;
+	
+	/**
+	* The last state the shape was in
+	*/	
+	private Shape old_state;
+
+	/**
+	* Player owning the shape
+	*/
+	public Player player;
+
+	/**
+	* Returns the current Shape
+	* 
+	* @return The Shape object
+	*/
+	public Shape getShape()
+	{
+		return this;
+	}
+	
+	/**
+	* returns the Blockmatrix that makes up a shape
+	*
+	* @return shape a Block[][] matrix that makes up the shape in the current position
+	*/
+	public Block[][] getShapeMatrix()
+	{
+		return this.shape;
+	}
+	
+	/**
+	* Return current left position of shape
+	*
+	* @return x the current left position for shape
+	*/
+	public int getX()
+	{
+		return this.x;
+	}
+	
+	/**
+	* Return current top position
+	*
+	* @return y current top position
+	*/
+	public int getY()
+	{
+		return this.y;
+	}
+	
+	/**
+	* Saves a copy of the shapes state, then modifies it's left position
+	*
+	* @param x amount to move in left-right direction
+	*/
+	public void setX(final int x)
+	{
+		try
+		{
+			this.old_state = (Shape)this.clone();
+			this.x = x;
+		} catch (CloneNotSupportedException err)
+		{
+			System.out.println("Something went wrong cloneing a shape");
+		}
+	}
+	
+	/**
+	* Saves a copy of the shapes state, then modifies it's top position
+	*
+	* @param y amount to move in up-down direction
+	*/
+	public void setY(final int y)
+	{
+		try
+		{
+			this.old_state = (Shape)this.clone();
+			this.y = y;
+		} catch (CloneNotSupportedException err)
+		{
+			System.out.println("Something went wrong cloneing a shape");
+		}
+	}
+	
+	/**
+	* Restore and return the previous state the shape was in
+	*
+	* @return the shape object in it's last state
+	*/
+	public Shape restore()
+	{
+		this.x = this.old_state.getX();
+		this.y = this.old_state.getY();
+		this.shape = this.old_state.getShapeMatrix();
+		
+		return this.old_state;
+	}
+	
+	/**
+	* Rotate the shape around its center.
+	* 
+	* @param clockwise if <code>true</code> we rotate clockwise (i.e. right), if <code>false</code> we rotate counterclockwise (i.e. left)
+	*/
+	public abstract void rotate(final boolean clockwise);
+	
+}
