@@ -271,6 +271,9 @@ public class Engine implements Blackboard.BlackboardObserver
 	    throw new Error("Shape.clone() is not implemented");
 	}
 	
+	for (int r = 0, rn = (int)(Math.random() * 3); r < rn; r++)
+	    fallingShape.rotate(true);
+	
 	fallingShape.setPlayer(currentPlayer = player);
 	
 	gameOver = board.canPut(fallingShape, false) == false;
