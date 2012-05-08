@@ -529,5 +529,15 @@ public class Blackboard
 	
     }
     
+    /**
+     * Game over!
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class GameOver implements BlackboardMessage
+    {
+	//Has default constructor
+    }
+    
 }
 
