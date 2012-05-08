@@ -41,7 +41,7 @@ public class Board
      */
     public void put(final Shape shape)
     {
-    	put(shape.getBlocks(), shape.getX(), shape.getY());
+    	put(shape.getBlockMatrix(), shape.getX(), shape.getY());
     }
     
     /**
@@ -146,6 +146,10 @@ public class Board
      */
     public boolean canPut(final Shape shape, final boolean ignoreEdges)
     {
+	final Block[][] newBlocks = shape.getBlockMatrix();
+	final int offX = shape.getX();
+	final int offY = shape.getY();
+	
     	for (int y = 0; y < newBlocks.length; y++)
 	
 	    if ((0 <= y + offY) && (y + offY < HEIGHT))
