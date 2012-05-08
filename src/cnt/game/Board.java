@@ -30,12 +30,7 @@ public class Board
     
     
     
-    /**
-     * Constructor
-     */
-    public Board()
-    {
-    }
+    // Has default constructor
     
     
     
@@ -71,7 +66,13 @@ public class Board
 			    blocks[y+offY][x+offX] = newBlocks[y][x];
     }
     
-    private void isFull(final Block[] row)
+    /**
+     * Tests if a row is full
+     * 
+     * @param   row  The row to test
+     * @return       Whether the row is full
+     */
+    private boolean isFull(final Block[] row)
     {
 	for (final Block block : row)
 	    if (block == null)
@@ -127,22 +128,12 @@ public class Board
      */
     public Block[][] getMatrix()
     {
-    	/*returnera klon av blocks
-    	 * 
-    	 */
+	Block[][] clone = new Block[HEIGHT][WIDTH];
 	
-    	for (int y = 0; y<HEIGHT;){
-	    for (int x = 0; x<WIDTH;){
-    	    	Block[][] cloneMatrix= blocks;
-    	    	return cloneMatrix;	
-	    }
-    	}
-
-    	
-	// for (0, 0) <= (y, x) < (HEIGHT, WIDTH)
-	//     cloneMatrix[y][x] = blocks[y][x];
+    	for (int y = 0; y <HEIGHT; y++)
+	    System.arraycopy(blocks[y], 0, clone[y], 0, WIDTH);
 	
-
+	return clone;
     }
     
     
