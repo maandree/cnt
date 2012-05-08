@@ -95,7 +95,7 @@ public class Board
     	       found[ptr++] = y;
 
     	int[] rc = new int[ptr];
-    	System.arraycopy(found, 0, rc, ptr);
+    	System.arraycopy(found, 0, rc, 0, ptr);
     	return rc;
     }
     
@@ -108,15 +108,15 @@ public class Board
      */
     public void delete(final boolean[][] deleteMatrix, final int offX, final int offY)
     {
-    	for (int y = 0; y < deleteBlocks.length; y++)
+    	for (int y = 0; y < deleteMatrix.length; y++)
 	    
 	    if ((0 <= y + offY) && (y + offY < HEIGHT))
 		
-		for (int x = 0; x < deleteBlocks[y].length; x++)
+		for (int x = 0; x < deleteMatrix[y].length; x++)
 		    
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
 			
-			if(deleteBlocks[y][x])
+			if(deleteMatrix[y][x])
 			    
 			    blocks[y+offY][x+offX] = null;
     }
