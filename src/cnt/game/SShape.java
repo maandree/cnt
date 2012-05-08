@@ -51,6 +51,7 @@ public class SShape extends Shape
 			matrix[2][2] = this.shape[0][1];
 			
 			this.shape = matrix;
+			this.flat = false;
 		} else
 		{
 			matrix[1][0] = this.shape[1][0];
@@ -59,7 +60,7 @@ public class SShape extends Shape
 			matrix[0][1] = this.shape[2][2];
 			
 			this.shape = matrix;
-
+			this.flat = true;
 		}				
 	}
 }
