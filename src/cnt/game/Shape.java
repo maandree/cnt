@@ -72,7 +72,7 @@ public abstract class Shape implements Cloneable, Serializable
 
 		for (int col = 0; col < shape.length; ++col)
 		{
-			for (int row = 0; row < shape[0].lenth; ++row)
+			for (int row = 0; row < shape[0].length; ++row)
 			{
 				if (shape[col][row] != null)
 				{
@@ -147,9 +147,30 @@ public abstract class Shape implements Cloneable, Serializable
 	{
 		this.x = this.old_state.getX();
 		this.y = this.old_state.getY();
-		this.shape = this.old_state.getShapeMatrix();
+		this.shape = this.old_state.getBlockMatrix();
 		
 		return this.old_state;
+	}
+
+	/**
+	* Returnss the current shape using * as marker for a block
+	*/
+	public String toString()
+	{
+		String strShape = "";
+		for (int i = 0; i < this.shape[0].length; ++i)
+		{
+			for (int j = 0; j < this.shape.length; ++j)
+			{
+				if (this.shape[j][i] != null)
+					strShape += "*";
+				else
+					strShape += " ";
+			}
+			strShape += "\n";
+		}
+		
+		return strShape;
 	}
 	
 	/**

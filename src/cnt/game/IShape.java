@@ -34,7 +34,7 @@ public class IShape extends Shape
 		int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getID());
+			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
 	}
 
@@ -49,14 +49,18 @@ public class IShape extends Shape
 		if (this.flat)
 		{
 			placement = new int[][]{{0,0},{0,1},{0,2},{0,3}};
+			this.flat = false;
 		} else
 		{
 			placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
+			this.flat = true;
 		}
 		
 		for (int[] place : placement)
 		{
 			matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
 		}
+
+		this.shape = matrix;
 	}
 }

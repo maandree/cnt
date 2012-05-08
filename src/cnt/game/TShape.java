@@ -29,10 +29,10 @@ public class TShape extends Shape
 		this.player = player;
 		this.shape = new Block[3][3];
 		
-		int[][] placement = new int[][] {{1,1},{0,1},{1,1},{2,1}};
+		int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getID());
+			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
 		
 	}
@@ -45,7 +45,7 @@ public class TShape extends Shape
 		} else
 		{
 			// 3 clockwise turns = 1 counterclockwise turn, so...
-			for (int i = 0, i < 4; ++i)
+			for (int i = 0; i < 4; ++i)
 			{
 				this.shape = this.turn();
 			}
@@ -68,6 +68,8 @@ public class TShape extends Shape
 		
 		if (this.shape[0][1] != null)
 			matrix[1][0] = this.shape[0][1];
+		
+		matrix[1][1] = this.shape[1][1];
 		
 		return matrix;
 	}

@@ -28,9 +28,9 @@ public class OShape extends Shape
 	{
 		this.player = player;
 		this.shape = new Block[2][2];
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < 2; ++i)
 		{
-			for (int j = 0; j < 3; ++j)
+			for (int j = 0; j < 2; ++j)
 			{
 				this.shape[i][j] = new Block(this.player.getColor());
 			}
