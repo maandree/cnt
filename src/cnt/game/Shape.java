@@ -209,7 +209,7 @@ public class Shape implements Cloneable, Serializable
      * 
      * @return  A matrix where <code>true</code> represents a block
      */
-    public boolean[][] getMatrix()
+    public boolean[][] getBooleanMatrix()
     {
 	return null;
     }
@@ -220,7 +220,7 @@ public class Shape implements Cloneable, Serializable
      * 
      * @return  A matrix with the shapes's blocks
      */
-    public Block[][] getBlocks()
+    public Block[][] getBlocksMatrix()
     {
 	return null;
     }
