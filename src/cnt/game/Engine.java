@@ -9,6 +9,8 @@ package cnt.game;
 import cnt.*;
 import cnt.mock.Board;
 
+//TODO  Do send shape removal followed by shape adding, send then togather, may be by merge all at each sleep
+
 
 /**
  * Game engine main class
@@ -18,9 +20,15 @@ import cnt.mock.Board;
 public class Engine implements Blackboard.BlackboardObserver
 {
     /**
-     * The initial interval between falls;
+     * The initial interval between falls
      */
     private static final int INITIAL_SLEEP_TIME = 1000;
+    
+    /**
+     * The value to multiply the sleep time each time the game speeds up;
+     * should be slighly less than 1.
+     */
+    private static final double SLEEP_TIME_MULTIPLER = 0.98;
     
     /**
      * The possible, initial, shapes
@@ -90,7 +98,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public static void start()
     {
-	sleepTime = INITIAL_SLEEP_TIME;
+	sleepTime = (int)(INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER); //the division will be nullified when the games starts by nextTurn()
 	board = new Board();
 	
 	final Engine blackboardObserver = new Engine();
@@ -121,7 +129,7 @@ public class Engine implements Blackboard.BlackboardObserver
 				    return;
 				}
 			    }
-			
+			    
 			    for (;;)
 			    {
 				try
@@ -137,8 +145,11 @@ public class Engine implements Blackboard.BlackboardObserver
 				
 				try
 				{
-				    if (Engine.fall() == false)
-					break;
+				    synchronized (Engine.class)
+				    {
+					if (Engine.fall() == false)
+					    break;
+				    }
 				}
 				catch (final InterruptedException err)
 			        {
@@ -157,6 +168,62 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
+     * Broadcasts a matrix patch that removes a shape
+     * 
+     * @param  shape  The shape to remove
+     */
+    private static void patchAway(final Shape shape)
+    {
+	final int offX = shape.getX();
+	final int offY = shape.getY();
+	final boolean[][] blocks = shape.getBooleanMatrix();
+	patchAway(blocks, offX, offY);
+    }
+    
+    
+    /**
+     * Broadcasts a matrix patch that removes a set of blocks
+     * 
+     * @param  blocks  The block pattern
+     * @param  offX    Offset on the x-axis
+     * @param  offY    Offset on the y-axis
+     */
+    private static void patchAway(final boolean[][] blocks, final int offX, final int offX)
+    {
+	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
+	Blackboard.broadcastMessage(patch);
+    }
+    
+    
+    /**
+     * Broadcasts a matrix patch that adds a shape
+     * 
+     * @param  shape  The shape to add
+     */
+    private static void patchIn(final Shape shape)
+    {
+	final int offX = shape.getX();
+	final int offY = shape.getY();
+	final Block[][] blocks = shape.getBlockMatrix();
+	patchIn(blocks, offX, offY);
+    }
+    
+    
+    /**
+     * Broadcasts a matrix patch that adds a set of blocks
+     * 
+     * @param  blocks  The block pattern
+     * @param  offX    Offset on the x-axis
+     * @param  offY    Offset on the y-axis
+     */
+    private static void patchIn(final Block[][] blocks, final int offX, final int offX)
+    {
+	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(null, blocks, offY, offX);
+	Blackboard.broadcastMessage(patch);
+    }
+    
+    
+    /**
      * Invoked when a player drops out, the falling block is removed
      * if the dropped out player is the playing player
      */
@@ -167,12 +234,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    currentPlayer = null;
 	    thread.interrupt();
 	    
-	    // patch away falling shape
-	    final int offX = fallingShape.getX();
-	    final int offY = fallingShape.getY();
-	    final boolean[][] blocks = fallingShape.getMatrix();
-	    final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
-	    Blackboard.broadcastMessage(patch);
+	    patchAway(fallingShape);
 	    
 	    fallingShape = null;
 	    nextTurn();
@@ -215,8 +277,8 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static boolean fall() throws InterruptedException
     {
+	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
-	
 	fallingShape.setY(fallingShape.getY() + 1);
 	
 	if (board.canPut(fallingShape, false) == false)
@@ -226,6 +288,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    return false;
 	}
 	
+	patchIn(fallingShape);
 	return true;
     }
     
@@ -237,6 +300,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void drop() throws InterruptedException
     {
+	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
 	for (int i = 1;; i++)
@@ -296,6 +360,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void reaction() throws InterruptedException
     {
+	patchIn(fallingShape);
 	board.put(fallingShape);
 	fallingShape = null;
 	
@@ -308,7 +373,10 @@ public class Engine implements Blackboard.BlackboardObserver
 		fullLine[0][x] = true;
 	    
 	    for (final int row : full)
+	    {
+		patchAway(fullLine, 0, row);
 		board.delete(fullLine, 0, row);
+	    }
 	}
 	
 	final Block[][] matrix = board.getMatrix();
@@ -325,6 +393,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    
 	    sub++;
 	    
+	    patchIn(move, 0, sub);
 	    board.put(move, 0, sub);
 	}
 	
@@ -333,10 +402,13 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
-     * Sends a request for letting the next player start
+     * Performs everthing needed for a new turn and
+     * sends a request for letting the next player start
      */
     private static void nextTurn()
     {
+	sleeptime = (int)(sleeptime * SLEEP_TIME_MULTIPLER);
+	
 	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
     }
     
@@ -349,23 +421,24 @@ public class Engine implements Blackboard.BlackboardObserver
 	try
 	{
 	    if (message instanceof Blackboard.GamePlayCommand)
-	    {
-		switch (((Blackboard.GamePlayCommand)message).move)
+		synchronized (Engine.class)
 		{
-		    case LEFT:           move(-1);       break;
-		    case RIGHT:          move(1);        break;
-		    case DROP:           drop();         break;
-		    case CLOCKWISE:      rotate(true);   break;
-		    case ANTICLOCKWISE:  rotate(false);  break;
-		    case DOWN:
-			if (fall() == false)
-			    thread.interrupt();
-			break;
-		    
-		    default:
-			throw new Error("Unrecognised GamePlayCommand.");
+		    switch (((Blackboard.GamePlayCommand)message).move)
+		    {
+			case LEFT:           move(-1);       break;
+			case RIGHT:          move(1);        break;
+			case DROP:           drop();         break;
+			case CLOCKWISE:      rotate(true);   break;
+			case ANTICLOCKWISE:  rotate(false);  break;
+			case DOWN:
+			    if (fall() == false)
+				thread.interrupt();
+			    break;
+			    
+			default:
+			    throw new Error("Unrecognised GamePlayCommand.");
+		    }
 		}
-	    }
 	    else if (message instanceof Blackboard.NextPlayer)     newTurn(((Blackboard.NextPlayer)message).player);
 	    else if (message instanceof Blackboard.PlayerDropped)  playerDropped(((Blackboard.PlayerDropped)message).player);
 	}
