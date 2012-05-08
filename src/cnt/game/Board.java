@@ -59,21 +59,16 @@ public class Board
     public void put(final Block[][] newBlocks, final int offX, final int offY)
     {
     	for (int y = 0; y < newBlocks.length; y++)
-	{
+	
 	    if ((0 <= y + offY) && (y + offY < HEIGHT))
-	    {
+	    
 		for (int x = 0; x < newBlocks[y].length; x++)
-		{
+		
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
-		    {
+			
 			if(newBlocks[y][x] !=null)
-			{
+			    
 			    blocks[y+offY][x+offX] = newBlocks[y][x];
-			}
-		    }
-		}
-	    }
-	}
     }
     
     private void isFull(final Block[] row)
@@ -113,21 +108,16 @@ public class Board
     public void delete(final boolean[][] deleteMatrix, final int offX, final int offY)
     {
     	for (int y = 0; y < deleteBlocks.length; y++)
-	{
+	    
 	    if ((0 <= y + offY) && (y + offY < HEIGHT))
-	    {
+		
 		for (int x = 0; x < deleteBlocks[y].length; x++)
-		{
+		    
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
-		    {
+			
 			if(deleteBlocks[y][x])
-			{
+			    
 			    blocks[y+offY][x+offX] = null;
-			}
-		    }
-		}
-	    }
-	}
     }
     
     /**
@@ -165,20 +155,25 @@ public class Board
      */
     public boolean canPut(final Shape shape, final boolean ignoreEdges)
     {
-    	Block [][] matrix=blocks;
-    	
-    	for (int y = 0; y<Shape.HEIGHT;){
-	    for (int x = 0; x<Shape.WIDTH;){
-		if(Shape[y][x] != null){
-		    if(matrix[y + Shape.y][x + Shape.x] != null){
-			return false;
+    	for (int y = 0; y < newBlocks.length; y++)
+	
+	    if ((0 <= y + offY) && (y + offY < HEIGHT))
+	    {
+		for (int x = 0; x < newBlocks[y].length; x++)
+		
+		    if ((0 <= x + offX) && (x + offX < WIDTH))
+		    {
+			if ((newBlocks[y][x] != null) && (blocks[y+offY][x+offX] != null))
+			    
+			    return false;
 		    }
-		}
-		return true;
+		    else if (ignoreEdges == false)
+			return false;
 	    }
-    	}
-    	
-	return false;
+	    else if (ignoreEdges == false)
+		return false;
+	
+	return true;
     }
     
 }
