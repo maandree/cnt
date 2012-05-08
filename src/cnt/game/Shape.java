@@ -54,11 +54,34 @@ public abstract class Shape implements Cloneable, Serializable
 	/**
 	* returns the Blockmatrix that makes up a shape
 	*
-	* @return shape a Block[][] matrix that makes up the shape in the current position
+	* @return a Block[][] matrix that makes up the shape in the current position
 	*/
-	public Block[][] getShapeMatrix()
+	public Block[][] getBlockMatrix()
 	{
 		return this.shape;
+	}
+
+	/**
+	* returns a Booleanmatrix that makes up a shape
+	*
+	* @return a boolean[][] matrix that makes up the shape in the current position
+	*/
+	public boolean[][] getBooleanMatrix()
+	{
+		boolean[][] matrix = new boolean[shape.length][shape[0].length];
+
+		for (int col = 0; col < shape.length; ++col)
+		{
+			for (int row = 0; row < shape[0].lenth; ++row)
+			{
+				if (shape[col][row] != null)
+				{
+					matrix[col][row] = true;
+				}
+			}
+		}
+		
+		return matrix;
 	}
 	
 	/**
