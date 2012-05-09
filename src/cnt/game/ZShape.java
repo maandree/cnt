@@ -23,10 +23,11 @@ import java.io.*;
 */
 public class ZShape extends Shape
 {
-	boolean flat = true;
+	boolean flat;
 	
 	public ZShape()
 	{
+	    this.flat = true;
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
@@ -39,6 +40,7 @@ public class ZShape extends Shape
     private ZShape(final ZShape original)
     {
 	original.cloneData(this);
+	this.flat = original.flat;
     }
     
     

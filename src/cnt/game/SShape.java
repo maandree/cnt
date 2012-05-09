@@ -24,10 +24,11 @@ import java.io.*;
 
 public class SShape extends Shape
 {
-	boolean flat = true;
+	boolean flat;
 	
 	public SShape()
 	{
+	    this.flat = true;
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{2,0},{0,1},{1,1}};
@@ -41,6 +42,7 @@ public class SShape extends Shape
     private SShape(final SShape original)
     {
 	original.cloneData(this);
+	this.flat = original.flat;
     }
 
 	public void rotate(final boolean clockwise)
