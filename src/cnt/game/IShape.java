@@ -17,25 +17,25 @@ import java.io.*;
 
 
 /**
-* Shape class representing a I-shape
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
-*/
+ * Shape class representing a I-shape
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ */
 public class IShape extends Shape
 {
-	private boolean flat = true;
+    private boolean flat = true;
 	
-	public IShape()
-	{
-		this.shape = new Block[4][4];
+    public IShape()
+    {
+	this.shape = new Block[4][4];
 		
-		int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
-		for (int[] place : placement)
-		{
-			this.shape[place[0]][place[1]] = new Block();
-		}
+	int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
+	for (int[] place : placement)
+	{
+	    this.shape[place[0]][place[1]] = new Block();
 	}
+    }
     
     private IShape(final IShape original)
     {
@@ -82,31 +82,32 @@ public class IShape extends Shape
     
     
 
-	/**
-	* {@inheritDoc}
-	*/
-	// Rotates kinda wierd, but hard to find a good rotation of this block...
-	public void rotate(final boolean clockwise)
+    /**
+     * {@inheritDoc}
+     */
+    // Rotates kinda wierd, but hard to find a good rotation of this block...
+    public void rotate(final boolean clockwise)
+    {
+	Block[][] matrix = new Block[4][4];
+	int[][] placement;
+	if (this.flat)
 	{
-		Block[][] matrix = new Block[4][4];
-		int[][] placement;
-		if (this.flat)
-		{
-			placement = new int[][]{{0,0},{0,1},{0,2},{0,3}};
-			this.flat = false;
-		} else
-		{
-			placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
-			this.flat = true;
-		}
-		
-		for (int[] place : placement)
-		{
-			matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
-		}
-
-		this.shape = matrix;
+	    placement = new int[][]{{0,0},{0,1},{0,2},{0,3}};
+	    this.flat = false;
 	}
+	else
+	{
+	    placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
+	    this.flat = true;
+	}
+		
+	for (int[] place : placement)
+	{
+	    matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
+	}
+
+	this.shape = matrix;
+    }
     
     public IShape clone()
     {

@@ -22,25 +22,25 @@ import java.io.*;
 */
 public abstract class Shape implements Cloneable, Serializable
 {
-	/**
-	* The shape that we want
-	*/
-        protected Block[][] shape;
+    /**
+     * The shape that we want
+     */
+    protected Block[][] shape;
 
-	/**
-	* Current X offset from top-left corner
-	*/
-	protected int x = 0;
+    /**
+     * Current X offset from top-left corner
+     */
+    protected int x = 0;
 
-	/**
-	* Current Y offset from top-left corner
-	*/
-	protected int y = 0;
+    /**
+     * Current Y offset from top-left corner
+     */
+    protected int y = 0;
 
-	/**
-	* Player owning the shape
-	*/
-        Player player = null;
+    /**
+     * Player owning the shape
+     */
+    Player player = null;
     
     
     
@@ -57,20 +57,20 @@ public abstract class Shape implements Cloneable, Serializable
         }
         
         
-	    /**
-	    * The shape that we want
-	    */
-	    private final Block[][] shape;
+	/**
+	 * The shape that we want
+	 */
+	private final Block[][] shape;
 
-	    /**
-	    * Current X offset from top-left corner
-	    */
-	    private final int x;
+	/**
+	 * Current X offset from top-left corner
+	 */
+	private final int x;
 
-	    /**
-	    * Current Y offset from top-left corner
-	    */
-	    private final int y;
+	/**
+	 * Current Y offset from top-left corner
+	 */
+	private final int y;
     
     
         /**
@@ -88,88 +88,82 @@ public abstract class Shape implements Cloneable, Serializable
         
     
     
-	/**
-	* Returns the current Shape
-	* 
-	* @return The Shape object
-	*/
-	public Shape getShape()
-	{
-		return this;
-	}
+    /**
+     * Returns the current Shape
+     * 
+     * @return The Shape object
+     */
+    public Shape getShape()
+    {
+	return this;
+    }
 	
-	/**
-	* returns the Blockmatrix that makes up a shape
-	*
-	* @return a Block[][] matrix that makes up the shape in the current position
-	*/
-	public Block[][] getBlockMatrix()
-	{
-		return this.shape;
-	}
+    /**
+     * returns the Blockmatrix that makes up a shape
+     *
+     * @return a Block[][] matrix that makes up the shape in the current position
+     */
+    public Block[][] getBlockMatrix()
+    {
+	return this.shape;
+    }
 
-	/**
-	* returns a Booleanmatrix that makes up a shape
-	*
-	* @return a boolean[][] matrix that makes up the shape in the current position
-	*/
-	public boolean[][] getBooleanMatrix()
-	{
-		boolean[][] matrix = new boolean[shape.length][shape[0].length];
+    /**
+     * returns a Booleanmatrix that makes up a shape
+     *
+     * @return a boolean[][] matrix that makes up the shape in the current position
+     */
+    public boolean[][] getBooleanMatrix()
+    {
+	boolean[][] matrix = new boolean[shape.length][shape[0].length];
 
-		for (int col = 0; col < shape.length; col++)
-		{
-			for (int row = 0; row < shape[0].length; row++)
-			{
-				if (shape[col][row] != null)
-				{
-					matrix[col][row] = true;
-				}
-			}
-		}
+	for (int col = 0; col < shape.length; col++)
+	    for (int row = 0; row < shape[0].length; row++)
+		if (shape[col][row] != null)
+		    matrix[col][row] = true;
 		
-		return matrix;
-	}
+	return matrix;
+    }
 	
-	/**
-	* Return current left position of shape
-	*
-	* @return x the current left position for shape
-	*/
-	public int getX()
-	{
-		return this.x;
-	}
+    /**
+     * Return current left position of shape
+     *
+     * @return x the current left position for shape
+     */
+    public int getX()
+    {
+	return this.x;
+    }
 	
-	/**
-	* Return current top position
-	*
-	* @return y current top position
-	*/
-	public int getY()
-	{
-		return this.y;
-	}
+    /**
+     * Return current top position
+     *
+     * @return y current top position
+     */
+    public int getY()
+    {
+	return this.y;
+    }
 	
-	/**
-	* Saves a copy of the shapes state, then modifies it's left position
-	*
-	* @param x amount to move in left-right direction
-	*/
-	public void setX(final int x)
-	{
-			this.x = x;
-	}
+    /**
+     * Saves a copy of the shapes state, then modifies it's left position
+     *
+     * @param x amount to move in left-right direction
+     */
+    public void setX(final int x)
+    {
+	this.x = x;
+    }
 	
-	/**
-	* Saves a copy of the shapes state, then modifies it's top position
-	*
-	* @param y amount to move in up-down direction
-	*/
-	public void setY(final int y)
-	{
-			this.y = y;
-	}
+    /**
+     * Saves a copy of the shapes state, then modifies it's top position
+     *
+     * @param y amount to move in up-down direction
+     */
+    public void setY(final int y)
+    {
+	this.y = y;
+    }
     
     
     /**
@@ -214,53 +208,53 @@ public abstract class Shape implements Cloneable, Serializable
 		block.setColor(value.getColor());
     }
     
-	/**
-	* Returnss the current shape using * as marker for a block
-	*/
-	public String toString()
+    /**
+     * Returnss the current shape using * as marker for a block
+     */
+    public String toString()
+    {
+	String strShape = "";
+	for (int i = 0; i < this.shape[0].length; i++)
 	{
-		String strShape = "";
-		for (int i = 0; i < this.shape[0].length; i++)
-		{
-			for (int j = 0; j < this.shape.length; j++)
-			{
-				if (this.shape[j][i] != null)
-					strShape += "*";
-				else
-					strShape += " ";
-			}
-			strShape += "\n";
-		}
+	    for (int j = 0; j < this.shape.length; j++)
+		if (this.shape[j][i] != null)
+		    strShape += "*";
+		else
+		    strShape += " ";
+	    
+	    strShape += "\n";
+	}
 		
-		return strShape;
-	}
+	return strShape;
+    }
 	
-	/**
-	* Rotate the shape around its center.
-	* 
-	* @param clockwise if <code>true</code> we rotate clockwise (i.e. right), if <code>false</code> we rotate counterclockwise (i.e. left)
-	*/
-	public abstract void rotate(final boolean clockwise);
+    /**
+     * Rotate the shape around its center.
+     * 
+     * @param  clockwise  <code>true</code> to rotate clockwise (right),
+     *                    <code>false</code> to rotate anticlockwise (left)
+     */
+    public abstract void rotate(final boolean clockwise);
 
-        /**
-	 * {@inheritDoc}
-	 */
-        public Shape clone() throws CloneNotSupportedException
-        {
-	    throw new CloneNotSupportedException();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public Shape clone() throws CloneNotSupportedException
+    {
+	throw new CloneNotSupportedException();
+    }
     
-        /**
-	 * Clones data into another {@link Shape}
-	 * 
-	 * @param  shape  Destination
-	 */
-        protected void cloneData(final Shape shape)
-        {
-	    shape.x = this.x;
-	    shape.y = this.y;
-	    shape.player = this.player;
-	    shape.shape = this.shape;
-	}
+    /**
+     * Clones data into another {@link Shape}
+     * 
+     * @param  shape  Destination
+     */
+    protected void cloneData(final Shape shape)
+    {
+	shape.x = this.x;
+	shape.y = this.y;
+	shape.player = this.player;
+	shape.shape = this.shape;
+    }
     
 }

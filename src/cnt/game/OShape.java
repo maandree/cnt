@@ -24,17 +24,13 @@ import java.io.*;
 */
 public class OShape extends Shape
 {
-	public OShape()
-	{
-		this.shape = new Block[2][2];
-		for (int i = 0; i < 2; i++)
-		{
-			for (int j = 0; j < 2; j++)
-			{
-				this.shape[i][j] = new Block();
-			}
-		}
-	}
+    public OShape()
+    {
+	this.shape = new Block[2][2];
+	for (int i = 0; i < 2; i++)
+	    for (int j = 0; j < 2; j++)
+		this.shape[i][j] = new Block();
+    }
     
     private OShape(final OShape original)
     {
@@ -77,10 +73,10 @@ public class OShape extends Shape
     
     
 
-	public void rotate(final boolean clockwise)
-	{
+    public void rotate(final boolean clockwise)
+    {
         //	indentity function
-	}
+    }
 	
     public OShape clone()
     {

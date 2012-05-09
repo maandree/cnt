@@ -24,19 +24,19 @@ import java.io.*;
 */
 public class ZShape extends Shape
 {
-	boolean flat;
+    boolean flat;
 	
-	public ZShape()
-	{
-	    this.flat = true;
-		this.shape = new Block[3][3];
+    public ZShape()
+    {
+	this.flat = true;
+	this.shape = new Block[3][3];
 		
-		int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
-		for (int[] place : placement)
-		{
-			this.shape[place[0]][place[1]] = new Block();
-		}
+	int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
+	for (int[] place : placement)
+	{
+	    this.shape[place[0]][place[1]] = new Block();
 	}
+    }
     
     private ZShape(final ZShape original)
     {
@@ -84,32 +84,31 @@ public class ZShape extends Shape
     
     
     
-	public void rotate(final boolean clockwise)
+    public void rotate(final boolean clockwise)
+    {
+	Block[][] matrix = new Block[3][3];
+
+	if (this.flat)
 	{
-		Block[][] matrix = new Block[3][3];
-
-		if (this.flat)
-		{
-			matrix[2][1] = this.shape[2][1];
-			matrix[1][1] = this.shape[1][1];
-			matrix[1][2] = this.shape[1][0];
-			matrix[2][0] = this.shape[0][0];
-			
-			this.shape = matrix;
-			this.flat = false;
-		} else
-		{
-						
-			matrix[2][1] = this.shape[2][1];
-			matrix[1][1] = this.shape[1][1];
-			matrix[1][0] = this.shape[1][2];
-			matrix[0][0] = this.shape[2][0];
-			
-			this.shape = matrix;
-			this.flat = true;
-
-		}				
+	    matrix[2][1] = this.shape[2][1];
+	    matrix[1][1] = this.shape[1][1];
+	    matrix[1][2] = this.shape[1][0];
+	    matrix[2][0] = this.shape[0][0];
+	    
+	    this.shape = matrix;
+	    this.flat = false;
 	}
+	else
+	{
+	    matrix[2][1] = this.shape[2][1];
+	    matrix[1][1] = this.shape[1][1];
+	    matrix[1][0] = this.shape[1][2];
+	    matrix[0][0] = this.shape[2][0];
+			
+	    this.shape = matrix;
+	    this.flat = true;
+	}
+    }
     
     public ZShape clone()
     {

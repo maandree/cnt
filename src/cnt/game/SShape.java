@@ -24,20 +24,20 @@ import java.io.*;
 */
 public class SShape extends Shape
 {
-	boolean flat;
+    boolean flat;
 	
-	public SShape()
+    public SShape()
+    {
+	this.flat = true;
+	this.shape = new Block[3][3];
+		
+	int[][] placement = new int[][] {{1,0},{2,0},{0,1},{1,1}};
+	for (int[] place : placement)
 	{
-	    this.flat = true;
-		this.shape = new Block[3][3];
-		
-		int[][] placement = new int[][] {{1,0},{2,0},{0,1},{1,1}};
-		for (int[] place : placement)
-		{
-			this.shape[place[0]][place[1]] = new Block();
-		}
-		
+	    this.shape[place[0]][place[1]] = new Block();
 	}
+		
+    }
     
     private SShape(final SShape original)
     {
@@ -85,30 +85,31 @@ public class SShape extends Shape
     
     
 
-	public void rotate(final boolean clockwise)
-	{
-		Block[][] matrix = new Block[3][3];
+    public void rotate(final boolean clockwise)
+    {
+	Block[][] matrix = new Block[3][3];
 
-		if (this.flat)
-		{
-			matrix[1][0] = this.shape[1][0];
-			matrix[1][1] = this.shape[1][1];
-			matrix[2][1] = this.shape[2][0];
-			matrix[2][2] = this.shape[0][1];
+	if (this.flat)
+	{
+	    matrix[1][0] = this.shape[1][0];
+	    matrix[1][1] = this.shape[1][1];
+	    matrix[2][1] = this.shape[2][0];
+	    matrix[2][2] = this.shape[0][1];
 			
-			this.shape = matrix;
-			this.flat = false;
-		} else
-		{
-			matrix[1][0] = this.shape[1][0];
-			matrix[1][1] = this.shape[1][1];
-			matrix[2][0] = this.shape[2][1];
-			matrix[0][1] = this.shape[2][2];
-			
-			this.shape = matrix;
-			this.flat = true;
-		}				
+	    this.shape = matrix;
+	    this.flat = false;
 	}
+	else
+	{
+	    matrix[1][0] = this.shape[1][0];
+	    matrix[1][1] = this.shape[1][1];
+	    matrix[2][0] = this.shape[2][1];
+	    matrix[0][1] = this.shape[2][2];
+			
+	    this.shape = matrix;
+	    this.flat = true;
+	}				
+    }
 	
     public SShape clone()
     {

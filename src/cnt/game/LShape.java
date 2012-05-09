@@ -24,42 +24,39 @@ import java.io.*;
 */
 public class LShape extends Shape
 {	
-	private Block[][][] states;
-	private int currState = 0;
-	public LShape()
+    private Block[][][] states;
+    private int currState = 0;
+    public LShape()
+    {
+	this.states = new Block[4][3][3];
+	this.shape = new Block[3][3];
+		
+	int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
+	for (int[] place : placement)
 	{
-	    this.states = new Block[4][3][3];
-		this.shape = new Block[3][3];
-		
-		int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
-		for (int[] place : placement)
-		{
-			this.shape[place[0]][place[1]] = new Block();
-		}
-		
-		this.states[0] = this.shape;
-		
-		int[][][] coords = new int[3][4][2];
-
-		coords[0] = new int[][] {{0,1},{1,1},{2,1},{0,2}};
-		coords[1] = new int[][] {{0,0},{1,0},{1,1},{1,2}};
-		coords[2] = new int[][] {{2,0},{0,1},{1,1},{2,1}};
-		
-		int i = 1;
-		for (int[][] coord : coords)
-		{
-			Block[][] matrix = new Block[3][3];
-			for (int[] place : coord)
-			{
-				matrix[place[0]][place[1]] = new Block();
-			}
-			
-			this.states[i++] = matrix;
-		}
-				
-		
-		
+	    this.shape[place[0]][place[1]] = new Block();
 	}
+	
+	this.states[0] = this.shape;
+	
+	int[][][] coords = new int[3][4][2];
+	
+	coords[0] = new int[][] {{0,1},{1,1},{2,1},{0,2}};
+	coords[1] = new int[][] {{0,0},{1,0},{1,1},{1,2}};
+	coords[2] = new int[][] {{2,0},{0,1},{1,1},{2,1}};
+	
+	int i = 1;
+	for (int[][] coord : coords)
+	{
+	    Block[][] matrix = new Block[3][3];
+	    for (int[] place : coord)
+	    {
+		matrix[place[0]][place[1]] = new Block();
+	    }
+	    
+	    this.states[i++] = matrix;
+	}
+    }
     
     /**
      * {@inheritDoc}
@@ -96,7 +93,7 @@ public class LShape extends Shape
         }
             
         private final Block[][][] states;
-	    private final int currState;
+	private final int currState;
     
         /**
          * Restores the shape's state
@@ -124,18 +121,18 @@ public class LShape extends Shape
     
     
 
-	public void rotate(final boolean clockwise)
-	{
-		if (clockwise)
-		{
-			this.currState = (this.currState + 1) % 3;
-		} else
-		{
-			this.currState = (this.currState - 1) < 0 ? (this.currState + 2) : (this.currState - 1);
-		}
-		
-		this.shape = this.states[this.currState];
-	}
+    public void rotate(final boolean clockwise)
+    {
+	if (clockwise)
+	    this.currState = (this.currState + 1) % 4;
+	
+	else
+	    this.currState = (this.currState - 1) < 0
+		             ? (this.currState + 3)
+		             : (this.currState - 1);
+	
+	this.shape = this.states[this.currState];
+    }
 	
     public LShape clone()
     {

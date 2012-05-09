@@ -24,17 +24,17 @@ import java.io.*;
 */
 public class TShape extends Shape
 {
-	public TShape()
-	{
-	    this.shape = new Block[3][3];
+    public TShape()
+    {
+	this.shape = new Block[3][3];
 	    
-	    int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
-	    for (int[] place : placement)
-		{
-		    this.shape[place[0]][place[1]] = new Block();
-		}
-		
+	int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
+	for (int[] place : placement)
+	{
+	    this.shape[place[0]][place[1]] = new Block();
 	}
+		
+    }
     
     private TShape(final TShape original)
     {
@@ -77,42 +77,35 @@ public class TShape extends Shape
     
     
 
-	public void rotate(final boolean clockwise)
-	{
-		if (clockwise) 
-		{
+    public void rotate(final boolean clockwise)
+    {
+	if (clockwise) 
+	    {
+		this.shape = this.turn();
+	    } else
+	    {
+		// 3 clockwise turns = 1 counterclockwise turn, so...
+		for (int i = 0; i < 4; i++)
+		    {
 			this.shape = this.turn();
-		} else
-		{
-			// 3 clockwise turns = 1 counterclockwise turn, so...
-			for (int i = 0; i < 4; i++)
-			{
-				this.shape = this.turn();
-			}
-		}
+		    }
+	    }
 				
-	}
+    }
 	
-	public Block[][] turn()
-	{
-		Block[][] matrix = new Block[3][3];
+    public Block[][] turn()
+    {
+	Block[][] matrix = new Block[3][3];
 		
-		if (this.shape[1][0] != null)
-			matrix[2][1] = this.shape[1][0];
+	if (this.shape[1][0] != null)  matrix[2][1] = this.shape[1][0];
+	if (this.shape[2][1] != null)  matrix[1][2] = this.shape[2][1];
+	if (this.shape[1][2] != null)  matrix[0][1] = this.shape[1][2];
+	if (this.shape[0][1] != null)  matrix[1][0] = this.shape[0][1];
 		
-		if (this.shape[2][1] != null)
-			matrix[1][2] = this.shape[2][1];
-	
-		if (this.shape[1][2] != null)
-			matrix[0][1] = this.shape[1][2];
+	matrix[1][1] = this.shape[1][1];
 		
-		if (this.shape[0][1] != null)
-			matrix[1][0] = this.shape[0][1];
-		
-		matrix[1][1] = this.shape[1][1];
-		
-		return matrix;
-	}
+	return matrix;
+    }
 	
     public TShape clone()
     {
