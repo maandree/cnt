@@ -41,6 +41,46 @@ public class IShape extends Shape
     {
 	original.cloneData(this);
     }
+    
+    
+    
+    /**
+     * Momento class for {@link IShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final IShape shape)
+        {
+            super(shape);
+            this.flat = shape.flat;
+        }
+            
+        private final boolean flat;
+    
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof IShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+            ((IShape)shape).flat = this.flat;
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
 
 	/**
 	* {@inheritDoc}

@@ -27,21 +27,66 @@ public abstract class Shape implements Cloneable, Serializable
 	public Block[][] shape;
 
 	/**
-	* Current offsets from top-left corner
+	* Current X offset from top-left corner
 	*/
-	public int x = 0, y = 0;
-	
+	public int x = 0;
+
 	/**
-	* The last state the shape was in
-	*/	
-	private Shape old_state;
+	* Current Y offset from top-left corner
+	*/
+	public int y = 0;
 
 	/**
 	* Player owning the shape
 	*/
 	public Player player = null;
+    
+    
+    
+    /**
+     * Momento class for {@link Shape}
+     */
+    public static abstract class Momento
+    {
+        public Momento(final Shape shape)
+        {
+            this.shape = shape.shape;
+            this.x = shape.x;
+            this.y = shape.y;
+        }
         
         
+	    /**
+	    * The shape that we want
+	    */
+	    private final Block[][] shape;
+
+	    /**
+	    * Current X offset from top-left corner
+	    */
+	    private final int x;
+
+	    /**
+	    * Current Y offset from top-left corner
+	    */
+	    private final int y;
+    
+    
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            shape.shape = this.shape;
+            shape.x = this.x;
+            shape.y = this.y;
+        }
+    }
+        
+    
+    
 	/**
 	* Returns the current Shape
 	* 
@@ -112,14 +157,7 @@ public abstract class Shape implements Cloneable, Serializable
 	*/
 	public void setX(final int x)
 	{
-		try
-		{
-			this.old_state = (Shape)this.clone();
 			this.x = x;
-		} catch (CloneNotSupportedException err)
-		{
-			System.out.println("Something went wrong cloneing a shape");
-		}
 	}
 	
 	/**
@@ -129,29 +167,27 @@ public abstract class Shape implements Cloneable, Serializable
 	*/
 	public void setY(final int y)
 	{
-		try
-		{
-			this.old_state = (Shape)this.clone();
 			this.y = y;
-		} catch (CloneNotSupportedException err)
-		{
-			System.out.println("Something went wrong cloneing a shape");
-		}
 	}
-	
-	/**
-	* Restore and return the previous state the shape was in
-	*
-	* @return the shape object in it's last state
-	*/
-	public Shape restore()
-	{
-		this.x = this.old_state.getX();
-		this.y = this.old_state.getY();
-		this.shape = this.old_state.getBlockMatrix();
-		
-		return this.old_state;
-	}
+    
+    
+    /**
+     * Stores the shape's current state to a {@link Momento}
+     * 
+     * @return  The state
+     */
+    public abstract Momento store();
+    
+    
+    /**
+     * Restores the shape's state from a {@link Momento}
+     * 
+     * @param  momento  The state
+     */
+    public void restore(final Momento momento)
+    {
+        momento.restore(this);
+    }
 
 	/**
 	* Returnss the current shape using * as marker for a block

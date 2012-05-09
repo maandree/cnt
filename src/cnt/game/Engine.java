@@ -263,7 +263,7 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	try
 	{
-	    fallingShape = (Shape)(POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone());
+	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone();
 	}
 	catch (final CloneNotSupportedException err)
 	{
@@ -277,7 +277,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	for (int r = 0, rn = (int)(Math.random() * 3); r < rn; r++)
 	    fallingShape.rotate(true);
 	
-	fallingShape.setPlayer(currentPlayer = player);
+	fallingShape.player = currentPlayer = player;
 	
 	gameOver = board.canPut(fallingShape, false) == false;
 	if (gameOver)

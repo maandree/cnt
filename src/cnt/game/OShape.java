@@ -40,6 +40,42 @@ public class OShape extends Shape
     {
 	original.cloneData(this);
     }
+    
+    
+    
+    /**
+     * Momento class for {@link OShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final OShape shape)
+        {
+            super(shape);
+        }
+        
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof OShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
 
 	public void rotate(final boolean clockwise)
 	{

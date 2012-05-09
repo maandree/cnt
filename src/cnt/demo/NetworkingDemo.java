@@ -40,10 +40,8 @@ public class NetworkingDemo
      * This is the main entry point of the program
      * 
      * @param  args  Start up arguments
-     * 
-     * @throws  IOException  On I/O exception (should not happen)
      */
-    public static void main(final String... args) throws IOException
+    public static void main(final String... args) throws Exception
     {
 	final ServerSocket server = new ServerSocket(9999);
 	

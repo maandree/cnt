@@ -44,6 +44,45 @@ public class ZShape extends Shape
     }
     
     
+    
+    /**
+     * Momento class for {@link ZShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final ZShape shape)
+        {
+            super(shape);
+            this.flat = shape.flat;
+        }
+            
+        private final boolean flat;
+    
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof ZShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+            ((ZShape)shape).flat = this.flat;
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
+    
 	public void rotate(final boolean clockwise)
 	{
 		Block[][] matrix = new Block[3][3];

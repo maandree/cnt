@@ -40,6 +40,42 @@ public class TShape extends Shape
     {
 	original.cloneData(this);
     }
+    
+    
+    
+    /**
+     * Momento class for {@link TShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final TShape shape)
+        {
+            super(shape);
+        }
+        
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof TShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
 
 	public void rotate(final boolean clockwise)
 	{

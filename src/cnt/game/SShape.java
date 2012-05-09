@@ -44,6 +44,46 @@ public class SShape extends Shape
 	original.cloneData(this);
 	this.flat = original.flat;
     }
+    
+    
+    
+    /**
+     * Momento class for {@link SShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final SShape shape)
+        {
+            super(shape);
+            this.flat = shape.flat;
+        }
+            
+        private final boolean flat;
+    
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof SShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+            ((SShape)shape).flat = this.flat;
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
 
 	public void rotate(final boolean clockwise)
 	{

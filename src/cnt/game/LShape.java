@@ -65,7 +65,51 @@ public class LShape extends Shape
     {
 	original.cloneData(this);
 	this.states = original.states;
+	this.currState = original.currState;
     }
+    
+    
+    
+    /**
+     * Momento class for {@link LShape}
+     */
+    public static class Momento extends Shape.Momento
+    {
+        public Momento(final LShape shape)
+        {
+            super(shape);
+            this.states = shape.states;
+            this.currState = shape.currState;
+        }
+            
+        private final Block[][][] states;
+	    private final int currState;
+    
+        /**
+         * Restores the shape's state
+         * 
+         * @param  Shape  The shape
+         */
+        public void restore(final Shape shape)
+        {
+            if (shape instanceof LShape)
+                throw new Error("Wrong shape type");
+            super.restore(shape);
+            ((LShape)shape).states = this.states;
+            ((LShape)shape).currState = this.currState;
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Momento store()
+    {
+        return new Momento(this);
+    }
+    
+    
 
 	public void rotate(final boolean clockwise)
 	{

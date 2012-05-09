@@ -17,6 +17,7 @@ import org.teleal.cling.controlpoint.*;
 * 
 * @author Calle Lejdbrandt, <a href="callel@kth.se">callel@kth.se</a>
 */
+@SuppressWarnings({"unchecked", "rawtypes"}) //TODO: Can you fix these warning
 public class UPnPDemo implements Runnable 
 {
 	/**
