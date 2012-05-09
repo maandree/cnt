@@ -66,6 +66,8 @@ public class Board
 			if(newBlocks[y][x] !=null)
 			    
 			    blocks[y+offY][x+offX] = newBlocks[y][x];
+	
+	System.err.println("\033[32mputting: block at " + newBlocks[0].length + "x" + newBlocks.length + "+" + offX + "+" + offY + "\033[0m");
     }
     
     /**
@@ -152,25 +154,35 @@ public class Board
 	final int offX = shape.getX();
 	final int offY = shape.getY();
 	
-    	for (int y = 0; y < newBlocks.length; y++)
+	System.err.println("\033[34mtesting put: block at " + newBlocks[0].length + "x" + newBlocks.length + "+" + offX + "+" + offY + "\033[0m");
+	boolean rc = false;
 	
-	    if ((0 <= y + offY) && (y + offY < HEIGHT))
-	    {
-		for (int x = 0; x < newBlocks[y].length; x++)
+	try
+	{
+	    for (int y = 0; y < newBlocks.length; y++)
+	
+		if ((0 <= y + offY) && (y + offY < HEIGHT))
+		{
+		    for (int x = 0; x < newBlocks[y].length; x++)
 		
-		    if ((0 <= x + offX) && (x + offX < WIDTH))
-		    {
-			if ((newBlocks[y][x] != null) && (blocks[y+offY][x+offX] != null))
-			    
-			    return false;
-		    }
-		    else if (ignoreEdges == false)
-			return false;
-	    }
-	    else if (ignoreEdges == false)
-		return false;
-	
-	return true;
+			if ((0 <= x + offX) && (x + offX < WIDTH))
+			{
+			    if ((newBlocks[y][x] != null) && (blocks[y+offY][x+offX] != null))
+				
+				return rc = false;
+			}
+			else if (ignoreEdges == false)
+			    return rc = false;
+		}
+		else if (ignoreEdges == false)
+		    return rc = false;
+	    
+	    return rc = true;
+	}
+	finally //post-return code ☺
+	{
+	    System.err.println(rc ? "\033[35mfree\033[0m" : "\033[31mcollision\033[0m");
+	}
     }
     
 }

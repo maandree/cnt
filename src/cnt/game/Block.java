@@ -25,13 +25,21 @@ public class Block implements Serializable
 	private int color;
 	
 	/**
-	* Default constructor expects a color of the block
+	* Constructor
 	*
 	* @param color the color of the new block
 	*/
 	public Block(final int color)
 	{
 		this.setColor(color);
+	}
+    
+	/**
+	* Constructor, without color
+	*/
+	public Block()
+	{
+	    this(0xFF0000C0);
 	}
 
 	/**

@@ -178,21 +178,33 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
     public void update(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
     {
 	if (erase != null)
-	    for (int y = 0, h = erase.length; y < h; y++)
+	    for (int y = offY < 0 ? offY : 0, h = erase.length; y < h; y++)
 	    {
 		final int Y = y + offY;
-		for (int x = 0, w = erase[y].length; x < w; x++)
+		if (Y >= this.matrix.length)
+		    break;
+		
+		for (int x = offX < 0 ? offX : 0, w = erase[y].length; x < w; x++)
 		    if (erase[y][x])
-			this.matrix[Y][x + offX] = null;
+			if (x + offX < this.matrix[Y].length)
+			    this.matrix[Y][x + offX] = null;
+			else
+			    break;
 	    }
 	
 	if (blocks != null)
-	    for (int y = 0, h = blocks.length; y < h; y++)
+	    for (int y = offY < 0 ? offY : 0, h = blocks.length; y < h; y++)
 	    {
 		final int Y = y + offY;
-		for (int x = 0, w = blocks[y].length; x < w; x++)
+		if ((Y >= this.matrix.length) || (0 > Y))
+		    break;
+		
+		for (int x = offX < 0 ? offX : 0, w = blocks[y].length; x < w; x++)
 		    if (blocks[y][x] != null)
-			this.matrix[Y][x + offX] = new Color(blocks[y][x].getColor());
+			if (x + offX < this.matrix[Y].length)
+			    this.matrix[Y][x + offX] = new Color(blocks[y][x].getColor());
+			else
+			    break;
 	    }
 	
 	this.repaint();

@@ -37,7 +37,7 @@ public class EngineDemo
      */
     public static void main(final String... args) throws InterruptedException
     {
-	final Color colour = new Color(36, 149, 190);   // NCS S 2050-B
+	final Color colour = new Color(36, 149, 190);
 	final Player player = new Player("The One", colour.getRGB());
 	
 	(new MainFrame()).setVisible(true);
@@ -49,15 +49,67 @@ public class EngineDemo
 		     */
 		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
 		    {
-			if (message instanceof Blackboard.NextPlayer)
+			if (message instanceof Blackboard.NextPlayer) /*do not thread*/
 			{
-			    System.out.println("\033[33mNext player\033[0m");
 			    if (((Blackboard.NextPlayer)message).player == null)
+			    {
+				System.out.println("\033[33mNext player\033[0m");
 				Blackboard.broadcastMessage(new Blackboard.NextPlayer(player));
+			    }
+			    else
+				System.out.println("\033[35m(Next player)\033[0m");
 			}
 			else if (message instanceof Blackboard.GameOver)
 			{
 			    System.out.println("\033[33mGame over!\033[0m");
+			}
+			else if (message instanceof Blackboard.MatrixPatch)
+			{
+			    final Blackboard.MatrixPatch patch = (Blackboard.MatrixPatch)message;
+			    
+			    final boolean[][] erase = patch.erase;
+			    final Block[][] blocks = patch.blocks;
+			    final int offY = patch.offY;
+			    final int offX = patch.offX;
+			    final int[][] matrix = new int[20][10];
+			    
+			    if (erase != null)
+				for (int y = offY < 0 ? offY : 0, h = erase.length; y < h; y++)
+				    {
+					final int Y = y + offY;
+					if (Y >= matrix.length)
+					    break;
+					
+					for (int x = offX < 0 ? offX : 0, w = erase[y].length; x < w; x++)
+					    if (erase[y][x])
+						if (x + offX < matrix[Y].length)
+						    matrix[Y][x + offX] |= 1;
+						else
+						    break;
+				    }
+			    
+			    if (blocks != null)
+				for (int y = offY < 0 ? offY : 0, h = blocks.length; y < h; y++)
+				    {
+					final int Y = y + offY;
+					    if ((Y >= matrix.length) || (0 > Y))
+						break;
+					    
+					    for (int x = offX < 0 ? offX : 0, w = blocks[y].length; x < w; x++)
+						if (blocks[y][x] != null)
+						    if (x + offX < matrix[Y].length)
+							matrix[Y][x + offX] |= 2;
+						    else
+							break;
+				    }
+			    
+			    for (int y = 0; y < 10; y++)
+			    {
+				for (int x = 0; x < 10; x++)
+				    System.out.print("\033[4" + matrix[(y << 1) | 0][x] + ";3" + matrix[(y << 1) | 1][x] + "m▄");
+				System.out.println("\033[0m");
+			    }
+			    System.out.println();
 			}
 		    }
 	        });

@@ -19,9 +19,9 @@ import java.io.*;
 /**
 * Shape class representing a L-shape
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
-
 public class LShape extends Shape
 {	
 	private Block[][][] states;
@@ -34,7 +34,7 @@ public class LShape extends Shape
 		int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
+			this.shape[place[0]][place[1]] = new Block();
 		}
 		
 		this.states[0] = this.shape;
@@ -51,7 +51,7 @@ public class LShape extends Shape
 			Block[][] matrix = new Block[3][3];
 			for (int[] place : coord)
 			{
-				matrix[place[0]][place[1]] = new Block(this.player.getColor());
+				matrix[place[0]][place[1]] = new Block();
 			}
 			
 			this.states[i++] = matrix;
@@ -60,6 +60,19 @@ public class LShape extends Shape
 		
 		
 	}
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setPlayer(final Player value)
+    {
+	super.setPlayer(value);
+	for (final Block[][] state : states)
+	    for (final Block[] row : state)
+		for (final Block block : row)
+		    block.setColor(value.getColor());
+    }
+
     
     private LShape(final LShape original)
     {
@@ -92,7 +105,7 @@ public class LShape extends Shape
          */
         public void restore(final Shape shape)
         {
-            if (shape instanceof LShape)
+            if (shape instanceof LShape == false)
                 throw new Error("Wrong shape type");
             super.restore(shape);
             ((LShape)shape).states = this.states;

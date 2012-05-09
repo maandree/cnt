@@ -19,9 +19,9 @@ import java.io.*;
 /**
 * Shape class representing a I-shape
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
-
 public class IShape extends Shape
 {
 	private boolean flat = true;
@@ -33,7 +33,7 @@ public class IShape extends Shape
 		int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
+			this.shape[place[0]][place[1]] = new Block();
 		}
 	}
     
@@ -64,7 +64,7 @@ public class IShape extends Shape
          */
         public void restore(final Shape shape)
         {
-            if (shape instanceof IShape)
+            if (shape instanceof IShape == false)
                 throw new Error("Wrong shape type");
             super.restore(shape);
             ((IShape)shape).flat = this.flat;

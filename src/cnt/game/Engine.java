@@ -81,11 +81,6 @@ public class Engine implements Blackboard.BlackboardObserver
     private static int sleepTime = INITIAL_SLEEP_TIME;
     
     /**
-     * Help monitor for the game thread, used to notify when a player has been found
-     */
-    private static Object threadingMonitor = new Object();
-    
-    /**
      * The game thread
      */
     private static Thread thread = null;
@@ -110,7 +105,8 @@ public class Engine implements Blackboard.BlackboardObserver
 	Blackboard.registerObserver(blackboardObserver);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
 					   Blackboard.GamePlayCommand.class,
-					   Blackboard.PlayerDropped.class,
+					   Blackboard.PlayerDropped.class);
+	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
 					   Blackboard.NextPlayer.class);
 	
 	thread = new Thread()
@@ -123,33 +119,26 @@ public class Engine implements Blackboard.BlackboardObserver
 		    {
 			for (;;)
 			{
-			    synchronized (Engine.threadingMonitor)
+			    System.err.println("@ 0");
+			    Engine.nextTurn();
+			    
+			    if (Engine.gameOver)
 			    {
-				try
-				{
-				    Engine.threadingMonitor.wait();
-				}
-				catch (final InterruptedException err)
-			        {
-				    System.err.println("Are you leaving?");
-				    return;
-				}
-				
-				if (Engine.gameOver)
-				{
-				    Blackboard.broadcastMessage(new Blackboard.GameOver());
-				    return;
-				}
+				System.err.println("@ x");
+				Blackboard.broadcastMessage(new Blackboard.GameOver());
+				return;
 			    }
 			    
 			    for (;;)
 			    {
 				try
 				{
+				    System.err.println("@ 1");
 				    Thread.sleep(Engine.sleepTime);
 				}
 				catch (final InterruptedException err)
 				{
+				    System.err.println("@ 1.e");
 				    if (Engine.currentPlayer == null)
 					break;
 				    continue;
@@ -157,14 +146,17 @@ public class Engine implements Blackboard.BlackboardObserver
 				
 				try
 				{
+				    System.err.println("@ 2");
 				    synchronized (Engine.class)
 				    {
+					System.err.println("@ 2.s");
 					if (Engine.fall() == false)
 					    break;
 				    }
 				}
 				catch (final InterruptedException err)
 			        {
+				    System.err.println("@ 2.e");
 				    System.err.println("Are you leaving?");
 				    return;
 				}
@@ -174,8 +166,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	        };
 	
 	thread.start();
-	
-	nextTurn();
     }
     
     
@@ -202,7 +192,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void patchAway(final boolean[][] blocks, final int offX, final int offY)
     {
-	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, (Block[][])null, offY, offX);
+	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
 	Blackboard.broadcastMessage(patch);
     }
     
@@ -261,9 +251,12 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void newTurn(final Player player)
     {
+	System.err.println("@ newTurn(" + player + ")");
+	
 	try
 	{
 	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone();
+	    System.err.println("New shape: " + fallingShape.getClass().toString());
 	}
 	catch (final CloneNotSupportedException err)
 	{
@@ -274,10 +267,14 @@ public class Engine implements Blackboard.BlackboardObserver
 	    throw new Error("*Shape.clone() is not implemented correctly");
 	}
 	
-	for (int r = 0, rn = (int)(Math.random() * 3); r < rn; r++)
+	currentPlayer = player;
+	//fallingShape.setPlayer(currentPlayer);  //########################################################################################### ?????????????????????????
+	
+	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
 	    fallingShape.rotate(true);
 	
-	fallingShape.player = currentPlayer = player;
+	fallingShape.setX((Board.WIDTH - fallingShape.getBlockMatrix()[0].length) >> 1);
+	fallingShape.setY(0);
 	
 	gameOver = board.canPut(fallingShape, false) == false;
 	if (gameOver)
@@ -286,10 +283,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
 	
-	synchronized (threadingMonitor)
-	{
-	    threadingMonitor.notify();
-	}
+	patchIn(fallingShape);
     }
     
     
@@ -300,8 +294,10 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static boolean fall() throws InterruptedException
+    static boolean fall() throws InterruptedException
     {
+	System.err.println("@ fall()");
+	
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	fallingShape.setY(fallingShape.getY() + 1);
@@ -310,8 +306,11 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    fallingShape.restore(moveInitialMomento);
 	    reaction();
+	    fallingShape = null;
 	    return false;
 	}
+	
+	moveInitialMomento = moveAppliedMomento = fallingShape.store();
 	
 	patchIn(fallingShape);
 	return true;
@@ -325,6 +324,8 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void drop() throws InterruptedException
     {
+	System.err.println("@ drop()");
+	
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -336,6 +337,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    {
 		fallingShape.restore(moveInitialMomento);
 		reaction();
+		fallingShape = null;
 		return;
 	    }
 	}
@@ -349,6 +351,8 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void rotate(final boolean clockwise)
     {
+	System.err.println("@ rotate(" + clockwise + ")");
+	
 	fallingShape.rotate(clockwise);
 	
 	if (board.canPut(fallingShape, false))
@@ -367,6 +371,8 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void move(final int incrX)
     {
+	System.err.println("@ move(" + incrX + ")");
+	
 	fallingShape.setX(fallingShape.getX() + incrX);
 	
 	if (board.canPut(fallingShape, false))
@@ -385,11 +391,18 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void reaction() throws InterruptedException
     {
+	System.err.println("@ reaction()");
+	
 	patchIn(fallingShape);
 	board.put(fallingShape);
-	fallingShape = null;
 	
 	final int[] full = board.getFullRows();
+	for (int i = 0, n = full.length >> 1; i < n; i++)
+	{
+	    full[i] ^= full[n - i - 1];
+	    full[n - i - 1] ^= full[i];
+	    full[i] ^= full[n - i - 1];
+	}
 	
 	if (full.length > 0)
 	{
@@ -421,8 +434,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	    patchIn(move, 0, sub);
 	    board.put(move, 0, sub);
 	}
-	
-	nextTurn();
     }
     
     
@@ -430,10 +441,11 @@ public class Engine implements Blackboard.BlackboardObserver
      * Performs everthing needed for a new turn and
      * sends a request for letting the next player start
      */
-    private static void nextTurn()
+    static void nextTurn()
     {
-	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
+	System.err.println("@ nextTurn()");
 	
+	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
 	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
     }
     
@@ -441,7 +453,7 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * {@inheritDoc}
      */
-    public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
 	try
 	{
@@ -464,8 +476,15 @@ public class Engine implements Blackboard.BlackboardObserver
 			    throw new Error("Unrecognised GamePlayCommand.");
 		    }
 		}
-	    else if (message instanceof Blackboard.NextPlayer)     newTurn(((Blackboard.NextPlayer)message).player);
-	    else if (message instanceof Blackboard.PlayerDropped)  playerDropped(((Blackboard.PlayerDropped)message).player);
+	    else if (message instanceof Blackboard.NextPlayer) /* do not thread */
+	    {
+		System.err.println("@ messageBroadcasted.NextPlayer(" + ((Blackboard.NextPlayer)message).player  + ")");
+		
+		if (((Blackboard.NextPlayer)message).player != null)
+		    newTurn(((Blackboard.NextPlayer)message).player);
+	    }
+	    else if (message instanceof Blackboard.PlayerDropped)
+		playerDropped(((Blackboard.PlayerDropped)message).player);
 	}
 	catch (final InterruptedException err)
 	{

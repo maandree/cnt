@@ -19,7 +19,8 @@ import java.io.*;
 /**
 * Shape class representing a Z-shape
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
 public class ZShape extends Shape
 {
@@ -33,7 +34,7 @@ public class ZShape extends Shape
 		int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
 		for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
+			this.shape[place[0]][place[1]] = new Block();
 		}
 	}
     
@@ -65,7 +66,7 @@ public class ZShape extends Shape
          */
         public void restore(final Shape shape)
         {
-            if (shape instanceof ZShape)
+            if (shape instanceof ZShape == false)
                 throw new Error("Wrong shape type");
             super.restore(shape);
             ((ZShape)shape).flat = this.flat;

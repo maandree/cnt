@@ -19,19 +19,19 @@ import java.io.*;
 /**
 * Shape class representing a O-shape
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
-
 public class OShape extends Shape
 {
 	public OShape()
 	{
 		this.shape = new Block[2][2];
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < 2; i++)
 		{
-			for (int j = 0; j < 2; ++j)
+			for (int j = 0; j < 2; j++)
 			{
-				this.shape[i][j] = new Block(this.player.getColor());
+				this.shape[i][j] = new Block();
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public class OShape extends Shape
          */
         public void restore(final Shape shape)
         {
-            if (shape instanceof OShape)
+            if (shape instanceof OShape == false)
                 throw new Error("Wrong shape type");
             super.restore(shape);
         }

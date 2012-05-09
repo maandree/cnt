@@ -17,29 +17,30 @@ import java.io.*;
 /**
 * Shape class representing a shape of objects
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
 public abstract class Shape implements Cloneable, Serializable
 {
 	/**
 	* The shape that we want
 	*/
-	public Block[][] shape;
+        protected Block[][] shape;
 
 	/**
 	* Current X offset from top-left corner
 	*/
-	public int x = 0;
+	protected int x = 0;
 
 	/**
 	* Current Y offset from top-left corner
 	*/
-	public int y = 0;
+	protected int y = 0;
 
 	/**
 	* Player owning the shape
 	*/
-	public Player player = null;
+        Player player = null;
     
     
     
@@ -116,9 +117,9 @@ public abstract class Shape implements Cloneable, Serializable
 	{
 		boolean[][] matrix = new boolean[shape.length][shape[0].length];
 
-		for (int col = 0; col < shape.length; ++col)
+		for (int col = 0; col < shape.length; col++)
 		{
-			for (int row = 0; row < shape[0].length; ++row)
+			for (int row = 0; row < shape[0].length; row++)
 			{
 				if (shape[col][row] != null)
 				{
@@ -189,15 +190,39 @@ public abstract class Shape implements Cloneable, Serializable
         momento.restore(this);
     }
 
+    /**
+     * Gets the player whom is playing or played the shape
+     * 
+     * @return  The player whom is playing or played the shape
+     */
+    public Player getPlayer()
+    {
+	return this.player;
+    }
+    
+    
+    /**
+     * Sets the player whom is playing the shape
+     * 
+     * @param  value  The player whom is playing the shape
+     */
+    public void setPlayer(final Player value)
+    {
+	this.player = value;
+	for (final Block[] row : this.shape)
+	    for (final Block block : row)
+		block.setColor(value.getColor());
+    }
+    
 	/**
 	* Returnss the current shape using * as marker for a block
 	*/
 	public String toString()
 	{
 		String strShape = "";
-		for (int i = 0; i < this.shape[0].length; ++i)
+		for (int i = 0; i < this.shape[0].length; i++)
 		{
-			for (int j = 0; j < this.shape.length; ++j)
+			for (int j = 0; j < this.shape.length; j++)
 			{
 				if (this.shape[j][i] != null)
 					strShape += "*";

@@ -19,19 +19,19 @@ import java.io.*;
 /**
 * Shape class representing a T-shape
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
-
 public class TShape extends Shape
 {
 	public TShape()
 	{
-		this.shape = new Block[3][3];
-		
-		int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
-		for (int[] place : placement)
+	    this.shape = new Block[3][3];
+	    
+	    int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
+	    for (int[] place : placement)
 		{
-			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
+		    this.shape[place[0]][place[1]] = new Block();
 		}
 		
 	}
@@ -60,7 +60,7 @@ public class TShape extends Shape
          */
         public void restore(final Shape shape)
         {
-            if (shape instanceof TShape)
+            if (shape instanceof TShape == false)
                 throw new Error("Wrong shape type");
             super.restore(shape);
         }
@@ -85,7 +85,7 @@ public class TShape extends Shape
 		} else
 		{
 			// 3 clockwise turns = 1 counterclockwise turn, so...
-			for (int i = 0; i < 4; ++i)
+			for (int i = 0; i < 4; i++)
 			{
 				this.shape = this.turn();
 			}
