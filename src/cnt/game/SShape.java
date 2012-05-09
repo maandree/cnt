@@ -17,18 +17,17 @@ import java.io.*;
 
 
 /**
-* Shape class representing a T-Shape
+* Shape class representing a S-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class SShape extends Shape
 {
 	boolean flat = true;
 	
-	public SShape(final Player player)
+	public SShape()
 	{
-		this.player = player;
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{2,0},{0,1},{1,1}};
@@ -38,6 +37,11 @@ public class SShape extends Shape
 		}
 		
 	}
+    
+    private SShape(final SShape original)
+    {
+	original.cloneData(this);
+    }
 
 	public void rotate(final boolean clockwise)
 	{
@@ -62,4 +66,9 @@ public class SShape extends Shape
 
 		}				
 	}
+	
+    public SShape clone()
+    {
+	return new SShape(this);
+    }
 }

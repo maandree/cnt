@@ -38,7 +38,7 @@ public class EngineDemo
     public static void main(final String... args) throws InterruptedException
     {
 	final Color colour = new Color(36, 149, 190);   // NCS S 2050-B
-	final Player player = new Player("The One", colour);
+	final Player player = new Player("The One", colour.getRGB());
 	
 	(new MainFrame()).setVisible(true);
 	

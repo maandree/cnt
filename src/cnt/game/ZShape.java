@@ -17,18 +17,16 @@ import java.io.*;
 
 
 /**
-* Shape class representing a T-Shape
+* Shape class representing a Z-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
-
 public class ZShape extends Shape
 {
 	boolean flat = true;
 	
-	public ZShape(final Player player)
+	public ZShape()
 	{
-		this.player = player;
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
@@ -36,9 +34,14 @@ public class ZShape extends Shape
 		{
 			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
-		
 	}
-
+    
+    private ZShape(final ZShape original)
+    {
+	original.cloneData(this);
+    }
+    
+    
 	public void rotate(final boolean clockwise)
 	{
 		Block[][] matrix = new Block[3][3];
@@ -63,4 +66,9 @@ public class ZShape extends Shape
 
 		}				
 	}
+    
+    public ZShape clone()
+    {
+	return new ZShape(this);
+    }
 }

@@ -17,7 +17,7 @@ import java.io.*;
 /**
 * Shape class representing a shape of objects
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 public abstract class Shape implements Cloneable, Serializable
 {
@@ -39,8 +39,9 @@ public abstract class Shape implements Cloneable, Serializable
 	/**
 	* Player owning the shape
 	*/
-	public Player player;
-
+	public Player player = null;
+        
+        
 	/**
 	* Returns the current Shape
 	* 
@@ -179,5 +180,26 @@ public abstract class Shape implements Cloneable, Serializable
 	* @param clockwise if <code>true</code> we rotate clockwise (i.e. right), if <code>false</code> we rotate counterclockwise (i.e. left)
 	*/
 	public abstract void rotate(final boolean clockwise);
-	
+
+        /**
+	 * {@inheritDoc}
+	 */
+        public Shape clone() throws CloneNotSupportedException
+        {
+	    throw new CloneNotSupportedException();
+	}
+    
+        /**
+	 * Clones data into another {@link Shape}
+	 * 
+	 * @param  shape  Destination
+	 */
+        protected void cloneData(final Shape shape)
+        {
+	    shape.x = this.x;
+	    shape.y = this.y;
+	    shape.player = this.player;
+	    shape.shape = this.shape;
+	}
+    
 }

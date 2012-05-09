@@ -5,10 +5,8 @@ public class shapeTest
 {
 	public static void main(String... args) throws InterruptedException
 	{
-		System.out.println("Setting up");
-		Player player = new Player("CNT", 3421236);
 		System.out.println("Testing to create an IShape");
-		Shape ishape = new IShape(player);
+		Shape ishape = new IShape();
 		System.out.println(ishape);
 		System.out.println("Testing rotateing IShape");
 		ishape.rotate(true);
@@ -17,7 +15,7 @@ public class shapeTest
 		Thread.sleep(1000);
 		
 		System.out.println("Testing to create an LShape");
-		Shape lshape = new LShape(player);
+		Shape lshape = new LShape();
 		System.out.println(lshape);
 		System.out.println("Testing rotateing LShape");
 		lshape.rotate(true);
@@ -26,7 +24,7 @@ public class shapeTest
 		Thread.sleep(1000);
 
 		System.out.println("Testing to create an JShape");
-		Shape jshape = new JShape(player);
+		Shape jshape = new JShape();
 		System.out.println(jshape);
 		System.out.println("Testing rotateing JShape");
 		jshape.rotate(true);
@@ -35,7 +33,7 @@ public class shapeTest
 		Thread.sleep(1000);		
 
 		System.out.println("Testing to create an SShape");
-		Shape sshape = new SShape(player);
+		Shape sshape = new SShape();
 		System.out.println(sshape);
 		System.out.println("Testing rotateing SShape");
 		sshape.rotate(true);
@@ -44,7 +42,7 @@ public class shapeTest
 		Thread.sleep(1000);
 
 		System.out.println("Testing to create an ZShape");
-		Shape zshape = new ZShape(player);
+		Shape zshape = new ZShape();
 		System.out.println(zshape);
 		System.out.println("Testing rotateing zShape");
 		zshape.rotate(true);
@@ -53,7 +51,7 @@ public class shapeTest
 		Thread.sleep(1000);
 
 		System.out.println("Testing to create an TShape");
-		Shape tshape = new TShape(player);
+		Shape tshape = new TShape();
 		System.out.println(tshape);
 		System.out.println("Testing rotateing TShape");
 		tshape.rotate(true);
@@ -62,7 +60,7 @@ public class shapeTest
 		Thread.sleep(1000);
 
 		System.out.println("Testing to create an OShape");
-		Shape oshape = new OShape(player);
+		Shape oshape = new OShape();
 		System.out.println(oshape);
 		System.out.println("Testing rotateing OShape");
 		oshape.rotate(true);

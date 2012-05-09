@@ -66,7 +66,7 @@ public class NetworkingDemo
 			    
 			    
 			    System.out.println("network0: sending message: ChatMessage");
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED), "sending a message"));
+			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED.getRGB()), "sending a message"));
 			    
 			    System.out.println("network0: sending message: SystemMessage");
 			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "system message"));
@@ -124,6 +124,7 @@ public class NetworkingDemo
 	        };
 	
 	thread0.start();
+	Thread.sleep(200);
 	thread1.start();
     }
     

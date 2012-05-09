@@ -17,18 +17,18 @@ import java.io.*;
 
 
 /**
-* Shape class representing a J-Shape
+* Shape class representing a J-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class JShape extends Shape
 {	
-	private Block[][][] states = new Block[4][3][3];
+	private Block[][][] states;
 	private int currState = 0;
-	public JShape(final Player player)
+	public JShape()
 	{
-		this.player = player;
+	    this.states = new Block[4][3][3];
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{1,1},{1,2},{0,2}};
@@ -56,10 +56,13 @@ public class JShape extends Shape
 			
 			this.states[i++] = matrix;
 		}
-				
-		
-		
 	}
+    
+    private JShape(final JShape original)
+    {
+	original.cloneData(this);
+	this.states = original.states;
+    }
 
 	public void rotate(final boolean clockwise)
 	{
@@ -73,4 +76,9 @@ public class JShape extends Shape
 		
 		this.shape = this.states[this.currState];
 	}
+	
+    public JShape clone()
+    {
+	return new JShape(this);
+    }
 }

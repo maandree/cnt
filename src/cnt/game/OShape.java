@@ -17,16 +17,15 @@ import java.io.*;
 
 
 /**
-* Shape class representing a O-Shape
+* Shape class representing a O-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class OShape extends Shape
 {
-	public OShape(final Player player)
+	public OShape()
 	{
-		this.player = player;
 		this.shape = new Block[2][2];
 		for (int i = 0; i < 2; ++i)
 		{
@@ -36,9 +35,19 @@ public class OShape extends Shape
 			}
 		}
 	}
+    
+    private OShape(final OShape original)
+    {
+	original.cloneData(this);
+    }
 
 	public void rotate(final boolean clockwise)
 	{
-	
+        //	indentity function
 	}
+	
+    public OShape clone()
+    {
+	return new OShape(this);
+    }
 }

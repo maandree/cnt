@@ -10,6 +10,8 @@ package cnt.game;
 
 /**
  * Game board with all stationed shapes
+ * 
+ * @author  Peyman Eshtiagh
  */
 public class Board 
 {

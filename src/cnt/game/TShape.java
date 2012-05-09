@@ -17,16 +17,15 @@ import java.io.*;
 
 
 /**
-* Shape class representing a T-Shape
+* Shape class representing a T-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class TShape extends Shape
 {
-	public TShape(final Player player)
+	public TShape()
 	{
-		this.player = player;
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
@@ -36,6 +35,11 @@ public class TShape extends Shape
 		}
 		
 	}
+    
+    private TShape(final TShape original)
+    {
+	original.cloneData(this);
+    }
 
 	public void rotate(final boolean clockwise)
 	{
@@ -73,4 +77,9 @@ public class TShape extends Shape
 		
 		return matrix;
 	}
+	
+    public TShape clone()
+    {
+	return new TShape(this);
+    }
 }

@@ -17,18 +17,17 @@ import java.io.*;
 
 
 /**
-* Shape class representing a I-Shape
+* Shape class representing a I-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class IShape extends Shape
 {
 	private boolean flat = true;
 	
-	public IShape(final Player player)
+	public IShape()
 	{
-		this.player = player;
 		this.shape = new Block[4][4];
 		
 		int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
@@ -37,6 +36,11 @@ public class IShape extends Shape
 			this.shape[place[0]][place[1]] = new Block(this.player.getColor());
 		}
 	}
+    
+    private IShape(final IShape original)
+    {
+	original.cloneData(this);
+    }
 
 	/**
 	* {@inheritDoc}
@@ -63,4 +67,9 @@ public class IShape extends Shape
 
 		this.shape = matrix;
 	}
+    
+    public IShape clone()
+    {
+	return new IShape(this);
+    }
 }

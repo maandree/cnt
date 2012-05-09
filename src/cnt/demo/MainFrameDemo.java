@@ -49,7 +49,7 @@ public class MainFrameDemo
 			if (message instanceof Blackboard.UserMessage)
 			{
 			    final String msg = ((Blackboard.UserMessage)message).message;
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.BLUE), msg));
+			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.BLUE.getRGB()), msg));
 			}
 		    }
 	        });

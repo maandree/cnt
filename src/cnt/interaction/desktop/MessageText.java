@@ -46,7 +46,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	    if (message instanceof Blackboard.ChatMessage)
 	    {
 		final Blackboard.ChatMessage msg = (Blackboard.ChatMessage)message;
-		addText(msg.message, msg.player.getName(), msg.player.getColour());
+		addText(msg.message, msg.player.getName(), new Color(msg.player.getColor()));
 	    }
 	}
     }

@@ -17,18 +17,18 @@ import java.io.*;
 
 
 /**
-* Shape class representing a L-Shape
+* Shape class representing a L-shape
 * 
-* @author Calle Lejdbrandt <a/ href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 
 public class LShape extends Shape
 {	
-	private Block[][][] states = new Block[4][3][3];
+	private Block[][][] states;
 	private int currState = 0;
-	public LShape(final Player player)
+	public LShape()
 	{
-		this.player = player;
+	    this.states = new Block[4][3][3];
 		this.shape = new Block[3][3];
 		
 		int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
@@ -60,6 +60,12 @@ public class LShape extends Shape
 		
 		
 	}
+    
+    private LShape(final LShape original)
+    {
+	original.cloneData(this);
+	this.states = original.states;
+    }
 
 	public void rotate(final boolean clockwise)
 	{
@@ -73,4 +79,9 @@ public class LShape extends Shape
 		
 		this.shape = this.states[this.currState];
 	}
+	
+    public LShape clone()
+    {
+	return new LShape(this);
+    }
 }

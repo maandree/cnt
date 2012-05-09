@@ -7,7 +7,6 @@
  */
 package cnt.game;
 import cnt.*;
-import cnt.mock.Board;
 
 //TODO  Do send shape removal followed by shape adding, send then togather, may be by merge all at each sleep
 
@@ -33,8 +32,8 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * The possible, initial, shapes
      */
-    private static final Shape[] POSSIBLE_SHAPES = {Shape.T_SHAPE, Shape.PIPE_SHAPE, Shape.SQUARE_SHAPE,
-						    Shape.L_SHAPE, Shape.J_SHAPE, Shape.S_SHAPE, Shape.Z_SHAPE};
+    private static final Shape[] POSSIBLE_SHAPES = {new TShape(), new IShape(), new OShape(),
+						    new LShape(), new JShape(), new SShape(), new ZShape()};
     
     
     
@@ -264,11 +263,15 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	try
 	{
-	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone();
+	    fallingShape = (Shape)(POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone());
 	}
 	catch (final CloneNotSupportedException err)
 	{
-	    throw new Error("Shape.clone() is not implemented");
+	    throw new Error("*Shape.clone() is not implemented");
+	}
+	catch (final Throwable err)
+	{
+	    throw new Error("*Shape.clone() is not implemented correctly");
 	}
 	
 	for (int r = 0, rn = (int)(Math.random() * 3); r < rn; r++)
