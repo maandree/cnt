@@ -54,6 +54,7 @@ public class ZShape extends Shape
 			matrix[2][0] = this.shape[0][0];
 			
 			this.shape = matrix;
+			this.flat = false;
 		} else
 		{
 						
@@ -63,6 +64,7 @@ public class ZShape extends Shape
 			matrix[0][0] = this.shape[2][0];
 			
 			this.shape = matrix;
+			this.flat = true;
 
 		}				
 	}
