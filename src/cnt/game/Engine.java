@@ -269,7 +269,8 @@ public class Engine implements Blackboard.BlackboardObserver
 	}
 	
 	currentPlayer = player;
-	//fallingShape.setPlayer(currentPlayer);  //########################################################################################### ?????????????????????????
+	System.out.println("PLAYER: " + player.toString());
+	fallingShape.setPlayer(currentPlayer);
 	
 	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
 	    fallingShape.rotate(true);
@@ -307,7 +308,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    fallingShape.restore(moveInitialMomento);
 	    reaction();
-	    //fallingShape = null;
+	    fallingShape = null;
 	    return false;
 	}
 	
@@ -338,7 +339,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    {
 		fallingShape.setY(fallingShape.getY() - 1);
 		reaction();
-		//fallingShape = null;
+		fallingShape = null;
 		return;
 	    }
 	}

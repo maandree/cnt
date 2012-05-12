@@ -100,5 +100,13 @@ public class Player implements Serializable
 	this.color = value;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+	return this.getName() + " (" + this.getColor() + ")";
+    }
+    
 }
 

@@ -205,7 +205,8 @@ public abstract class Shape implements Cloneable, Serializable
 	this.player = value;
 	for (final Block[] row : this.shape)
 	    for (final Block block : row)
-		block.setColor(value.getColor());
+		if (block != null)
+		    block.setColor(value.getColor());
     }
     
     /**

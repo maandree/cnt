@@ -67,7 +67,8 @@ public class LShape extends Shape
 	for (final Block[][] state : states)
 	    for (final Block[] row : state)
 		for (final Block block : row)
-		    block.setColor(value.getColor());
+		    if (block != null)
+			block.setColor(value.getColor());
     }
 
     
