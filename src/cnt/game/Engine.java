@@ -441,6 +441,8 @@ public class Engine implements Blackboard.BlackboardObserver
 	    patchIn(move, 0, sub);
 	    board.put(move, 0, sub);
 	}
+	
+	currentPlayer = null;
     }
     
     
@@ -475,12 +477,15 @@ public class Engine implements Blackboard.BlackboardObserver
 		    {
 			case LEFT:           move(-1);       break;
 			case RIGHT:          move(1);        break;
-			case DROP:           drop();         break;
 			case CLOCKWISE:      rotate(true);   break;
 			case ANTICLOCKWISE:  rotate(false);  break;
 			case DOWN:
 			    if (fall() == false)
 				thread.interrupt();
+			    break;
+			case DROP:
+			    drop();
+			    thread.interrupt();
 			    break;
 			    
 			default:
