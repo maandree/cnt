@@ -306,7 +306,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    fallingShape.restore(moveInitialMomento);
 	    reaction();
-	    fallingShape = null;
+	    //fallingShape = null;
 	    return false;
 	}
 	
@@ -337,7 +337,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    {
 		fallingShape.restore(moveInitialMomento);
 		reaction();
-		fallingShape = null;
+		//fallingShape = null;
 		return;
 	    }
 	}
@@ -376,9 +376,15 @@ public class Engine implements Blackboard.BlackboardObserver
 	fallingShape.setX(fallingShape.getX() + incrX);
 	
 	if (board.canPut(fallingShape, false))
+	{
 	    moveAppliedMomento = fallingShape.store();
+	    System.err.println("SUCCESS");
+	}
 	else
+	{
 	    moveAppliedMomento = moveInitialMomento;
+	    System.err.println("FAILURE");
+	}
 	
 	fallingShape.restore(moveInitialMomento);
     }
@@ -455,11 +461,15 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
+	System.err.println("MESSAGE: " + message.toString());
 	try
 	{
 	    if (message instanceof Blackboard.GamePlayCommand)
+	    {
+		System.err.println(">LOCKING<");
 		synchronized (Engine.class)
 		{
+		    System.err.println(">LOCKED<");
 		    switch (((Blackboard.GamePlayCommand)message).move)
 		    {
 			case LEFT:           move(-1);       break;
@@ -475,7 +485,10 @@ public class Engine implements Blackboard.BlackboardObserver
 			default:
 			    throw new Error("Unrecognised GamePlayCommand.");
 		    }
+		    System.err.println("<UNLOCKING>");
 		}
+		    System.err.println("<UNLOCKED>");
+	    }
 	    else if (message instanceof Blackboard.NextPlayer) /* do not thread */
 	    {
 		System.err.println("@ messageBroadcasted.NextPlayer(" + ((Blackboard.NextPlayer)message).player  + ")");

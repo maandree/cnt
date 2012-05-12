@@ -124,13 +124,15 @@ public class Blackboard
     /**
      * Registrered observers
      */
-    private static WeakHashMap<BlackboardObserver, Void> observers = new WeakHashMap<BlackboardObserver, Void>(); //simulate the missing cass: WeakHashSet
+    private static /*Weak*/HashMap<BlackboardObserver, Void> observers = new /*Weak*/HashMap<BlackboardObserver, Void>(); /*//simulate the missing cass: WeakHashSet*/
     
     /**
      * How to thread message observations
      */
-    private static WeakHashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading =
-	       new WeakHashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>>();
+    private static /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading =
+	       new /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>>();
+    
+    //// Something is wrong, it seems WeakHashMap set behaved as a SoftHashMap, but also as there was no strong reference 😖
     
     
     
@@ -179,6 +181,7 @@ public class Blackboard
      */
     public static void registerObserver(final BlackboardObserver observer)
     {
+	System.err.println("BLACKBOARD.registerObserver(" + observer + ")");
 	observers.put(observer, null);
     }
     
@@ -189,6 +192,7 @@ public class Blackboard
      */
     public static void unregisterObserver(final BlackboardObserver observer)
     {
+	System.err.println("BLACKBOARD.unregisterObserver(" + observer + ")");
 	observers.remove(observer);
 	observationThreading.remove(observer);
     }
@@ -236,10 +240,12 @@ public class Blackboard
      */
     public static void broadcastMessage(final BlackboardMessage message)
     {
+	System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
 	final ArrayList<Thread> threads = new ArrayList<Thread>();
 	
 	for (final BlackboardObserver observer : observers.keySet())
 	{
+	    System.err.println("BLACKBOARD.broadcastMessage() ==> " + observer.toString());
 	    final ThreadingPolicy policy;
 	    final Runnable runnable = new Runnable()
 		    {
@@ -266,6 +272,8 @@ public class Blackboard
 	
 	for (final Thread thread : threads)
 	    thread.start();
+	
+	System.err.println("BLACKBOARD.broadcastMessage() <<<<");
     }
     
     
