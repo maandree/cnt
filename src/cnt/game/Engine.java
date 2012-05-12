@@ -329,13 +329,13 @@ public class Engine implements Blackboard.BlackboardObserver
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
-	for (int i = 1;; i++)
+	for (;;)
 	{
-	    fallingShape.setY(fallingShape.getY() + i);
+	    fallingShape.setY(fallingShape.getY() + 1);
 	    
 	    if (board.canPut(fallingShape, false) == false)
 	    {
-		fallingShape.restore(moveInitialMomento);
+		fallingShape.setY(fallingShape.getY() - 1);
 		reaction();
 		//fallingShape = null;
 		return;
