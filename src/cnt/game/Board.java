@@ -63,7 +63,7 @@ public class Board
 		
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
 			
-			if(newBlocks[y][x] !=null)
+			if (newBlocks[y][x] !=null)
 			    
 			    blocks[y+offY][x+offX] = newBlocks[y][x];
 	
@@ -113,15 +113,15 @@ public class Board
     public void delete(final boolean[][] deleteMatrix, final int offX, final int offY)
     {
     	for (int y = 0; y < deleteMatrix.length; y++)
-	    
+
 	    if ((0 <= y + offY) && (y + offY < HEIGHT))
-		
+
 		for (int x = 0; x < deleteMatrix[y].length; x++)
-		    
+
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
-			
+
 			if(deleteMatrix[y][x])
-			    
+
 			    blocks[y+offY][x+offX] = null;
     }
     
@@ -160,22 +160,18 @@ public class Board
 	try
 	{
 	    for (int y = 0; y < newBlocks.length; y++)
-	
-		if ((0 <= y + offY) && (y + offY < HEIGHT))
-		{
-		    for (int x = 0; x < newBlocks[y].length; x++)
-		
-			if ((0 <= x + offX) && (x + offX < WIDTH))
-			{
-			    if ((newBlocks[y][x] != null) && (blocks[y+offY][x+offX] != null))
-				
-				return rc = false;
-			}
-			else if (ignoreEdges == false)
-			    return rc = false;
-		}
-		else if (ignoreEdges == false)
-		    return rc = false;
+
+		for (int x = 0; x < newBlocks[y].length; x++)
+
+		    if ((0 <= y + offY) && (y + offY < HEIGHT) && (0 <= x + offX) && (x + offX < WIDTH))
+		    {
+			if ((newBlocks[y][x] != null) && (blocks[y+offY][x+offX] != null))
+
+			    return rc = false; //YES =, not ==
+		    }
+		    else if ((ignoreEdges == false) && (newBlocks[y][x] != null))
+
+			return rc = false;
 	    
 	    return rc = true;
 	}
