@@ -126,6 +126,7 @@ public class Engine implements Blackboard.BlackboardObserver
 			    {
 				System.err.println("@ x");
 				Blackboard.broadcastMessage(new Blackboard.GameOver());
+				Blackboard.unregisterObserver(blackboardObserver);
 				return;
 			    }
 			    
@@ -278,7 +279,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	gameOver = board.canPut(fallingShape, false) == false;
 	if (gameOver)
-	    do  fallingShape.setY(fallingShape.getY() - 1);
+	    do  {fallingShape.setY(fallingShape.getY() - 1); System.err.println("one up");}
 	      while (board.canPut(fallingShape, true) == false);
 	
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();

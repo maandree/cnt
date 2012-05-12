@@ -132,8 +132,6 @@ public class Blackboard
     private static /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading =
 	       new /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>>();
     
-    //// Something is wrong, it seems WeakHashMap set behaved as a SoftHashMap, but also as there was no strong reference 😖
-    
     
     
     /**

@@ -74,13 +74,13 @@ public class EngineDemo
 			    final int[][] matrix = new int[20][10];
 			    
 			    if (erase != null)
-				for (int y = offY < 0 ? offY : 0, h = erase.length; y < h; y++)
+				for (int y = offY < 0 ? -offY : 0, h = erase.length; y < h; y++)
 				    {
 					final int Y = y + offY;
 					if (Y >= matrix.length)
 					    break;
 					
-					for (int x = offX < 0 ? offX : 0, w = erase[y].length; x < w; x++)
+					for (int x = offX < 0 ? -offX : 0, w = erase[y].length; x < w; x++)
 					    if (erase[y][x])
 						if (x + offX < matrix[Y].length)
 						    matrix[Y][x + offX] |= 1;
@@ -89,13 +89,13 @@ public class EngineDemo
 				    }
 			    
 			    if (blocks != null)
-				for (int y = offY < 0 ? offY : 0, h = blocks.length; y < h; y++)
+				for (int y = offY < 0 ? -offY : 0, h = blocks.length; y < h; y++)
 				    {
 					final int Y = y + offY;
 					    if ((Y >= matrix.length) || (0 > Y))
 						break;
 					    
-					    for (int x = offX < 0 ? offX : 0, w = blocks[y].length; x < w; x++)
+					    for (int x = offX < 0 ? -offX : 0, w = blocks[y].length; x < w; x++)
 						if (blocks[y][x] != null)
 						    if (x + offX < matrix[Y].length)
 							matrix[Y][x + offX] |= 2;
