@@ -51,6 +51,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	if (this.pieceImage == null)
 	{
 	    System.err.println("WARNING: Can't load piece image!");
+	    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "Can't load piece image, your blocks will lose graphical quality!"));
 	    this.pieceImageW = this.pieceImageH = 1; //initialising
 	}
 	else
