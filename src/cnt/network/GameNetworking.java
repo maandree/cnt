@@ -5,8 +5,7 @@
  * 
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.mock;
-import cnt.network.*;
+package cnt.network;
 import cnt.game.*;
 import cnt.*;
 
@@ -15,7 +14,7 @@ import java.io.*;
 
 
 /**
- * Game networking layer mock object
+ * Game networking layer object
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */

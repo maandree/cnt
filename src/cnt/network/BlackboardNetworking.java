@@ -7,7 +7,6 @@
  */
 package cnt.network;
 import cnt.*;
-import cnt.mock.GameNetworking;
 
 import java.util.*;
 import java.io.*;

@@ -6,7 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.demo;
-import cnt.mock.*;
 import cnt.game.*;
 import cnt.network.*;
 import cnt.*;
