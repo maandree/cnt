@@ -8,7 +8,7 @@
 package cnt.game;
 import cnt.*;
 
-//TODO  Do send shape removal followed by shape adding, send then togather, may be by merge all at each sleep
+import java.util.ArrayList;
 
 
 /**
@@ -90,6 +90,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static boolean gameOver = true;
     
+    /**
+     * All queued matrix patches for {@link Blackboard}
+     */
+    private static final ArrayList<Blackboard.MatrixPatch> patches = new ArrayList<Blackboard.MatrixPatch>();
+    
     
     
     /**
@@ -135,7 +140,7 @@ public class Engine implements Blackboard.BlackboardObserver
 				try
 				{
 				    System.err.println("@ 1");
-				    Thread.sleep(Engine.sleepTime);
+				    Engine.sleep(Engine.sleepTime);
 				}
 				catch (final InterruptedException err)
 				{
@@ -194,7 +199,7 @@ public class Engine implements Blackboard.BlackboardObserver
     private static void patchAway(final boolean[][] blocks, final int offX, final int offY)
     {
 	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
-	Blackboard.broadcastMessage(patch);
+	patches.add(patch);
     }
     
     
@@ -222,7 +227,7 @@ public class Engine implements Blackboard.BlackboardObserver
     private static void patchIn(final Block[][] blocks, final int offX, final int offY)
     {
 	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(null, blocks, offY, offX);
-	Blackboard.broadcastMessage(patch);
+	patches.add(patch);
     }
     
     
@@ -300,6 +305,7 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	System.err.println("@ fall()");
 	
+	Engine.sleep(0);
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	fallingShape.setY(fallingShape.getY() + 1);
@@ -430,7 +436,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	int sub = 0;
 	for (final int row : full)
 	{
-	    Thread.sleep(sleepTime);
+	    Engine.sleep(sleepTime);
 	    
 	    final Block[][] move = new Block[row - sub][];
 		
@@ -457,6 +463,79 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
 	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
+    }
+    
+    
+    /**
+     * Just like {@link Thread#sleep(int)}, but it also broadcasts all updates
+     * 
+     * @param  milliseconds  The number of milliseconds to sleep, <code>0</code> for not sleeping
+     * 
+     * @throws  InterruptedException  If the thread is interrupted
+     */
+    static void sleep(final int milliseconds) throws InterruptedException
+    {
+	if (patches.isEmpty() == false)
+	{
+	    int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
+	    boolean del = false, add = false;
+	    
+	    for (final Blackboard.MatrixPatch patch : patches)
+	    {
+		if (x1 > patch.offX)  x1 = patch.offX;
+		if (y1 > patch.offY)  y1 = patch.offY;
+		
+		if (patch.erase != null)
+		    if (del)
+		    {
+			if (x2 < patch.offX + patch.erase[0].length)  x2 = patch.offX + patch.erase[0].length;
+			if (y2 < patch.offY + patch.erase.length)     y2 = patch.offY + patch.erase.length;
+		    }
+		    else
+		    {
+			del = true;
+			x2 = patch.offX + patch.erase[0].length;
+			y2 = patch.offY + patch.erase.length;
+		    }
+		
+	        if (patch.blocks != null)
+		    if (add)
+		    {
+			if (x3 < patch.offX + patch.blocks[0].length)  x3 = patch.offX + patch.blocks[0].length;
+			if (y3 < patch.offY + patch.blocks.length)     y3 = patch.offY + patch.blocks.length;
+		    }
+		    else
+		    {
+			add = true;
+			x3 = patch.offX + patch.blocks[0].length;
+			y3 = patch.offY + patch.blocks.length;
+		    }
+	    }
+	    
+	    final boolean[][] erase  = del ? new boolean[y2 - y1][x2 - x1] : null;
+	    final Block  [][] blocks = add ? new Block  [y3 - y1][x3 - x1] : null;
+	    
+	    for (final Blackboard.MatrixPatch patch : patches)
+	    {
+		if (patch.erase != null)
+		    for (int y = 0; y < patch.erase.length; y++)
+			for (int x = 0; x < patch.erase[y].length; x++)
+			    erase[y + patch.offY - y1][x + patch.offX - x1] = patch.erase[y][x];
+		
+	        if (patch.blocks != null)
+		    for (int y = 0; y < patch.blocks.length; y++)
+			for (int x = 0; x < patch.blocks[y].length; x++)
+			    blocks[y + patch.offY - y1][x + patch.offX - x1] = patch.blocks[y][x];
+	    }
+	    
+	    patches.clear();
+	    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(erase, blocks, y1, x1));
+	}
+	else
+	    System.err.println("Shouldn't there be matrix patches here?");
+	
+	if (milliseconds != 0)
+	    Thread.sleep(milliseconds);
     }
     
     
