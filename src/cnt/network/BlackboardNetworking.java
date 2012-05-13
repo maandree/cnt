@@ -67,7 +67,6 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
         {
 	    if      (message instanceof Blackboard.MatrixPatch)    this.gameNetworking.forward(message);
 	    else if (message instanceof Blackboard.ChatMessage)    this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.SystemMessage)  this.gameNetworking.forward(message);
 	    else if (message instanceof Blackboard.UserMessage)
 	    {
 		Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
