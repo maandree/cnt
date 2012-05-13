@@ -1,7 +1,7 @@
 package cnt.test;
 import cnt.game.*;
 
-public class shapeTest
+public class ShapeTest
 {
 	public static void main(String... args) throws InterruptedException
 	{

@@ -1,5 +1,7 @@
 mkdir bin 2>/dev/null
 
+. run.sh --completion--
+
 cp src/*.png bin/
 cp src/*.png ./
 
