@@ -46,7 +46,12 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	    if (message instanceof Blackboard.ChatMessage)
 	    {
 		final Blackboard.ChatMessage msg = (Blackboard.ChatMessage)message;
-		addText(msg.message, msg.player.getName(), new Color(msg.player.getColor()));
+		addUserText(msg.message, msg.player.getName(), new Color(msg.player.getColor()));
+	    }
+	    else if (message instanceof Blackboard.SystemMessage)
+	    {
+		final Blackboard.SystemMessage msg = (Blackboard.SystemMessage)message;
+		addSystemText(msg.message, msg.player == null ? null : new Color(msg.player.getColor()));
 	    }
 	}
     }
@@ -58,12 +63,13 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
      * @param  name    The player whom sent the message
      * @param  colour  The colour of the player
      */
-    private void addText(final String text, final String name, final Color colour)
+    private void addUserText(final String text, final String name, final Color colour)
     {
 	StyleContext style = StyleContext.getDefaultStyleContext();
 	AttributeSet attrs;
 	
 	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, colour); //Switching to player name style
+	attrs = style.addAttribute(attrs, StyleConstants.Bold, Boolean.TRUE);
 	
 	final int pos0 = getDocument().getLength();
 	final int pos1 = pos0 + (name + ": ").length();
@@ -82,6 +88,35 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setSelectionStart(pos1);	this.setSelectionEnd(pos1);
 	this.replaceSelection(text + "\n"); //Prints the player's message
 	this.setSelectionStart(pos1);	this.setSelectionEnd(pos2);
+	this.setCharacterAttributes(attrs, true);
+	
+	this.setSelectionStart(pos2);	this.setSelectionEnd(pos2);
+	this.setEditable(false);
+    }
+    
+    /**
+     * Appends a message sent by the system
+     * 
+     * @param  text    The message to append
+     * @param  colour  The colour of the player, if any
+     */
+    private void addSystemText (final String text, final Color colour)
+    {
+	StyleContext style = StyleContext.getDefaultStyleContext();
+	AttributeSet attrs;
+	
+	final int pos0 = getDocument().getLength();
+	final int pos1 = pos0 + (text + "\n").length();
+	
+	this.setEditable(true);
+	
+	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, colour == null ? Color.GRAY : colour);
+	attrs = style.addAttribute(attrs, StyleConstants.Italic, Boolean.TRUE);
+	
+	
+	this.setSelectionStart(pos0);	this.setSelectionEnd(pos0);
+	this.replaceSelection(text + "\n"); //Prints the system's message
+	this.setSelectionStart(pos0);	this.setSelectionEnd(pos1);
 	this.setCharacterAttributes(attrs, true);
 	
 	this.setSelectionStart(pos1);	this.setSelectionEnd(pos1);
