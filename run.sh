@@ -31,6 +31,9 @@ elif [[ $1 = "frame" ]]; then
 elif [[ $1 = "network" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo
 
+elif [[ $1 = "peernetwork" ]]; then
+    javaSeven -ea -cp bin$jars cnt.demo.PeerNetworkingDemo $2 $3 $4 $5 $6
+
 elif [[ $1 = "upnp" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.UPnPDemo
 
@@ -47,7 +50,7 @@ elif [[ $1 = "--completion--" ]]; then
 	local cur prev words cword
 	_init_completion -n = || return
 	
-	COMPREPLY=( $( compgen -W 'main main-da engine frame network upnp shape linkedlist' -- "$cur" ) )
+	COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork upnp shape linkedlist' -- "$cur" ) )
     }
     
     complete -o default -F _run run

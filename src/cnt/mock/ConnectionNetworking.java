@@ -162,6 +162,7 @@ public class ConnectionNetworking
     {
 	final InputStream in = sock.getInputStream();
 	final OutputStream out = sock.getOutputStream();
+	final Object mutex = new Object();
 	
 	final Thread threadIn = new Thread()
 	        {
@@ -189,6 +190,7 @@ public class ConnectionNetworking
 				    privateOut.flush();
 				}
 				else
+				{
 				    synchronized (monitor)
 				    {
 					for (int i = 0, n = newpeers.length(); i < n; i++)
@@ -199,9 +201,10 @@ public class ConnectionNetworking
 					{
 					    System.out.println("I can send to: " + peers[0]);
 					    
-					    monitor.notifyAll();
+					    monitor.notify();
 					}
 				    }
+				}
 			    }
 			}
 			catch (final IOException err)
@@ -226,17 +229,18 @@ public class ConnectionNetworking
 			{
 			    synchronized (monitor)
 			    {
-				if (peers[0].isEmpty() == false) //safety first
-				    for (;;)
+				for (;;)
+				{
+				    synchronized (mutex)
 				    {
 					for (int i = 0, n = peers[0].length(); i < n; i++)
 					    out.write(peers[0].charAt(i));
 					out.write('\n');
 					out.flush();
-					
-					monitor.notifyAll();
-					monitor.wait();
 				    }
+				    
+				    monitor.wait();
+				}
 			    }
 			}
 			catch (final InterruptedException err)
@@ -269,7 +273,7 @@ public class ConnectionNetworking
 			    for (;;)
 			    {
 				int p = privateIn.read();
-				synchronized (monitor)
+				synchronized (mutex)
 				{
 				    out.write(p);
 				    while ((p = privateIn.read()) != 0)
@@ -301,7 +305,7 @@ public class ConnectionNetworking
 	
 	threadIn.start();
 	threadSysOut.start();
-	threadMsgOut.start();
+	//threadMsgOut.start();
     }
     
 }

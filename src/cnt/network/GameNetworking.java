@@ -27,7 +27,19 @@ public class GameNetworking
      */
     public GameNetworking(final ObjectNetworking objectNetworking)
     {
+	this(objectNetworking, new Player("You", Color.PINK.getRGB()));
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param  objectNetworking  The next layer in the protocol stack
+     * @param  player            The local player
+     */
+    public GameNetworking(final ObjectNetworking objectNetworking, final Player player)
+    {
 	this.objectNetworking = objectNetworking;
+	this.player = player;
     }
     
     
@@ -36,6 +48,11 @@ public class GameNetworking
      * The next layer in the protocol stack
      */
     private final ObjectNetworking objectNetworking;
+    
+    /**
+     * The local player
+     */
+    private final Player player;
     
     
     
@@ -61,7 +78,7 @@ public class GameNetworking
     public void chat(final String message)
     {
 	System.out.println("local chat message: " + message);
-	Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("You", Color.PINK.getRGB()), message));
+	Blackboard.broadcastMessage(new Blackboard.ChatMessage(player, message));
     }
     
     
