@@ -120,7 +120,45 @@ public class ConnectionNetworking
     }
     
     
-    private static void connect(final Socket sock, final Object monitor, final String[] peers) throws IOException
+    
+    public  final PipedInputStream  globalIn   = new PipedInputStream();
+    private final PipedOutputStream privateOut = new PipedOutputStream(globalIn);
+    private final PipedInputStream  privateIn  = new PipedInputStream();
+    public  final PipedOutputStream globalOut  = new PipedOutputStream(privateIn)
+	    {
+		private boolean started = false;
+		
+		@Override
+		public void write(final int b) throws IOException
+		{
+		    if (started == false)
+		    {
+			super.write(10);
+			started = true;
+		    }
+		    switch (b)
+		    {
+			case 0:
+			case 27:
+			    super.write(27);
+			    break;
+		    }
+		    
+		    super.write(b);
+		}
+		
+		@Override
+		public void flush() throws IOException
+		{
+		    super.write(0);
+		    super.flush();
+		    this.started = false;
+		}
+	    };
+    
+    
+    
+    private void connect(final Socket sock, final Object monitor, final String[] peers) throws IOException
     {
 	final InputStream in = sock.getInputStream();
 	final OutputStream out = sock.getOutputStream();
@@ -140,24 +178,35 @@ public class ConnectionNetworking
 				for (int p; (p = in.read()) != '\n';)
 				    newpeers += (char)p;
 				
-				synchronized (monitor)
+				if (newpeers.isEmpty())
 				{
-				    for (int i = 0, n = newpeers.length(); i < n; i++)
-					if (peers[0].indexOf(newpeers.charAt(i)) < 0)
-					    peers[0] += newpeers.charAt(i);
-				    
-				    if (peers[0].equals(oldpeers) == false)
+				    for (int p; (p = in.read()) != 0;)
 				    {
-					System.out.println("I can send to: " + peers[0]);
-					
-					monitor.notifyAll();
+					if (p == 27)
+					    p = in.read();
+					privateOut.write(p);
 				    }
+				    privateOut.flush();
 				}
+				else
+				    synchronized (monitor)
+				    {
+					for (int i = 0, n = newpeers.length(); i < n; i++)
+					    if (peers[0].indexOf(newpeers.charAt(i)) < 0)
+						peers[0] += newpeers.charAt(i);
+					
+					if (peers[0].equals(oldpeers) == false)
+					{
+					    System.out.println("I can send to: " + peers[0]);
+					    
+					    monitor.notifyAll();
+					}
+				    }
 			    }
 			}
 			catch (final IOException err)
 			{
-			    synchronized (TCPPeer.class)
+			    synchronized (ConnectionNetworking.this)
 			    {
 				System.err.print("\033[31m");
 				System.err.println("error: IOException");
@@ -168,7 +217,7 @@ public class ConnectionNetworking
 		    }
 	        };
 	
-	final Thread threadOut = new Thread()
+	final Thread threadSysOut = new Thread()
 	        {
 		    @Override
 		    public void run()
@@ -177,28 +226,29 @@ public class ConnectionNetworking
 			{
 			    synchronized (monitor)
 			    {
-				for (;;)
-				{
-				    for (int i = 0, n = peers[0].length(); i < n; i++)
-					out.write(peers[0].charAt(i));
-				    out.write('\n');
-				    out.flush();
-				    
-				    monitor.notifyAll();
-				    monitor.wait();
-				}
+				if (peers[0].isEmpty() == false) //safety first
+				    for (;;)
+				    {
+					for (int i = 0, n = peers[0].length(); i < n; i++)
+					    out.write(peers[0].charAt(i));
+					out.write('\n');
+					out.flush();
+					
+					monitor.notifyAll();
+					monitor.wait();
+				    }
 			    }
 			}
 			catch (final InterruptedException err)
 			{
-			    synchronized (TCPPeer.class)
+			    synchronized (ConnectionNetworking.this)
 			    {
 				System.err.println("error: InterruptedException");
 			    }
 			}
 			catch (final IOException err)
 			{
-			    synchronized (TCPPeer.class)
+			    synchronized (ConnectionNetworking.this)
 			    {
 				System.err.print("\033[33m");
 				System.err.println("error: IOException");
@@ -209,8 +259,49 @@ public class ConnectionNetworking
 		    }
 	        };
 	
+	final Thread threadMsgOut = new Thread()
+	        {
+		    @Override
+		    public void run()
+		    {
+			try
+			{
+			    for (;;)
+			    {
+				int p = privateIn.read();
+				synchronized (monitor)
+				{
+				    out.write(p);
+				    while ((p = privateIn.read()) != 0)
+				    {
+					out.write(p);
+					if (p == 27)
+					    out.write(privateIn.read());
+					else if (p == 0)
+					{
+					    out.flush();
+					    break;
+					}
+				    }
+				}
+			    }
+			}
+			catch (final IOException err)
+			{
+			    synchronized (ConnectionNetworking.this)
+			    {
+				System.err.print("\033[35m");
+				System.err.println("error: IOException");
+				err.printStackTrace(System.err);
+				System.err.print("\033[0m");
+			    }
+			}
+		    }
+	        };
+	
 	threadIn.start();
-	threadOut.start();
+	threadSysOut.start();
+	threadMsgOut.start();
     }
     
 }
