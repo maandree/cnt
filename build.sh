@@ -10,10 +10,24 @@ dia Documentation/CNT_class_diagram.dia -e Documentation/CNT_class_diagram.pdf
 jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar"
 
 
-#javac7 -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1 | less
-#javac7  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
-#javac7 -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
+[[ $(javac -version 2>&1 | cut -d . -f 2) = '7' ]] &&
+    function javacSeven()
+    {
+	javac $@
+    }
 
-#javac7 -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1
-javac7  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1
-#javac7 -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1
+
+[[ $(javac -version 2>&1 | cut -d . -f 2) = '7' ]] ||
+    function javacSeven()
+    {
+	javac7 $@
+    }
+
+
+#javacSeven -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1 | less
+#javacSeven  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
+#javacSeven -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
+
+#javacSeven -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1
+javacSeven  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1
+#javacSeven -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1

@@ -1,32 +1,45 @@
 jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar"
 
+
+[[ $(echo `java -version 2>&1 | cut -d . -f 2` | cut -d ' ' -f 1) = '7' ]] &&
+    function javaSeven()
+    {
+	java $@
+    }
+
+[[ $(echo `java -version 2>&1 | cut -d . -f 2` | cut -d ' ' -f 1) = '7' ]] ||
+    function javaSeven() {
+	java7 $@
+    }
+
+
 if [[ $# = 0 ]]; then
-    java7 -ea -cp bin$jars cnt.Program
+    javaSeven -ea -cp bin$jars cnt.Program
 
 elif [[ $1 = "main" ]]; then
-    java7 -ea -cp bin$jars cnt.Program
+    javaSeven -ea -cp bin$jars cnt.Program
 
 elif [[ $1 = "main-da" ]]; then
-    java7 -da -cp bin$jars cnt.Program
+    javaSeven -da -cp bin$jars cnt.Program
 
 elif [[ $1 = "engine" ]]; then
-    java7 -ea -cp bin$jars cnt.demo.EngineDemo
+    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo
 
 elif [[ $1 = "frame" ]]; then
-    java7 -ea -cp bin$jars cnt.demo.MainFrameDemo
+    javaSeven -ea -cp bin$jars cnt.demo.MainFrameDemo
 
 elif [[ $1 = "network" ]]; then
-    java7 -ea -cp bin$jars cnt.demo.NetworkingDemo
+    javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo
 
 elif [[ $1 = "upnp" ]]; then
-    java7 -ea -cp bin$jars cnt.demo.UPnPDemo
+    javaSeven -ea -cp bin$jars cnt.demo.UPnPDemo
 
 elif [[ $1 = "shape" ]]; then
-    java7 -ea -cp bin$jars cnt.test.ShapeTest
+    javaSeven -ea -cp bin$jars cnt.test.ShapeTest
 
 elif [[ $1 = "linkedlist" ]]; then
-    java7 -ea -cp bin$jars cnt.test.CDLinkedListTest
-    java7 -ea -cp bin$jars cnt.test.ACDLinkedListTest
+    javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
+    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
 
 elif [[ $1 = "--completion--" ]]; then
     _run()
