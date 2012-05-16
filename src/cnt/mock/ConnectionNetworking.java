@@ -46,6 +46,8 @@ public class ConnectionNetworking
 	final String[] peers = { Character.toString(name) };
 	final Object monitor = new Object();
 	
+	createPipes();
+	
 	if (server != null)
 	{
 	    System.out.println("I am a server");
@@ -124,51 +126,60 @@ public class ConnectionNetworking
     
     
     
-    public  final PipedInputStream  globalIn   = new PipedInputStream();
-    private final PipedOutputStream privateOut = new PipedOutputStream(globalIn);
-    private final PipedInputStream  privateIn  = new PipedInputStream();
-    public  final PipedOutputStream globalOut  = new PipedOutputStream(privateIn)
-	    {
-		private boolean started = false;
-		
-		@Override
-		public void write(final byte[] data, final int off, final int len) throws IOException
-		{
-		    //* This is important *//
-		    for (int i = off, n = off + len; i < n; i++)
-			write((int)(data[i]) < 0 ? (256 + (int)(data[i])) : (int)(data[i]));
-		}
-		
-		@Override
-		public void write(final int b) throws IOException
-		{
-		    if (started == false)
+    public  PipedInputStream  globalIn;
+    private PipedOutputStream privateOut;
+    private PipedInputStream  privateIn;
+    public  PipedOutputStream globalOut;
+    
+    
+    private void createPipes() throws IOException
+    {
+	this.privateOut = new PipedOutputStream();
+	this.globalOut  = new PipedOutputStream()
+	        {
+		    private boolean started = false;
+		    
+		    @Override
+		    public void write(final byte[] data, final int off, final int len) throws IOException
 		    {
-			super.write(10);
-			started = true;
-		    }
-		    switch (b)
-		    {
-			case 0:
-			case 27:
-			    super.write(27);
-			    break;
+			//* This is important *//
+			for (int i = off, n = off + len; i < n; i++)
+			    write((int)(data[i]) < 0 ? (256 + (int)(data[i])) : (int)(data[i]));
 		    }
 		    
-		    super.write(b);
-		}
-		
-		@Override
-		public void flush() throws IOException
-		{
-		    if (this.started == false)
-			super.write(10);
-		    this.started = false;
-		    super.write(0);
-		    super.flush();
-		}
-	    };
-    
+		    @Override
+		    public void write(final int b) throws IOException
+		    {
+			if (started == false)
+			{
+			    super.write(10);
+			    started = true;
+			}
+			switch (b)
+			{
+			    case 0:
+			    case 27:
+				super.write(27);
+				break;
+			}
+					    
+			super.write(b);
+		    }
+					
+		    @Override
+		    public void flush() throws IOException
+		    {
+			if (this.started == false)
+			    super.write(10);
+			this.started = false;
+			super.write(0);
+			super.flush();
+		    }
+	        };
+	
+	this.globalIn  = new PipedInputStream(privateOut);
+	this.privateIn = new PipedInputStream(globalOut);
+    }
     
     
     private void connect(final Socket sock, final Object monitor, final String[] peers) throws IOException

@@ -87,6 +87,13 @@ public class ChatDemo
 	        };
 	readThread.start();
 	System.out.println("Thread created");
+	
+	
+	//* It is important to keep this thread alive, otherwise, the pipes between ConnectionNetworking and ObjectNetworking breaks *//
+	synchronized (ChatDemo.class)
+	{
+	    ChatDemo.class.wait();
+	}
     }
     
 }
