@@ -28,7 +28,7 @@ public class ObjectNetworking
      */
     public ObjectNetworking(final InputStream input, final OutputStream output) throws IOException
     {
-	this.output = new ObjectOutputStream(output);
+	this.output = new ObjectOutputStream(new BufferedOutputStream(output));
 	this.output.flush(); //Program freezes otherwise
 	this.input  = new ObjectInputStream(new BufferedInputStream(input));
     }

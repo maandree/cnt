@@ -49,20 +49,60 @@ public class PeerNetworkingDemo
 	final int serverport = Integer.parseInt(args[3]);
 	final String remote = args[4];
 	
+	
 	final ConnectionNetworking connectionNetworking = new ConnectionNetworking(name, serverauth, pubip, serverport, remote);
-	final ObjectNetworking     objectNetworking     = new ObjectNetworking(connectionNetworking.globalIn, connectionNetworking.globalOut);
-	final GameNetworking       gameNetworking       = new GameNetworking(objectNetworking, new Player(args[0], args[0].hashCode() | (255 << 24)));
-	final BlackboardNetworking blackboardNetworking = new BlackboardNetworking(gameNetworking)
-	        {
-		    /**
-		     * {@inheritDoc}
-		     */
-		    @Override
-		    protected void broadcastMessage(final Blackboard.BlackboardMessage message) throws IOException, ClassNotFoundException
-		    {
-			System.out.println("received blackboard message: " + message.getClass().toString());
-		    }
-	        };
+	System.out.println("ConnectionNetworking created");
+	
+	//final ObjectNetworking     objectNetworking     = new ObjectNetworking(connectionNetworking.globalIn, connectionNetworking.globalOut);
+	//System.out.println("ObjectNetworking created");
+	//
+	//final GameNetworking       gameNetworking       = new GameNetworking(objectNetworking, new Player(args[0], args[0].hashCode() | (255 << 24)));
+	//System.out.println("GameNetworking created");
+	//
+	//final BlackboardNetworking blackboardNetworking = new BlackboardNetworking(gameNetworking)
+	//        {
+	//	    /**
+	//	     * {@inheritDoc}
+	//	     */
+	//	    @Override
+	//	    protected void broadcastMessage(final Blackboard.BlackboardMessage message) throws IOException, ClassNotFoundException
+	//	    {
+	//		System.out.println("received blackboard message: " + message.getClass().toString());
+	//	    }
+	//      };
+	//System.out.println("BlackboardNetworking created");
+	//
+	//
+	//final Thread readThread = new Thread()
+	//        {
+	//	    /**
+	//	     * {@inheritDoc}
+	//	     */
+	//	    @Override
+	//	    public void run()
+	//	    {
+	//		try
+	//		{
+	//		    for (;;)
+	//			blackboardNetworking.receiveAndBroadcast();
+	//		}
+	//		catch (final Throwable err)
+	//		{
+	//		    err.printStackTrace(System.err);
+	//		}
+	//	    }
+	//        };
+	//readThread.start();
+	//System.out.println("Thread created");
+	//
+	//
+	//final Scanner sc = new Scanner(System.in);
+	//while (sc.hasNext())
+	//{
+	//    final String line = sc.nextLine();
+	//    System.out.println("Sending: " + line);
+	//    Blackboard.broadcastMessage(new Blackboard.UserMessage(line));
+	//}
 	
 	
 	final Thread readThread = new Thread()
@@ -75,8 +115,12 @@ public class PeerNetworkingDemo
 		    {
 			try
 			{
-			    for (;;)
-				blackboardNetworking.receiveAndBroadcast();
+			    final InputStream in = connectionNetworking.globalIn;
+			    for (int d; (d = in.read()) != -1;)
+			    {
+				System.out.write(d);
+				System.out.flush();
+			    }
 			}
 			catch (final Throwable err)
 			{
@@ -85,10 +129,17 @@ public class PeerNetworkingDemo
 		    }
 	        };
 	readThread.start();
+	System.out.println("Thread created");
+	
 	
 	final Scanner sc = new Scanner(System.in);
 	while (sc.hasNext())
-	    Blackboard.broadcastMessage(new Blackboard.UserMessage(sc.nextLine()));
+	{
+	    final String line = sc.nextLine();
+	    System.out.println("Sending: " + line);
+	    connectionNetworking.globalOut.write(line.getBytes("UTF-8"));
+	    connectionNetworking.globalOut.flush();
+	}
     }
     
 }

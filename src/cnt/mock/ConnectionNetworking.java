@@ -74,7 +74,10 @@ public class ConnectionNetworking
 			{
 			    try
 			    {
-				connect(new Socket(remote, serverport), monitor, peers);
+				if (remote.equals(pubip) == false)
+				    connect(new Socket(remote, serverport), monitor, peers);
+				else
+				    System.out.println("Remote server is local server");
 			    }
 			    catch (final Throwable err)
 			    {
@@ -129,6 +132,14 @@ public class ConnectionNetworking
 		private boolean started = false;
 		
 		@Override
+		public void write(final byte[] data, final int off, final int len) throws IOException
+		{
+		    //* This is important *//
+		    for (int i = off, n = off + len; i < n; i++)
+			write((int)(data[i]) < 0 ? (256 + (int)(data[i])) : (int)(data[i]));
+		}
+		
+		@Override
 		public void write(final int b) throws IOException
 		{
 		    if (started == false)
@@ -150,9 +161,11 @@ public class ConnectionNetworking
 		@Override
 		public void flush() throws IOException
 		{
+		    if (this.started == false)
+			super.write(10);
+		    this.started = false;
 		    super.write(0);
 		    super.flush();
-		    this.started = false;
 		}
 	    };
     
@@ -276,7 +289,7 @@ public class ConnectionNetworking
 				synchronized (mutex)
 				{
 				    out.write(p);
-				    while ((p = privateIn.read()) != 0)
+				    while ((p = privateIn.read()) != -1)
 				    {
 					out.write(p);
 					if (p == 27)
@@ -305,7 +318,7 @@ public class ConnectionNetworking
 	
 	threadIn.start();
 	threadSysOut.start();
-	//threadMsgOut.start();
+	threadMsgOut.start();
     }
     
 }
