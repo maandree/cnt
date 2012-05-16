@@ -31,10 +31,10 @@ public class UserList extends JPanel
 	this.list = new JList<String>(model);
 	
 	final JScrollPane pane = new JScrollPane(this.list);
-	this.model.addElement("<html><span style=\"color: rgb(0, 255, 0);\">Peyman</span></html>");
+	this.model.addElement("<html><span style=\"color: rgb(0, 0, 255);\">Peyman</span></html>");
 	this.model.addElement("<html><span style=\"color: rgb(255, 255, 0);\">Calle</span></html>");
 	this.model.addElement("<html><span style=\"color: rgb(255, 0, 0);\">Magnus</span></html>");
-	this.model.addElement("<html><span style=\"color: rgb(0, 0, 255);\">Mattias</span></html>");
+	this.model.addElement("<html><span style=\"color: rgb(0, 255, 0);\">Mattias</span></html>");
 	
 	LookAndFeel.installBorder(pane, "BorderFactory.createEmptyBorder()");
 	
