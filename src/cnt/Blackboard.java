@@ -656,6 +656,48 @@ public class Blackboard
     }
     
     /**
+     * This message is broadcasted when a player has joined the game session
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class PlayerJoined implements BlackboardMessage
+    {
+	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param  player  The player
+	 */
+	public PlayerJoined(final Player player)
+	{
+	    assert player != null : "Null is not allowed";
+	    this.player = player;
+	}
+	
+	
+	
+	/**
+	 * The player
+	 */
+	public final Player player;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.player == null ? "[no player, that's wierd]" : ("Joined player: " + this.player.toString());
+	}
+    }
+    
+    /**
      * This message is broadcasted when the next player is request, and as a response
      * 
      * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
