@@ -30,6 +30,18 @@ public class JShape extends Shape
     
     
     /**
+     * How much to change {@link #x} by at each 90° clockwise rotation, depending on the state
+     */
+    private static final int[] xrot = {-1,  0, 0, 1};
+    
+    /**
+     * How much to change {@link #y} by at each 90° clockwise rotation, depending on the state
+     */
+    private static final int[] yrot = { 1, -1, 0, 0};
+    
+    
+    
+    /**
      * Constructor
      */
     public JShape()
@@ -164,11 +176,23 @@ public class JShape extends Shape
     public void rotate(final boolean clockwise)
     {
 	if (clockwise)
+	{
+	    super.x += xrot[this.currState];
+	    super.y += yrot[this.currState];
+	}
+	
+	if (clockwise)
 	    this.currState = (this.currState + 1) % 4;
 	else
 	    this.currState = (this.currState - 1) < 0
 		             ? (this.currState + 3)
 		             : (this.currState - 1);
+	
+	if (clockwise == false)
+	{
+	    super.x -= xrot[this.currState];
+	    super.y -= yrot[this.currState];
+	}
 		
 	this.shape = this.states[this.currState];
     }

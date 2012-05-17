@@ -272,7 +272,7 @@ public abstract class Shape implements Cloneable, Serializable
     public String toString()
     {
 	String strShape = "┌";
-	for (int x = 0; x < this.shape[y].length; x++)
+	for (int x = 0; x < this.shape[0].length; x++)
 	    strShape += "──";
 	strShape += "┐\n";
 	
@@ -290,7 +290,7 @@ public abstract class Shape implements Cloneable, Serializable
 	}
 	
 	strShape += "└";
-	for (int x = 0; x < this.shape[y].length; x++)
+	for (int x = 0; x < this.shape[0].length; x++)
 	    strShape += "──";
 	strShape += "┘";
 	return strShape;
