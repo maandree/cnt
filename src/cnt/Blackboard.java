@@ -139,7 +139,22 @@ public class Blackboard
      */
     public static interface BlackboardMessage extends Serializable
     {
-	//Marker interface
+	/**
+	 * <p>
+	 *   Checks to integrity of the message, if it fails, you should
+	 *   kick be player who sent it. That client is faulty.
+	 * </p>
+	 * <p>
+	 *   This mechanism is only for messages recieved over the network,
+	 *   locally created instances are checked in the constructors using
+	 *   the asserting mechanism.
+	 * </p>
+	 * 
+	 * @return  {@link Boolean#TRUE} if the message checks out,
+	 *          {@link Boolean#FALSE} if the message is corrupt, and
+	 *          <code>null</code> if external examination is required.
+	 */
+	public Boolean checkIntegrity();
     }
     
     
@@ -304,6 +319,9 @@ public class Blackboard
 	 */
 	public MatrixPatch(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
 	{
+	    assert ((this.erase != null) || (this.blocks != null)) : "Matrix patches must contain something";
+	    assert this.checkIntegrity() == Boolean.TRUE : "Matrix patch contains null rows";
+	    
 	    this.erase = erase;
 	    this.blocks = blocks;
 	    this.offY = offY;
@@ -339,6 +357,27 @@ public class Blackboard
 	 */
 	public String toString() {
 	    return "Matrix patch!";
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity()
+	{
+	    if ((this.erase == null) && (this.blocks == null))
+		return Boolean.FALSE;
+	    
+	    if (this.erase != null)
+		for (final boolean[] row : this.erase)
+		    if (row == null)
+			return Boolean.FALSE;
+	    
+	    if (this.blocks != null)
+		for (final Block[] row : this.blocks)
+		    if (blocks == null)
+			return Boolean.FALSE;
+	    
+	    return Boolean.TRUE;
 	}
     }
     
@@ -402,6 +441,12 @@ public class Blackboard
 	    return "Message from " + this.player.toString() + ": " + this.message;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.valueOf((this.player != null) && (this.message != null));
+	}
     }
     
     
@@ -455,6 +500,13 @@ public class Blackboard
 	    return this.message == null ? "[no message, that's weird]" : ("System message " + assoc + ": " + this.message);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return false; //For machine local use only
+	}
+	
     }
     
     
@@ -499,6 +551,12 @@ public class Blackboard
 	    return this.message == null ? "[no message, that's weird]" : ("Message from local player: " + this.message);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return false; //For machine local use only
+	}
     }
     
     
@@ -611,6 +669,13 @@ public class Blackboard
 	public String toString() {
 	    return this.move == null ? "[no move, that's wierd]" : ("Move: " + this.move.toString());
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.valueOf(this.move != null);
+	}
     }
     
     /**
@@ -652,6 +717,13 @@ public class Blackboard
 	 */
 	public String toString() {
 	    return this.player == null ? "[no player, that's wierd]" : ("Dropped player: " + this.player.toString());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.valueOf(this.player != null);
 	}
     }
     
@@ -695,6 +767,13 @@ public class Blackboard
 	public String toString() {
 	    return this.player == null ? "[no player, that's wierd]" : ("Joined player: " + this.player.toString());
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.valueOf(this.player != null);
+	}
     }
     
     /**
@@ -737,6 +816,12 @@ public class Blackboard
 	    return this.player == null ? "Request for next player" : ("Next player: " + this.player.toString());
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.TRUE;
+	}
     }
     
     /**
@@ -762,6 +847,13 @@ public class Blackboard
 	 */
 	public String toString() {
 	    return "Game over!";
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return Boolean.TRUE;
 	}
 	
     }
