@@ -146,7 +146,7 @@ public class LShape extends Shape
         public void restore(final Shape shape)
         {
             if (shape instanceof LShape == false)
-                throw new Error("Wrong shape type");
+                throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
             ((LShape)shape).states = this.states;
             ((LShape)shape).currState = this.currState;

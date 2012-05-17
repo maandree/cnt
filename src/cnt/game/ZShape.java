@@ -96,7 +96,7 @@ public class ZShape extends Shape
         public void restore(final Shape shape)
         {
             if (shape instanceof ZShape == false)
-                throw new Error("Wrong shape type");
+                throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
             ((ZShape)shape).flat = this.flat;
         }

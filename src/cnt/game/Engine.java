@@ -259,31 +259,29 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	try
 	{
-	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length].clone();
-	    fallingShape.setPlayer(player);
+	    //fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length].clone();
+	    //fallingShape.setPlayer(player);
 	    
-	    /*fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length];
+	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length];
 	    
 	    HashMap<Shape, SoftReference<Shape>> playerShapeCache = shapeCache.get(player);
 	    Shape nshape;
 	    if (playerShapeCache == null)
 	    {
-		playerShapeCache = new HashMap<Shape, SoftReference<Shape>>();
-		nshape = fallingShape.clone();
+	        shapeCache.put(player, playerShapeCache = new HashMap<Shape, SoftReference<Shape>>());
+		playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape = fallingShape.clone()));
 		nshape.setPlayer(player);
-		playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape));
 	    }
 	    else
 	    {
 		SoftReference<Shape> ref = playerShapeCache.get(fallingShape);
 		if ((ref == null) || ((nshape = ref.get()) == null))
 		{
-		    nshape = fallingShape.clone();
+		    playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape = fallingShape.clone()));
 		    nshape.setPlayer(player);
-		    playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape));
 		}
 	    }
-	    fallingShape = nshape;*/
+	    fallingShape = nshape;
 	}
 	catch (final CloneNotSupportedException err)
 	{

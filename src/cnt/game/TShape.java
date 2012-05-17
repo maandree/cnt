@@ -78,7 +78,7 @@ public class TShape extends Shape
         public void restore(final Shape shape)
         {
             if (shape instanceof TShape == false)
-                throw new Error("Wrong shape type");
+                throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
         }
     }
