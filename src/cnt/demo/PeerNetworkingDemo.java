@@ -37,7 +37,7 @@ public class PeerNetworkingDemo
     /**
      * This is the main entry point of the demo
      * 
-     * @param  args  Startup arguments, unused
+     * @param  args  Startup arguments, {name, may be server ? s : c, local public IP address, servers' port, remote peer's IP address}
      * 
      * @throws  Exception  On total failure
      */

@@ -147,6 +147,8 @@ public class CDLinkedListTest
 	System.out.println("\nPassed all!");
     }
     
+    
+    
     /**
      * Prints a description of a test and whether it fail or passed.<br/>
      * If the test, which is perform by this method, failed the program exits with a user error code.
@@ -162,6 +164,7 @@ public class CDLinkedListTest
 	if (got.equals(expected) == false)
 	    System.exit(-1);
     }
+    
     
     /**
      * Prints a description of a test and whether it fail or passed.<br/>

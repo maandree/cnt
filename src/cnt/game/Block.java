@@ -13,10 +13,10 @@ import java.io.Serializable;
 
 
 /**
-* Class representing a single block in the playing field
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-*/
+ * Class representing a single block in the playing field
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ */
 public class Block implements Serializable
 {
     /**
@@ -29,7 +29,7 @@ public class Block implements Serializable
     /**
      * Constructor
      *
-     * @param color the color of the new block
+     * @param  color  The color of the new block
      */
     public Block(final int color)
     {
@@ -56,7 +56,8 @@ public class Block implements Serializable
     /**
      * Setter for int colors
      *
-     * @param color an int representing a color
+     * @param   color  An integer representing a color, the new color
+     * @return         TODO: [Mattias: I think this should be determined in the interfaces, not here]
      */
     public boolean setColor(final int color)
     {
@@ -69,10 +70,10 @@ public class Block implements Serializable
     /**
      * Setter for a string representing hexadecimal number
      *
-     * @param color a string representing a hexadecimal number
+     * @param   color  A string representing a hexadecimal number
+     * @return         TODO: [Mattias: I think this should be determined in the interfaces, not here]
      */
-    public boolean setColor(final String color)
-    {
+    public boolean setColor(final String color) {
 	if (this.setColor(hexToInt(color)))
 	    return true;
 	else
@@ -80,38 +81,36 @@ public class Block implements Serializable
     }
     
     /**
-     * Returns block color as an int
+     * Returns block color as an integer
+     * 
+     * @return  The color in raw integer representation
      */
-    public int getColor()
-    {
+    public int getColor() {
 	return this.color;
     }
     
     /**
      * Returns color as a string in hexadecimal format
+     * 
+     * @return  The color as in hexadecimal representation
      */
-    public String getHexColor()
-    {
+    public String getHexColor() {
 	return Integer.toHexString(this.color);
     }
     
     /**
      * Helper method to convert "hex" string to integer
      *
-     * @param  strNum  String to be converted to integer
+     * @param   strNum  String to convert to integer
+     * @return          The string converted to an integer
      */
     private int hexToInt(final String strNum)
     {
-	int number = 0;
-	try
-	{
-	    number = Integer.valueOf(strNum, 16).intValue();
+	try {
+	    return Integer.valueOf(strNum, 16).intValue();
 	}
-	catch (Exception err)
-	{
+	catch (Exception err) {
 	    throw new Error("Trying to parse String into a color failed for unknown reason.");
 	}
-	
-	return number;
     }
 }

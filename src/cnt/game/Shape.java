@@ -109,8 +109,7 @@ public abstract class Shape implements Cloneable, Serializable
      * 
      * @return The Shape object
      */
-    public Shape getShape()
-    {
+    public Shape getShape() {
 	return this;
     }
 	
@@ -119,8 +118,7 @@ public abstract class Shape implements Cloneable, Serializable
      *
      * @return a Block[][] matrix that makes up the shape in the current position
      */
-    public Block[][] getBlockMatrix()
-    {
+    public Block[][] getBlockMatrix(){
 	return this.shape;
     }
 
@@ -140,44 +138,41 @@ public abstract class Shape implements Cloneable, Serializable
 		
 	return matrix;
     }
-	
+    
+    
     /**
      * Return current left position of shape
      *
      * @return x the current left position for shape
      */
-    public int getX()
-    {
+    public int getX() {
 	return this.x;
     }
-	
+    
     /**
      * Return current top position
      *
      * @return y current top position
      */
-    public int getY()
-    {
+    public int getY() {
 	return this.y;
     }
-	
+    
     /**
      * Saves a copy of the shapes state, then modifies it's left position
      *
      * @param x amount to move in left-right direction
      */
-    public void setX(final int x)
-    {
+    public void setX(final int x) {
 	this.x = x;
     }
-	
+    
     /**
      * Saves a copy of the shapes state, then modifies it's top position
      *
      * @param y amount to move in up-down direction
      */
-    public void setY(final int y)
-    {
+    public void setY(final int y) {
 	this.y = y;
     }
     
@@ -225,6 +220,39 @@ public abstract class Shape implements Cloneable, Serializable
 		    block.setColor(value.getColor());
     }
     
+    
+    /**
+     * Rotate the shape around its center.
+     * 
+     * @param  clockwise  <code>true</code> to rotate clockwise (right),
+     *                    <code>false</code> to rotate anticlockwise (left)
+     */
+    public abstract void rotate(final boolean clockwise);
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Shape clone() throws CloneNotSupportedException
+    {
+	throw new CloneNotSupportedException();
+    }
+    
+    
+    /**
+     * Clones data into another {@link Shape}
+     * 
+     * @param  shape  Destination
+     */
+    protected void cloneData(final Shape shape)
+    {
+	shape.x = this.x;
+	shape.y = this.y;
+	shape.player = this.player;
+	shape.shape = this.shape;
+    }
+    
+    
     /**
      * Returnss the current shape using * as marker for a block
      */
@@ -243,35 +271,6 @@ public abstract class Shape implements Cloneable, Serializable
 	}
 		
 	return strShape;
-    }
-	
-    /**
-     * Rotate the shape around its center.
-     * 
-     * @param  clockwise  <code>true</code> to rotate clockwise (right),
-     *                    <code>false</code> to rotate anticlockwise (left)
-     */
-    public abstract void rotate(final boolean clockwise);
-
-    /**
-     * {@inheritDoc}
-     */
-    public Shape clone() throws CloneNotSupportedException
-    {
-	throw new CloneNotSupportedException();
-    }
-    
-    /**
-     * Clones data into another {@link Shape}
-     * 
-     * @param  shape  Destination
-     */
-    protected void cloneData(final Shape shape)
-    {
-	shape.x = this.x;
-	shape.y = this.y;
-	shape.player = this.player;
-	shape.shape = this.shape;
     }
     
 }

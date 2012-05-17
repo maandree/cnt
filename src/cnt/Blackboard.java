@@ -156,6 +156,7 @@ public class Blackboard
 	public void messageBroadcasted(final Blackboard.BlackboardMessage message);
     }
     
+    
     /**
      * Message observation threading policy
      */
@@ -183,6 +184,7 @@ public class Blackboard
 	observers.put(observer, null);
     }
     
+    
     /**
      * Unregisters a message type-wide observer
      *
@@ -194,6 +196,7 @@ public class Blackboard
 	observers.remove(observer);
 	observationThreading.remove(observer);
     }
+    
     
     /**
      * Registers a threading policy for an observer and a message type
@@ -209,6 +212,7 @@ public class Blackboard
     {
 	registerThreadingPolicy(observer, policy, messageType);
     }
+    
     
     /**
      * Registers a threading policy for an observer and some message types
@@ -229,7 +233,7 @@ public class Blackboard
 	for (final Class<? extends BlackboardMessage> messageType : messageTypes)
 	    map.put(messageType, policy);
     }
-
+    
     
     /**
      * Broadcasts a message to all observers

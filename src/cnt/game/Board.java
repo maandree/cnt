@@ -48,6 +48,7 @@ public class Board
     	put(shape.getBlockMatrix(), shape.getX(), shape.getY());
     }
     
+    
     /**
      * Puts a set of blocks on the board
      * 
@@ -72,6 +73,7 @@ public class Board
 	System.err.println("\033[32mputting: block at " + newBlocks[0].length + "x" + newBlocks.length + "+" + offX + "+" + offY + "\033[0m");
     }
     
+    
     /**
      * Tests if a row is full
      * 
@@ -85,7 +87,8 @@ public class Board
 		return false;
 	return true;
     }
-
+    
+    
     /**
      * Generates an array of the indices (y-position) of all full rows
      * 
@@ -104,6 +107,7 @@ public class Board
     	System.arraycopy(found, 0, rc, 0, ptr);
     	return rc;
     }
+    
     
     /**
      * Deletes blocks from the board
@@ -126,6 +130,7 @@ public class Board
 
 			    blocks[y+offY][x+offX] = null;
     }
+    
     
     /**
      * Gets a matrix with all shapes on the board

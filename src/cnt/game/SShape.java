@@ -106,10 +106,17 @@ public class SShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
+    
+    /**
+     * {@inheritDoc}
+     */	
+    public SShape clone() {
+	return new SShape(this);
+    }
+    
     
     /**
      * {@inheritDoc}
@@ -138,13 +145,5 @@ public class SShape extends Shape
 	    this.shape = matrix;
 	    this.flat = true;
 	}				
-    }
-    
-    /**
-     * {@inheritDoc}
-     */	
-    public SShape clone()
-    {
-	return new SShape(this);
     }
 }

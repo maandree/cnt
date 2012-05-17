@@ -57,6 +57,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	}
     }
     
+    
     /**
      * Appends a message sent by a player
      * 
@@ -95,6 +96,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setSelectionStart(pos2);	this.setSelectionEnd(pos2);
 	this.setEditable(false);
     }
+    
     
     /**
      * Appends a message sent by the system

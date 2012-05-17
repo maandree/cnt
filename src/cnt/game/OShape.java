@@ -87,9 +87,15 @@ public class OShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */	
+    public OShape clone() {
+	return new OShape(this);
     }
     
     /**
@@ -98,13 +104,5 @@ public class OShape extends Shape
     public void rotate(final boolean clockwise)
     {
         //indentity function
-    }
-    
-    /**
-     * {@inheritDoc}
-     */	
-    public OShape clone()
-    {
-	return new OShape(this);
     }
 }

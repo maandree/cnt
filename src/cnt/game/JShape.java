@@ -137,13 +137,18 @@ public class JShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
     
+    /**
+     * {@inheritDoc}
+     */	
+    public JShape clone() {
+	return new JShape(this);
+    }
     
-
+    
     /**
      * {@inheritDoc}
      */
@@ -159,13 +164,6 @@ public class JShape extends Shape
 	this.shape = this.states[this.currState];
     }
     
-    /**
-     * {@inheritDoc}
-     */	
-    public JShape clone()
-    {
-	return new JShape(this);
-    }
     
     /**
      * {@inheritDoc}

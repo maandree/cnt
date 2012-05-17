@@ -65,13 +65,15 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	
 	try
         {
-	    if      (message instanceof Blackboard.MatrixPatch)    this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.ChatMessage)    this.gameNetworking.forward(message);
+	    if      (message instanceof Blackboard.GamePlayCommand)  this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.MatrixPatch)      this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.ChatMessage)      this.gameNetworking.forward(message);
 	    else if (message instanceof Blackboard.UserMessage)
 	    {
 		Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
 		this.gameNetworking.chat(msg.message);
 	    }
+	    else if (message instanceof Blackboard.SystemMessage) ; /* Do nothing */
 	    else
 		assert false : "Update message types in BlackboardNetworking";
 	}
@@ -94,7 +96,6 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	if (object instanceof Blackboard.BlackboardMessage)
 	    broadcastMessage((Blackboard.BlackboardMessage)object);
     }
-    
     
     /**
      * Broadcasts a message

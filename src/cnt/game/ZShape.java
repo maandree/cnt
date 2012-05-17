@@ -106,10 +106,17 @@ public class ZShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public ZShape clone() {
+	return new ZShape(this);
+    }
+    
     
     /**
      * {@inheritDoc}
@@ -138,13 +145,5 @@ public class ZShape extends Shape
 	    this.shape = matrix;
 	    this.flat = true;
 	}
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public ZShape clone()
-    {
-	return new ZShape(this);
     }
 }

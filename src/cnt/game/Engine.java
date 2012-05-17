@@ -383,11 +383,11 @@ public class Engine implements Blackboard.BlackboardObserver
 	board.put(fallingShape);
 	
 	final int[] full = board.getFullRows();
-	for (int i = 0, n = full.length >> 1; i < n; i++)
+	for (int i = 0, n = (full.length >> 1) - 1; i <= n; i++) //reversing
 	{
-	    full[i] ^= full[n - i - 1];
-	    full[n - i - 1] ^= full[i];
-	    full[i] ^= full[n - i - 1];
+	    full[i] ^= full[n - i];
+	    full[n - i] ^= full[i];
+	    full[i] ^= full[n - i];
 	}
 	
 	if (full.length > 0)
@@ -526,10 +526,12 @@ public class Engine implements Blackboard.BlackboardObserver
 			case RIGHT:          move(1);        break;
 			case CLOCKWISE:      rotate(true);   break;
 			case ANTICLOCKWISE:  rotate(false);  break;
+			    
 			case DOWN:
 			    if (fall() == false)
 				thread.interrupt();
 			    break;
+			    
 			case DROP:
 			    drop();
 			    thread.interrupt();

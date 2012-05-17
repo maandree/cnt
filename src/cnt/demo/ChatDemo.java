@@ -38,7 +38,7 @@ public class ChatDemo
     /**
      * This is the main entry point of the demo
      * 
-     * @param  args  Startup argument, unused
+     * @param  args  Startup argument, {name, may be server ? s : c, local public IP address, servers' port, remote peer's IP address}
      * 
      * @throws  Exception  On total failure
      */

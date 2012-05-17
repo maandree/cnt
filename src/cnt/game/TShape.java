@@ -88,10 +88,17 @@ public class TShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
+    
+    /**
+     * {@inheritDoc}
+     */		
+    public TShape clone() {
+	return new TShape(this);
+    }
+    
     
     /**
      * {@inheritDoc}
@@ -126,13 +133,5 @@ public class TShape extends Shape
 	matrix[1][1] = this.shape[1][1];
 	
 	return matrix;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */		
-    public TShape clone()
-    {
-	return new TShape(this);
     }
 }

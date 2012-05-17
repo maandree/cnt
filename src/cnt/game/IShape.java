@@ -104,17 +104,25 @@ public class IShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
     
     /**
      * {@inheritDoc}
      */
-    // Rotates kinda wierd, but hard to find a good rotation of this block...
+    public IShape clone() {
+	return new IShape(this);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void rotate(final boolean clockwise)
     {
+	// Rotates kinda wierd, but hard to find a good rotation of this block...
+	
 	Block[][] matrix = new Block[4][4];
 	int[][] placement;
 	if (this.flat)
@@ -132,13 +140,5 @@ public class IShape extends Shape
 	    matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
 	
 	this.shape = matrix;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public IShape clone()
-    {
-	return new IShape(this);
     }
 }

@@ -137,10 +137,17 @@ public class LShape extends Shape
     /**
      * {@inheritDoc}
      */
-    public Momento store()
-    {
+    public Momento store() {
         return new Momento(this);
     }
+    
+    /**
+     * {@inheritDoc}
+     */	
+    public LShape clone() {
+	return new LShape(this);
+    }
+    
     
     /**
      * {@inheritDoc}
@@ -157,13 +164,6 @@ public class LShape extends Shape
 	this.shape = this.states[this.currState];
     }
     
-    /**
-     * {@inheritDoc}
-     */	
-    public LShape clone()
-    {
-	return new LShape(this);
-    }
     
     /**
      * {@inheritDoc}
