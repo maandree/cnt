@@ -34,32 +34,27 @@ public class JShape extends Shape
      */
     public JShape()
     {
-	this.states = new Block[4][3][3];
-	this.shape = new Block[3][3];
-		
-	int[][] placement = new int[][] {       {0,1},
-					        {1,1},
-					 {2,0}, {2,1}};
-	for (int[] place : placement)
-	    this.shape[place[0]][place[1]] = new Block();
+	this.shape = new Block[][]
+	        {
+		    {null       , new Block()},
+		    {null       , new Block()},
+		    {new Block(), new Block()},
+		};
 	
-	this.states[0] = this.shape;
-	
-	int[][][] coords = new int[3][4][2];
-	
-	coords[0] = new int[][] {{1,0},{1,1},{1,2},{0,0}};
-	coords[1] = new int[][] {{0,2},{0,1},{1,1},{2,1}};
-	coords[2] = new int[][] {{2,2},{1,0},{1,1},{1,2}};
-	
-	int i = 1;
-	for (int[][] coord : coords)
-	{
-	    Block[][] matrix = new Block[3][3];
-	    for (int[] place : coord)
-		matrix[place[0]][place[1]] = new Block();
-	    
-	    this.states[i++] = matrix;
-	}
+	this.states = new Block[][][]
+	        {
+		    this.shape,
+		    
+		    {  {new Block(), null,        null       },
+		       {new Block(), new Block(), new Block()}, },
+		    
+		    {  {new Block(), new Block()},
+		       {new Block(), null       },
+		       {new Block(), null       },  },
+		       
+		    {  {new Block(), new Block(), new Block()},
+		       {null,        null     ,   new Block()},  },
+		};
     }
     
     /**
@@ -120,16 +115,10 @@ public class JShape extends Shape
         public Momento(final JShape shape)
         {
             super(shape);
-            this.states = shape.states;
             this.currState = shape.currState;
         }
 	
 	
-	
-	/**
-	 * See {@link JShape#states}
-	 */
-        private final Block[][][] states;
 	
 	/**
 	 * See {@link JShape#currState}
@@ -148,7 +137,6 @@ public class JShape extends Shape
             if (shape instanceof JShape == false)
                 throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
-            ((JShape)shape).states = this.states;
             ((JShape)shape).currState = this.currState;
         }
     }
@@ -184,7 +172,6 @@ public class JShape extends Shape
 		
 	this.shape = this.states[this.currState];
     }
-    
     
     /**
      * {@inheritDoc}

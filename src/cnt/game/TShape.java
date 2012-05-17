@@ -34,11 +34,27 @@ public class TShape extends Shape
      */
     public TShape()
     {
-	this.shape = new Block[3][3];
-	    
-	int[][] placement = new int[][] {{1,1},{0,1},{1,0},{2,1}};
-	for (int[] place : placement)
-	    this.shape[place[0]][place[1]] = new Block();
+	this.shape = new Block[][]
+	        {
+		    {null       , new Block(), null       },
+		    {new Block(), new Block(), new Block()},
+		};
+	
+	this.states = new Block[][][]
+	        {
+		    this.shape,
+		    
+		    {  {new Block(), null,      },
+		       {new Block(), new Block()},
+		       {new Block(), null,      }, },
+		       
+		    {  {new Block(), new Block(), new Block()},
+		       {null,        new Block(), null       }, },
+		    
+		    {  {null,        new Block()},
+		       {new Block(), new Block()},
+		       {null,        new Block()}, }, 
+		};
     }
     
     /**
@@ -49,7 +65,40 @@ public class TShape extends Shape
     private TShape(final TShape original)
     {
 	original.cloneData(this);
+	this.currState = original.currState;
+	
+	int d, w, h;
+	this.states = new Block[d = original.states.length][][];
+	
+	for (int z = 0; z < d; z++)
+	{
+	    Block[][] os = original.states[z];
+	    Block[][] s = this.states[z] =
+		    new Block[h = os.length]
+		             [w = os[0].length];
+	    
+	    for (int y = 0; y < h; y++)
+	    {
+		Block[] row = s[y];
+		Block[] orow = os[y];
+		for (int x = 0; x < w; x++)
+		    if (orow[x] != null)
+			row[x] = new Block(orow[x].getColor());
+	    }
+	}
     }
+    
+    
+    
+    /**
+     * The shape's possible states
+     */
+    Block[][][] states;
+    
+    /**
+     * The index of the shape's current state
+     */
+    int currState = 0;
     
     
     
@@ -66,7 +115,15 @@ public class TShape extends Shape
         public Momento(final TShape shape)
         {
             super(shape);
+            this.currState = shape.currState;
         }
+	
+	
+	
+	/**
+	 * See {@link TShape#currState}
+	 */
+	private final int currState;
         
 	
 	
@@ -80,6 +137,7 @@ public class TShape extends Shape
             if (shape instanceof TShape == false)
                 throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
+            ((TShape)shape).currState = this.currState;
         }
     }
     
@@ -105,33 +163,27 @@ public class TShape extends Shape
      */
     public void rotate(final boolean clockwise)
     {
-	if (clockwise) 
-	    this.shape = this.turn();
+	if (clockwise)
+	    this.currState = (this.currState + 1) % 4;
 	else
-        {
-	    // 3 clockwise turns = 1 counterclockwise turn, so...
-	    for (int i = 0; i < 4; i++)
-		this.shape = this.turn();
-	}
+	    this.currState = (this.currState - 1) < 0
+		             ? (this.currState + 3)
+		             : (this.currState - 1);
 	
+	this.shape = this.states[this.currState];
     }
     
     /**
-     * Performs a 90° clockwise rotation
-     * 
-     * @return  The new block layout
+     * {@inheritDoc}
      */
-    protected Block[][] turn()
+    @Override
+    public void setPlayer(final Player value)
     {
-	Block[][] matrix = new Block[3][3];
-	
-	if (this.shape[0][1] != null)  matrix[1][2] = this.shape[0][1];
-	if (this.shape[1][2] != null)  matrix[2][1] = this.shape[1][2];
-	if (this.shape[2][1] != null)  matrix[1][0] = this.shape[2][1];
-	if (this.shape[1][0] != null)  matrix[0][1] = this.shape[1][0];
-	
-	matrix[1][1] = this.shape[1][1];
-	
-	return matrix;
+	super.setPlayer(value);
+	for (final Block[][] state : states)
+	    for (final Block[] row : state)
+		for (final Block block : row)
+		    if (block != null)
+			block.setColor(value.getColor());
     }
 }

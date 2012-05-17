@@ -34,11 +34,19 @@ public class IShape extends Shape
      */
     public IShape()
     {
-	this.shape = new Block[4][4];
+	this.shape = new Block[][]
+	        {
+		    {new Block()},
+		    {new Block()},
+		    {new Block()},
+		    {new Block()},
+		};
 	
-	int[][] placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
-	for (int[] place : placement)
-	    this.shape[place[0]][place[1]] = new Block();
+	this.states = new Block[][][]
+	        {
+		    this.shape,
+		    { {new Block(), new Block(), new Block(), new Block()}, }
+		};
     }
     
     /**
@@ -49,14 +57,40 @@ public class IShape extends Shape
     private IShape(final IShape original)
     {
 	original.cloneData(this);
+	this.currState = original.currState;
+	
+	int d, w, h;
+	this.states = new Block[d = original.states.length][][];
+	
+	for (int z = 0; z < d; z++)
+	{
+	    Block[][] os = original.states[z];
+	    Block[][] s = this.states[z] =
+		    new Block[h = os.length]
+		             [w = os[0].length];
+	    
+	    for (int y = 0; y < h; y++)
+	    {
+		Block[] row = s[y];
+		Block[] orow = os[y];
+		for (int x = 0; x < w; x++)
+		    if (orow[x] != null)
+			row[x] = new Block(orow[x].getColor());
+	    }
+	}
     }
     
     
     
     /**
-     * Whether the shape is in its horizontal (flat) state
+     * The shape's possible states
      */
-    boolean flat = true;
+    Block[][][] states;
+    
+    /**
+     * The index of the shape's current state
+     */
+    int currState = 0;
     
     
     
@@ -73,15 +107,15 @@ public class IShape extends Shape
         public Momento(final IShape shape)
         {
             super(shape);
-            this.flat = shape.flat;
+            this.currState = shape.currState;
         }
         
 	
 	
 	/**
-	 * See {@link IShape#flat}
+	 * See {@link JShape#currState}
 	 */
-        private final boolean flat;
+	private final int currState;
 	
 	
 	
@@ -95,7 +129,7 @@ public class IShape extends Shape
             if (shape instanceof IShape == false)
                 throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
-            ((IShape)shape).flat = this.flat;
+            ((IShape)shape).currState = this.currState;
         }
     }
     
@@ -123,22 +157,21 @@ public class IShape extends Shape
     {
 	// Rotates kinda wierd, but hard to find a good rotation of this block...
 	
-	Block[][] matrix = new Block[4][4];
-	int[][] placement;
-	if (this.flat)
-	{
-	    placement = new int[][]{{0,0},{0,1},{0,2},{0,3}};
-	    this.flat = false;
-	}
-	else
-	{
-	    placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
-	    this.flat = true;
-	}
-	
-	for (int[] place : placement)
-	    matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
-	
-	this.shape = matrix;
+	this.currState = 1 - this.currState;
+	this.shape = this.states[this.currState];
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPlayer(final Player value)
+    {
+	super.setPlayer(value);
+	for (final Block[][] state : states)
+	    for (final Block[] row : state)
+		for (final Block block : row)
+		    if (block != null)
+			block.setColor(value.getColor());
     }
 }

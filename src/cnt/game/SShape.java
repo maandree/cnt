@@ -34,13 +34,19 @@ public class SShape extends Shape
      */
     public SShape()
     {
-	this.flat = true;
-	this.shape = new Block[3][3];
+	this.shape = new Block[][]
+	        {
+		    {null,        new Block(), new Block()},
+		    {new Block(), new Block(), null       },
+		};
 	
-	int[][] placement = new int[][] {       {0,1}, {0,2},
-					 {1,0}, {1,1}       };
-	for (int[] place : placement)
-	    this.shape[place[0]][place[1]] = new Block();
+	this.states = new Block[][][]
+	        {
+		    this.shape,
+		    {   {new Block(), null       },
+			{new Block(), new Block()},
+			{null,        new Block()},  }
+		};
     }
     
     /**
@@ -51,15 +57,40 @@ public class SShape extends Shape
     private SShape(final SShape original)
     {
 	original.cloneData(this);
-	this.flat = original.flat;
+	this.currState = original.currState;
+	
+	int d, w, h;
+	this.states = new Block[d = original.states.length][][];
+	
+	for (int z = 0; z < d; z++)
+	{
+	    Block[][] os = original.states[z];
+	    Block[][] s = this.states[z] =
+		    new Block[h = os.length]
+		             [w = os[0].length];
+	    
+	    for (int y = 0; y < h; y++)
+	    {
+		Block[] row = s[y];
+		Block[] orow = os[y];
+		for (int x = 0; x < w; x++)
+		    if (orow[x] != null)
+			row[x] = new Block(orow[x].getColor());
+	    }
+	}
     }
     
     
     
     /**
-     * Whether the shape is in its horizontal (flat) state
+     * The shape's possible states
      */
-    boolean flat;
+    Block[][][] states;
+    
+    /**
+     * The index of the shape's current state
+     */
+    int currState = 0;
     
     
     
@@ -76,15 +107,15 @@ public class SShape extends Shape
         public Momento(final SShape shape)
         {
             super(shape);
-            this.flat = shape.flat;
+            this.currState = shape.currState;
         }
 	
 	
 	
 	/**
-	 * See {@link SShape#flat}
+	 * See {@link SShape#currState}
 	 */
-        private final boolean flat;
+        private final int currState;
 	
 	
 	
@@ -98,7 +129,7 @@ public class SShape extends Shape
             if (shape instanceof SShape == false)
                 throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
-            ((SShape)shape).flat = this.flat;
+            ((SShape)shape).currState = this.currState;
         }
     }
     
@@ -124,27 +155,21 @@ public class SShape extends Shape
      */
     public void rotate(final boolean clockwise)
     {
-	Block[][] matrix = new Block[3][3];
-
-	if (this.flat)
-	{
-	    matrix[0][1] = this.shape[0][1];
-	    matrix[1][1] = this.shape[1][1];
-	    matrix[1][2] = this.shape[0][2];
-	    matrix[2][2] = this.shape[1][0];
-			
-	    this.shape = matrix;
-	    this.flat = false;
-	}
-	else
-	{
-	    matrix[0][1] = this.shape[0][1];
-	    matrix[1][1] = this.shape[1][1];
-	    matrix[0][2] = this.shape[1][2];
-	    matrix[1][0] = this.shape[2][2];
-			
-	    this.shape = matrix;
-	    this.flat = true;
-	}				
+	this.currState = 1 - this.currState;
+	this.shape = this.states[this.currState];
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPlayer(final Player value)
+    {
+	super.setPlayer(value);
+	for (final Block[][] state : states)
+	    for (final Block[] row : state)
+		for (final Block block : row)
+		    if (block != null)
+			block.setColor(value.getColor());
     }
 }
