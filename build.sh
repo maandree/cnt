@@ -24,10 +24,10 @@ jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.
     }
 
 
-#javacSeven -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1 | less
-#javacSeven  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
+#javacSeven -Xlint:all -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1 | less
+#javacSeven  -Xlint:all -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
 #javacSeven -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1 | less
 
-#javacSeven -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1
-javacSeven  -Xlint:all,-serial -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1
+#javacSeven -Xlint:all -cp .$jars -s src -d bin src/cnt/{*,*/*,*/*/*}.java 2>&1
+javacSeven  -Xlint:all -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1
 #javacSeven -cp .$jars -s src -d bin src/cnt/{*,{d,g,t,u,m}*/*,*/*/*,n*/{B,O,G}*}.java 2>&1

@@ -20,6 +20,13 @@ import java.io.*;
 public class Player implements Serializable
 {
     /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
+    /**
      * Constructor
      * 
      * @param  name    The name of the player

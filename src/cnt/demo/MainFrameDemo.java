@@ -31,9 +31,11 @@ public class MainFrameDemo
     
     
     /**
-     * This is the main entry point of the program
+     * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments
+     * @param  args  Startup arguments, unused
+     * 
+     * @thorws  InterruptedException  On thread interruption
      */
     public static void main(final String... args) throws InterruptedException
     {

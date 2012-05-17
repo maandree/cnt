@@ -6,8 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-
-// Added this for clarity
 import cnt.game.Board;
 import cnt.game.Block;
 
@@ -15,13 +13,24 @@ import java.io.*;
 
 
 /**
-* Shape class representing a shape of objects
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
-*/
+ * Shape class representing a shape of objects
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ */
 public abstract class Shape implements Cloneable, Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
+    // Has default constructor
+    
+    
+    
     /**
      * The shape that we want
      */
@@ -49,6 +58,11 @@ public abstract class Shape implements Cloneable, Serializable
      */
     public static abstract class Momento
     {
+	/**
+	 * Constructor
+	 * 
+	 * @param  shape  The shape of which to save the state
+	 */
         public Momento(final Shape shape)
         {
             this.shape = shape.shape;
@@ -57,22 +71,24 @@ public abstract class Shape implements Cloneable, Serializable
         }
         
         
+	
 	/**
-	 * The shape that we want
+	 * See {@link State#shape}
 	 */
 	private final Block[][] shape;
-
+	
 	/**
-	 * Current X offset from top-left corner
+	 * See {@link State#x}
 	 */
 	private final int x;
-
+	
 	/**
-	 * Current Y offset from top-left corner
+	 * See {@link State#y}
 	 */
 	private final int y;
-    
-    
+	
+	
+	
         /**
          * Restores the shape's state
          * 

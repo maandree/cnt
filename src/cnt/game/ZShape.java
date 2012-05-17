@@ -6,8 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-
-// Added this for clarity
 import cnt.game.Board;
 import cnt.game.Block;
 import cnt.game.Shape;
@@ -17,15 +15,23 @@ import java.io.*;
 
 
 /**
-* Shape class representing a Z-shape
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
-*/
+ * Shape class representing a Z-shape
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ */
 public class ZShape extends Shape
 {
-    boolean flat;
-	
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
+    /**
+     * Constructor
+     */
     public ZShape()
     {
 	this.flat = true;
@@ -33,11 +39,14 @@ public class ZShape extends Shape
 		
 	int[][] placement = new int[][] {{1,0},{0,0},{2,1},{1,1}};
 	for (int[] place : placement)
-	{
 	    this.shape[place[0]][place[1]] = new Block();
-	}
     }
     
+    /**
+     * Cloning constructor
+     * 
+     * @param  original  The shape to clone
+     */
     private ZShape(final ZShape original)
     {
 	original.cloneData(this);
@@ -47,18 +56,37 @@ public class ZShape extends Shape
     
     
     /**
+     * Whether the shape is in its horizontal (flat) state
+     */
+    boolean flat;
+    
+    
+    
+    /**
      * Momento class for {@link ZShape}
      */
     public static class Momento extends Shape.Momento
     {
+	/**
+	 * Constructor
+	 * 
+	 * @param  shape  The shape of which to save the state
+	 */
         public Momento(final ZShape shape)
         {
             super(shape);
             this.flat = shape.flat;
         }
-            
+	
+	
+	
+	/**
+	 * See {@link ZShape#flat}
+	 */
         private final boolean flat;
     
+	
+	
         /**
          * Restores the shape's state
          * 
@@ -74,6 +102,7 @@ public class ZShape extends Shape
     }
     
     
+    
     /**
      * {@inheritDoc}
      */
@@ -82,8 +111,9 @@ public class ZShape extends Shape
         return new Momento(this);
     }
     
-    
-    
+    /**
+     * {@inheritDoc}
+     */
     public void rotate(final boolean clockwise)
     {
 	Block[][] matrix = new Block[3][3];
@@ -110,6 +140,9 @@ public class ZShape extends Shape
 	}
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public ZShape clone()
     {
 	return new ZShape(this);

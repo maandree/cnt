@@ -65,7 +65,6 @@ public class GameNetworking
      */
     public void forward(final Serializable message) throws IOException
     {
-	System.out.println("forwarding: " + message.getClass().toString());
 	this.objectNetworking.send(message);
     }
     
@@ -77,7 +76,6 @@ public class GameNetworking
      */
     public void chat(final String message)
     {
-	System.out.println("local chat message: " + message);
 	Blackboard.broadcastMessage(new Blackboard.ChatMessage(player, message));
     }
     

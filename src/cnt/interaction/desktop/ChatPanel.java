@@ -20,15 +20,9 @@ import java.io.*;
  * @author  Magnus Lundberg
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class ChatPanel extends JPanel implements ActionListener
 {
-    /**
-     * Desired by {@link Serializable}
-     */
-    private static final long serialVersionUID = 1L;
-    
-    
-    
     /**
      * The message displayed when the player as not entered anything.
      */

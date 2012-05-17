@@ -24,7 +24,6 @@ import java.net.*;
  */
 public class PeerNetworkingDemo
 {
-    
     /**
      * Non-constructor
      */
@@ -35,11 +34,12 @@ public class PeerNetworkingDemo
     
     
     
-    
     /**
-     * This is the main entry point of the program
+     * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments
+     * @param  args  Startup arguments, unused
+     * 
+     * @throws  Exception  On total failure
      */
     public static void main(final String... args) throws Exception
     {
@@ -103,43 +103,6 @@ public class PeerNetworkingDemo
 	    System.out.println("Sending: " + line);
 	    Blackboard.broadcastMessage(new Blackboard.UserMessage(line));
 	}
-	
-	
-	//final Thread readThread = new Thread()
-	//        {
-	//	    /**
-	//	     * {@inheritDoc}
-	//	     */
-	//	    @Override
-	//	    public void run()
-	//	    {
-	//		try
-	//		{
-	//		    final InputStream in = connectionNetworking.globalIn;
-	//		    for (int d; (d = in.read()) != -1;)
-	//		    {
-	//			System.out.write(d);
-	//			System.out.flush();
-	//		    }
-	//		}
-	//		catch (final Throwable err)
-	//		{
-	//		    err.printStackTrace(System.err);
-	//		}
-	//	    }
-	//      };
-	//readThread.start();
-	//System.out.println("Thread created");
-	
-	
-	//final Scanner sc = new Scanner(System.in);
-	//while (sc.hasNext())
-	//{
-	//    final String line = sc.nextLine();
-	//    System.out.println("Sending: " + line);
-	//    connectionNetworking.globalOut.write(line.getBytes("UTF-8"));
-	//    connectionNetworking.globalOut.flush();
-	//}
     }
     
 }

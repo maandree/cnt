@@ -31,9 +31,11 @@ public class EngineDemo
     
     
     /**
-     * This is the main entry point of the program
+     * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments
+     * @param  args  Start up arguments, unused
+     * 
+     * @thorws  InterruptedException  On thread interruption
      */
     public static void main(final String... args) throws InterruptedException
     {
@@ -117,29 +119,6 @@ public class EngineDemo
 	Engine.start();
 	
 	
-	/*
-	Thread.sleep(500);   System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT));
-	Thread.sleep(200);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));
-	for (int i = 0; i < 10; i++)
-	    { Thread.sleep(1000);  System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT)); }
-	
-	Thread.sleep(500);   System.out.println("    DROP");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DROP));
-	
-	for (int i = 0; i < 10; i++)
-	    { Thread.sleep(500);   System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT)); }
-	
-	for (int i = 0; i < 5; i++)
-	    { Thread.sleep(300);   System.out.println("  DOWN");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DOWN)); }
-	
-	Thread.sleep(7000);
-	
-	for (int i = 0; i < 4; i++)
-	    { Thread.sleep(1000);  System.out.println("CLOCKWISE");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.CLOCKWISE)); }
-	
-	for (int i = 0; i < 4; i++)
-	    { Thread.sleep(1000);  System.out.println("ANTI-CLOCKWISE");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE)); }
-	/**/
-	/**/
 	Thread.sleep(500);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));
 	Thread.sleep(200);   System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT));
 	for (int i = 0; i < 10; i++)
@@ -160,7 +139,6 @@ public class EngineDemo
 	
 	for (int i = 0; i < 4; i++)
 	    { Thread.sleep(1000);  System.out.println("ANTI-CLOCKWISE");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE)); }
-	/**/
     }
     
 }

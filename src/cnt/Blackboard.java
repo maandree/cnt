@@ -284,6 +284,13 @@ public class Blackboard
     public static final class MatrixPatch implements BlackboardMessage
     {
 	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  erase   A matrix where <code>true</code> indicates removal of block
@@ -332,6 +339,13 @@ public class Blackboard
     public static final class ChatMessage implements BlackboardMessage
     {
 	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  player   The player sending the message
@@ -365,6 +379,13 @@ public class Blackboard
      */
     public static final class SystemMessage implements BlackboardMessage
     {
+	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
 	/**
 	 * Constructor
 	 * 
@@ -400,6 +421,13 @@ public class Blackboard
     public static final class UserMessage implements BlackboardMessage
     {
 	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  message  The message
@@ -429,6 +457,13 @@ public class Blackboard
      */
     public static final class GamePlayCommand implements BlackboardMessage
     {
+	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
 	/**
 	 * Constructor
 	 * 
@@ -495,6 +530,13 @@ public class Blackboard
     public static final class PlayerDropped implements BlackboardMessage
     {
 	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  player  The player
@@ -521,6 +563,13 @@ public class Blackboard
     public static final class NextPlayer implements BlackboardMessage
     {
 	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  player  The player, <code>null</code> if requested
@@ -546,6 +595,13 @@ public class Blackboard
      */
     public static final class GameOver implements BlackboardMessage
     {
+	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
 	//Has default constructor
     }
     

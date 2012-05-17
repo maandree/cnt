@@ -6,8 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-
-// Added this for clarity
 import cnt.game.Board;
 import cnt.game.Block;
 import cnt.game.Shape;
@@ -17,13 +15,23 @@ import java.io.*;
 
 
 /**
-* Shape class representing a O-shape
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
-*/
+ * Shape class representing a O-shape
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ */
 public class OShape extends Shape
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
+    /**
+     * Constructor
+     */
     public OShape()
     {
 	this.shape = new Block[2][2];
@@ -32,6 +40,11 @@ public class OShape extends Shape
 		this.shape[i][j] = new Block();
     }
     
+    /**
+     * Cloning constructor
+     * 
+     * @param  original  The shape to clone
+     */
     private OShape(final OShape original)
     {
 	original.cloneData(this);
@@ -44,11 +57,18 @@ public class OShape extends Shape
      */
     public static class Momento extends Shape.Momento
     {
+	/**
+	 * Constructor
+	 * 
+	 * @param  shape  The shape of which to save the state
+	 */
         public Momento(final OShape shape)
         {
             super(shape);
         }
         
+	
+	
         /**
          * Restores the shape's state
          * 
@@ -63,6 +83,7 @@ public class OShape extends Shape
     }
     
     
+    
     /**
      * {@inheritDoc}
      */
@@ -71,13 +92,17 @@ public class OShape extends Shape
         return new Momento(this);
     }
     
-    
-
+    /**
+     * {@inheritDoc}
+     */
     public void rotate(final boolean clockwise)
     {
-        //	indentity function
+        //indentity function
     }
-	
+    
+    /**
+     * {@inheritDoc}
+     */	
     public OShape clone()
     {
 	return new OShape(this);

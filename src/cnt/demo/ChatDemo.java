@@ -25,7 +25,6 @@ import java.net.*;
  */
 public class ChatDemo
 {
-    
     /**
      * Non-constructor
      */
@@ -36,11 +35,12 @@ public class ChatDemo
     
     
     
-    
     /**
-     * This is the main entry point of the program
+     * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments
+     * @param  args  Startup argument, unused
+     * 
+     * @throws  Exception  On total failure
      */
     public static void main(final String... args) throws Exception
     {

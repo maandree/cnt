@@ -16,6 +16,7 @@ import java.awt.*;
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class MainFrame extends JFrame
 {
     /**
@@ -50,16 +51,17 @@ public class MainFrame extends JFrame
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO only on demo
 	
 	this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)); //TODO temporary, should depend on screen
+	//TODO use system positioning
 	
-	decorate();
+	buildInterior();
     }
     
     
     
     /**
-     * Decorates the window
+     * Builds and lays out all components for the frame
      */
-    private void decorate()
+    private void buildInterior()
     {
 	this.setLayout(new BorderLayout());
 	

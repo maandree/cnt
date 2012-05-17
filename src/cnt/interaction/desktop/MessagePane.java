@@ -17,6 +17,7 @@ import javax.swing.*;
  * @author  Magnus Lundberg
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class MessagePane extends JPanel
 {
     /**

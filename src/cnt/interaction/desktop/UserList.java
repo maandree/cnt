@@ -18,6 +18,7 @@ import java.awt.event.*;
  * @author  Peyman Eshtiagh
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class UserList extends JPanel
 {
     /**

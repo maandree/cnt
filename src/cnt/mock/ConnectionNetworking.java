@@ -19,7 +19,10 @@ import java.net.*;
 public class ConnectionNetworking
 {
     /**
-     * Constructor
+     * <p>Constructor.</p>
+     * <p>
+     *   The thread calling constructor must be keep alive, otherwise the pipes ({@link #globalIn} and {@link #globalOut}) breaks.
+     * </p>
      * 
      * @param  name        The name of the peer
      * @param  serverauth  Whether the peer may be the network's server
@@ -29,6 +32,12 @@ public class ConnectionNetworking
      */
     public ConnectionNetworking(final char name, final boolean serverauth, final String pubip, final int serverport, final String remote) throws IOException
     {
+	System.err.println("I am " + name + " on " + pubip);
+	if (serverauth == false)
+	    System.err.println("I may not be a server");
+	System.err.println("Servers use port " + serverport + ",");
+	System.err.println("And my remote peer is " + remote);
+	
 	ServerSocket _server = null;
 	
 	if (serverauth)
@@ -50,10 +59,13 @@ public class ConnectionNetworking
 	
 	if (server != null)
 	{
-	    System.out.println("I am a server");
+	    System.err.println("I am a server");
 	    
 	    final Thread threadServer = new Thread()
 		    {
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public void run()
 			{
@@ -64,13 +76,16 @@ public class ConnectionNetworking
 			    }
 			    catch (final IOException err)
 			    {
-				System.out.println("Server error");
+				System.err.println("Server error");
 			    }
 			};
 		    };
 	    
 	    final Thread threadClient = new Thread()
 		    {
+			/**
+			 * {@inheritDoc}
+			 */
                         @Override
 			public void run()
 			{
@@ -79,11 +94,11 @@ public class ConnectionNetworking
 				if (remote.equals(pubip) == false)
 				    connect(new Socket(remote, serverport), monitor, peers);
 				else
-				    System.out.println("Remote server is local server");
+				    System.err.println("Remote server is local server");
 			    }
 			    catch (final Throwable err)
 			    {
-				System.out.println("No remote server to connect to");
+				System.err.println("No remote server to connect to");
 			    }
 			}
 		    };
@@ -93,28 +108,31 @@ public class ConnectionNetworking
 	}
 	else
 	{
-	    System.out.println("I am a client");
+	    System.err.println("I am a client");
 	    
 	    final Thread threadClient = new Thread()
 		    {
+			/**
+			 * {@inheritDoc}
+			 */
 			@Override
 			public void run()
 			{
 			    try
 			    {
 				connect(new Socket(pubip, serverport), monitor, peers);
-				System.out.println("I am connected to local server");
+				System.err.println("I am connected to local server");
 			    }
 			    catch (final Throwable err)
 			    {
 				try
 				{
 				    connect(new Socket(remote, serverport), monitor, peers);
-				    System.out.println("I am connected to remote server");
+				    System.err.println("I am connected to remote server");
 				}
 				catch (final Throwable ierr)
 				{
-				    System.out.println("I could not connect to any server");
+				    System.err.println("I could not connect to any server");
 				}
 			    }
 			}
@@ -126,19 +144,51 @@ public class ConnectionNetworking
     
     
     
+    /**
+     * Message data input stream
+     */
     public  PipedInputStream  globalIn;
+    
+    /**
+     * The other end of {@link #globalIn}
+     */
     private PipedOutputStream privateOut;
+    
+    /**
+     * The other end of {@link #globalOut}
+     */
     private PipedInputStream  privateIn;
+    
+    /**
+     * Message data output stream
+     */
     public  PipedOutputStream globalOut;
     
     
+    
+    /**
+     * <p>Creates input and output pipes.</p>
+     * <p>
+     *   The thread calling method "must" be keep alive, otherwise the pipes ({@link #globalIn} and {@link #globalOut}) breaks.
+     * </p>
+     *
+     * @throws  IOException  On I/O error, this should not happen
+     */
     private void createPipes() throws IOException
     {
 	this.privateOut = new PipedOutputStream();
 	this.globalOut  = new PipedOutputStream()
 	        {
+		    /**
+		     * Whether the an transmission has already started, without having finished
+		     */
 		    private boolean started = false;
 		    
+		    
+		    
+		    /**
+		     * {@inheritDoc}
+		     */
 		    @Override
 		    public void write(final byte[] data, final int off, final int len) throws IOException
 		    {
@@ -147,6 +197,9 @@ public class ConnectionNetworking
 			    write((int)(data[i]) < 0 ? (256 + (int)(data[i])) : (int)(data[i]));
 		    }
 		    
+		    /**
+		     * {@inheritDoc}
+		     */
 		    @Override
 		    public void write(final int b) throws IOException
 		    {
@@ -165,7 +218,10 @@ public class ConnectionNetworking
 					    
 			super.write(b);
 		    }
-					
+		    
+		    /**
+		     * {@inheritDoc}
+		     */			
 		    @Override
 		    public void flush() throws IOException
 		    {
@@ -182,6 +238,15 @@ public class ConnectionNetworking
     }
     
     
+    /**
+     * Starts all threads needed for data transfers
+     * 
+     * @param  sock     The connected socket
+     * @param  monitor  Peer update monitor, it is shared for all invocation of the method by this instance of this class
+     * @param  peers    Reference array (singleton array) with all peers
+     * 
+     * @throws  IOException  Throws if you are experiencing problems with getting your socket's I/O streams
+     */
     private void connect(final Socket sock, final Object monitor, final String[] peers) throws IOException
     {
 	final InputStream in = sock.getInputStream();
@@ -190,6 +255,9 @@ public class ConnectionNetworking
 	
 	final Thread threadIn = new Thread()
 	        {
+		    /**
+		     * {@inheritDoc}
+		     */
 		    @Override
 		    public void run()
 		    {
@@ -246,6 +314,9 @@ public class ConnectionNetworking
 	
 	final Thread threadSysOut = new Thread()
 	        {
+		    /**
+		     * {@inheritDoc}
+		     */
 		    @Override
 		    public void run()
 		    {
@@ -289,6 +360,9 @@ public class ConnectionNetworking
 	
 	final Thread threadMsgOut = new Thread()
 	        {
+		    /**
+		     * {@inheritDoc}
+		     */
 		    @Override
 		    public void run()
 		    {
@@ -327,9 +401,9 @@ public class ConnectionNetworking
 		    }
 	        };
 	
-	threadIn.start();
-	threadSysOut.start();
-	threadMsgOut.start();
+	threadIn.start();      // Socket input reading thread
+	threadSysOut.start();  // Peer update socket output thread
+	threadMsgOut.start();  // Message sending socket outout and reading pipe input thread
     }
     
 }

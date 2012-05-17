@@ -24,6 +24,7 @@ import static java.awt.RenderingHints.*;
  *
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 {
     /**

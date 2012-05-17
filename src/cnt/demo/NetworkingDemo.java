@@ -23,7 +23,6 @@ import java.net.*;
  */
 public class NetworkingDemo
 {
-    
     /**
      * Non-constructor
      */
@@ -34,15 +33,17 @@ public class NetworkingDemo
     
     
     
-    
     /**
-     * This is the main entry point of the program
+     * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments
+     * @param  args  Startup arguments, unused
+     * 
+     * @throws  Exception  On total failure
      */
     public static void main(final String... args) throws Exception
     {
-	final ServerSocket server = new ServerSocket(9999);
+	final int PORT = 9999;
+	final ServerSocket server = new ServerSocket(PORT);
 	
 	
 	final Thread thread0 = new Thread()
@@ -91,7 +92,7 @@ public class NetworkingDemo
 		    {
 			try
 			{
-			    final Socket sock = new Socket("127.0.0.1", 9999);
+			    final Socket sock = new Socket("127.0.0.1", PORT);
 			    final InputStream in = sock.getInputStream();
 			    final OutputStream out = sock.getOutputStream();
 			    

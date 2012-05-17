@@ -18,6 +18,21 @@ import java.util.Iterator;
  */
 public class CDLinkedListTest
 {
+    /**
+     * Non-constructor
+     */
+    private CDLinkedListTest()
+    {
+	assert false : "You may not create instances of this class [CDLinkedListTest].";
+    }
+    
+    
+    
+    /**
+     * The is the main entry point of the test
+     * 
+     * @param  args  Starup arguments, unused
+     */
     public static void main(final String... args)
     {
 	final CDLinkedList<String> list = new CDLinkedList<String>();
@@ -132,14 +147,30 @@ public class CDLinkedListTest
 	System.out.println("\nPassed all!");
     }
     
-    public static void assertion(final String description, final Object a, final Object b)
+    /**
+     * Prints a description of a test and whether it fail or passed.<br/>
+     * If the test, which is perform by this method, failed the program exits with a user error code.
+     * 
+     * @param  description  The description of the test, one line
+     * @param  got          The value the test rutine got
+     * @param  expected     The expected value
+     */
+    private static void assertion(final String description, final Object got, final Object expected)
     {
-	System.out.println(description + ": " + (a.equals(b) ? "passed" : ("failed: got " + b.toString() + " expected " + a.toString())));
-	if (a.equals(b) == false)
+	System.out.println(description + ": " + (got.equals(expected) ? "passed"
+		: ("failed: got " + got.toString() + " expected " + expected.toString())));
+	if (got.equals(expected) == false)
 	    System.exit(-1);
     }
     
-    public static void assertion(final String description, final boolean passed)
+    /**
+     * Prints a description of a test and whether it fail or passed.<br/>
+     * If the test failed the program exits with a user error code.
+     * 
+     * @param  description  The description of the test, one line
+     * @param  passed       Whether the test passed
+     */
+    private static void assertion(final String description, final boolean passed)
     {
 	System.out.println(description + ": " + (passed ? "passed" : "failed"));
 	if (passed == false)
@@ -147,4 +178,3 @@ public class CDLinkedListTest
     }
     
 }
-

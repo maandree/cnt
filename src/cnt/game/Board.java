@@ -25,14 +25,16 @@ public class Board
      */
     public static final int HEIGHT = 20;
     
-    /**
-     * Creates the matrix blocks
-     */
-    private final Block[][] blocks = new Block[HEIGHT][WIDTH];
-    
     
     
     // Has default constructor
+    
+    
+    
+    /**
+     * The game board matrix with a stationed blocks
+     */
+    private final Block[][] blocks = new Block[HEIGHT][WIDTH];
     
     
     
@@ -120,7 +122,7 @@ public class Board
 
 		    if ((0 <= x + offX) && (x + offX < WIDTH))
 
-			if(deleteMatrix[y][x])
+			if (deleteMatrix[y][x])
 
 			    blocks[y+offY][x+offX] = null;
     }

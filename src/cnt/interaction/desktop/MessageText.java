@@ -20,6 +20,7 @@ import java.awt.*;
  * @author  Magnus Lundberg
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
+@SuppressWarnings("serial")
 public class MessageText extends JTextPane implements Blackboard.BlackboardObserver
 {
     /**
@@ -68,6 +69,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	StyleContext style = StyleContext.getDefaultStyleContext();
 	AttributeSet attrs;
 	
+	
 	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, colour); //Switching to player name style
 	attrs = style.addAttribute(attrs, StyleConstants.Bold, Boolean.TRUE);
 	
@@ -82,8 +84,8 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setSelectionStart(pos0);	this.setSelectionEnd(pos1);
 	this.setCharacterAttributes(attrs, true);
 	
-	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.WHITE); //Switing to message style
 	
+	attrs = style.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.WHITE); //Switing to message style
 	
 	this.setSelectionStart(pos1);	this.setSelectionEnd(pos1);
 	this.replaceSelection(text + "\n"); //Prints the player's message
@@ -98,9 +100,9 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
      * Appends a message sent by the system
      * 
      * @param  text    The message to append
-     * @param  colour  The colour of the player, if any
+     * @param  colour  The colour of the player, <code>null</code> if none
      */
-    private void addSystemText (final String text, final Color colour)
+    private void addSystemText(final String text, final Color colour)
     {
 	StyleContext style = StyleContext.getDefaultStyleContext();
 	AttributeSet attrs;

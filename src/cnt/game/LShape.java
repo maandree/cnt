@@ -6,8 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-
-// Added this for clarity
 import cnt.game.Board;
 import cnt.game.Block;
 import cnt.game.Shape;
@@ -17,15 +15,23 @@ import java.io.*;
 
 
 /**
-* Shape class representing a L-shape
-* 
-* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
-* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
-*/
+ * Shape class representing a L-shape
+ * 
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+ * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+ */
 public class LShape extends Shape
-{	
-    private Block[][][] states;
-    private int currState = 0;
+{
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;	
+    
+    
+    
+    /**
+     * Constructor
+     */
     public LShape()
     {
 	this.states = new Block[4][3][3];
@@ -33,9 +39,7 @@ public class LShape extends Shape
 		
 	int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
 	for (int[] place : placement)
-	{
 	    this.shape[place[0]][place[1]] = new Block();
-	}
 	
 	this.states[0] = this.shape;
 	
@@ -50,28 +54,17 @@ public class LShape extends Shape
 	{
 	    Block[][] matrix = new Block[3][3];
 	    for (int[] place : coord)
-	    {
 		matrix[place[0]][place[1]] = new Block();
-	    }
 	    
 	    this.states[i++] = matrix;
 	}
     }
     
     /**
-     * {@inheritDoc}
+     * Cloning constructor
+     * 
+     * @param  original  The shape to clone
      */
-    public void setPlayer(final Player value)
-    {
-	super.setPlayer(value);
-	for (final Block[][] state : states)
-	    for (final Block[] row : state)
-		for (final Block block : row)
-		    if (block != null)
-			block.setColor(value.getColor());
-    }
-
-    
     private LShape(final LShape original)
     {
 	original.cloneData(this);
@@ -82,20 +75,48 @@ public class LShape extends Shape
     
     
     /**
+     * The shape's possible states
+     */
+    Block[][][] states;
+    
+    /**
+     * The index of the shape's current state
+     */
+    int currState = 0;
+    
+    
+    
+    /**
      * Momento class for {@link LShape}
      */
     public static class Momento extends Shape.Momento
     {
+	/**
+	 * Constructor
+	 * 
+	 * @param  shape  The shape of which to save the state
+	 */
         public Momento(final LShape shape)
         {
             super(shape);
             this.states = shape.states;
             this.currState = shape.currState;
         }
-            
+	
+	
+	
+	/**
+	 * See {@link LShape#states}
+	 */
         private final Block[][][] states;
+	
+	/**
+	 * See {@link LShape#currState}
+	 */
 	private final int currState;
-    
+	
+	
+	
         /**
          * Restores the shape's state
          * 
@@ -112,6 +133,7 @@ public class LShape extends Shape
     }
     
     
+    
     /**
      * {@inheritDoc}
      */
@@ -120,13 +142,13 @@ public class LShape extends Shape
         return new Momento(this);
     }
     
-    
-
+    /**
+     * {@inheritDoc}
+     */
     public void rotate(final boolean clockwise)
     {
 	if (clockwise)
 	    this.currState = (this.currState + 1) % 4;
-	
 	else
 	    this.currState = (this.currState - 1) < 0
 		             ? (this.currState + 3)
@@ -134,9 +156,26 @@ public class LShape extends Shape
 	
 	this.shape = this.states[this.currState];
     }
-	
+    
+    /**
+     * {@inheritDoc}
+     */	
     public LShape clone()
     {
 	return new LShape(this);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPlayer(final Player value)
+    {
+	super.setPlayer(value);
+	for (final Block[][] state : states)
+	    for (final Block[] row : state)
+		for (final Block block : row)
+		    if (block != null)
+			block.setColor(value.getColor());
     }
 }

@@ -28,7 +28,7 @@ public class Program
     /**
      * This is the main entry point of the program
      * 
-     * @param  args  Start up arguments
+     * @param  args  Startup arguments, unused
      */
     public static void main(final String... args)
     {

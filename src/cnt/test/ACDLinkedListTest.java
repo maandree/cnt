@@ -16,6 +16,21 @@ import cnt.util.*;
  */
 public class ACDLinkedListTest
 {
+    /**
+     * Non-constructor
+     */
+    private ACDLinkedListTest()
+    {
+	assert false : "You may not create instances of this class [ACDLinkedListTest].";
+    }
+    
+    
+    
+    /**
+     * This is main entry point of the test
+     * 
+     * @param  args  Startup arguments, unused
+     */
     public static void main(final String... args)
     {
 	ACDLinkedList<String> linkedList = new ACDLinkedList<String>();
@@ -45,8 +60,15 @@ public class ACDLinkedListTest
 
         System.out.println("\nPassed all!");
     }
-
-    public static void assertion(final String description, final boolean passed)
+    
+    /**
+     * Prints a description of a test and whether it fail or passed.<br/>
+     * If the test failed the program exits with a user error code.
+     * 
+     * @param  description  The description of the test, one line
+     * @param  passed       Whether the test passed
+     */
+    private static void assertion(final String description, final boolean passed)
     {
         System.out.println(description + ": " + (passed ? "passed" : "failed"));
         if (passed == false)
