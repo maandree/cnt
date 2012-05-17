@@ -39,7 +39,17 @@ public class MainFrameDemo
      */
     public static void main(final String... args) throws InterruptedException
     {
+ 	final Player peyman  = new Player("Peyman" , "Peyman" .hashCode() | (255 << 24));
+	final Player calle   = new Player("Calle"  , "Calle"  .hashCode() | (255 << 24));
+	final Player magnus  = new Player("Magnus" , "Magnus" .hashCode() | (255 << 24));
+	final Player mattias = new Player("Mattias", "Mattias".hashCode() | (255 << 24));
+	
 	(new MainFrame()).setVisible(true);
+	
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(peyman));
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(calle));
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(magnus));
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(mattias));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -51,7 +61,7 @@ public class MainFrameDemo
 			if (message instanceof Blackboard.UserMessage)
 			{
 			    final String msg = ((Blackboard.UserMessage)message).message;
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.BLUE.getRGB()), msg));
+			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(mattias, msg));
 			}
 		    }
 	        });

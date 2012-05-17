@@ -38,6 +38,8 @@ public class Player implements Serializable
 	this.color = color;
     }
     
+    
+    
     /**
      * The name of the player
      */
@@ -65,12 +67,10 @@ public class Player implements Serializable
 	return this.name.equals(p.name) && (this.color == p.color);
     }
     
-    
     /**
      * {@inheritDoc}
      */
-    public int hashCode()
-    {
+    public int hashCode() {
 	return this.name.hashCode() ^ this.color;
     }
     
@@ -80,8 +80,7 @@ public class Player implements Serializable
      * 
      * @return  The name of the player
      */
-    public String getName()
-    {
+    public String getName() {
 	return this.name;
     }
     
@@ -91,8 +90,7 @@ public class Player implements Serializable
      * 
      * @return  The color and ID of the player
      */
-    public int getColor()
-    {
+    public int getColor() {
 	return this.color;
     }
     
@@ -102,16 +100,14 @@ public class Player implements Serializable
      * 
      * @param  value  The new color and ID of the player
      */
-    public void setColor(final int value)
-    {
+    public void setColor(final int value) {
 	this.color = value;
     }
     
     /**
      * {@inheritDoc}
      */
-    public String toString()
-    {
+    public String toString() {
 	return this.getName() + " (" + this.getColor() + ")";
     }
     

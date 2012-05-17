@@ -319,13 +319,13 @@ public class Blackboard
 	 */
 	public MatrixPatch(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
 	{
-	    assert ((this.erase != null) || (this.blocks != null)) : "Matrix patches must contain something";
-	    assert this.checkIntegrity() == Boolean.TRUE : "Matrix patch contains null rows";
-	    
 	    this.erase = erase;
 	    this.blocks = blocks;
 	    this.offY = offY;
 	    this.offX = offX;
+	    
+	    assert ((erase != null) || (blocks != null)) : "Matrix patches must contain something";
+	    assert this.checkIntegrity() == Boolean.TRUE : "Matrix patch contains null rows";
 	}
 	
 	

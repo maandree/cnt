@@ -6,10 +6,13 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.game.Player;
+import cnt.Blackboard;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.HashMap;
 
 
 /**
@@ -19,7 +22,7 @@ import java.awt.event.*;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 @SuppressWarnings("serial")
-public class UserList extends JPanel
+public class UserList extends JPanel implements Blackboard.BlackboardObserver
 {
     /**
      * Constructor
@@ -32,10 +35,9 @@ public class UserList extends JPanel
 	this.list = new JList<String>(model);
 	
 	final JScrollPane pane = new JScrollPane(this.list);
-	this.model.addElement("<html><span style=\"color: rgb(0, 0, 255);\">Peyman</span></html>");
-	this.model.addElement("<html><span style=\"color: rgb(255, 255, 0);\">Calle</span></html>");
-	this.model.addElement("<html><span style=\"color: rgb(255, 0, 0);\">Magnus</span></html>");
-	this.model.addElement("<html><span style=\"color: rgb(0, 255, 0);\">Mattias</span></html>");
+	
+	Blackboard.registerObserver(this);
+	Blackboard.registerThreadingPolicy(this, Blackboard.DAEMON_THREADING, Blackboard.PlayerDropped.class, Blackboard.PlayerJoined.class);
 	
 	LookAndFeel.installBorder(pane, "BorderFactory.createEmptyBorder()");
 	
@@ -108,6 +110,38 @@ public class UserList extends JPanel
      * The “Add to friend list” menu item
      */
     private final JMenuItem menuFriend;
+    
+    /**
+     * Mapping form players to their list item
+     */
+    private final HashMap<Player, String> playerMap = new HashMap<Player, String>();
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	synchronized (this)
+	{
+	    if (message instanceof Blackboard.PlayerJoined)
+	    {
+		final Player player = ((Blackboard.PlayerJoined)message).player;
+		int _colour = player.getColor();
+		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
+		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
+		      colour += Integer.toString((_colour >>  0) & 255);
+		final String item = "<html><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
+		this.model.addElement(item);
+	    }
+	    else if (message instanceof Blackboard.PlayerDropped)
+	    {
+		final Player player = ((Blackboard.PlayerDropped)message).player;
+		this.model.removeElement(this.playerMap.get(player));
+	    }
+	}
+    }
     
 }
 

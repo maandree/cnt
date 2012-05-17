@@ -538,24 +538,29 @@ public class Engine implements Blackboard.BlackboardObserver
 		    }
 	    }
 	    
-	    final boolean[][] erase  = del ? new boolean[y2 - y1][x2 - x1] : null;
-	    final Block  [][] blocks = add ? new Block  [y3 - y1][x3 - x1] : null;
-	    
-	    for (final Blackboard.MatrixPatch patch : patches)
+	    if (del || add)
 	    {
-		if (patch.erase != null)
-		    for (int y = 0; y < patch.erase.length; y++)
-			for (int x = 0; x < patch.erase[y].length; x++)
-			    erase[y + patch.offY - y1][x + patch.offX - x1] = patch.erase[y][x];
+		final boolean[][] erase  = del ? new boolean[y2 - y1][x2 - x1] : null;
+		final Block  [][] blocks = add ? new Block  [y3 - y1][x3 - x1] : null;
 		
-	        if (patch.blocks != null)
-		    for (int y = 0; y < patch.blocks.length; y++)
-			for (int x = 0; x < patch.blocks[y].length; x++)
-			    blocks[y + patch.offY - y1][x + patch.offX - x1] = patch.blocks[y][x];
+		for (final Blackboard.MatrixPatch patch : patches)
+		{
+		    if (patch.erase != null)
+			for (int y = 0; y < patch.erase.length; y++)
+			    for (int x = 0; x < patch.erase[y].length; x++)
+				erase[y + patch.offY - y1][x + patch.offX - x1] = patch.erase[y][x];
+		    
+		    if (patch.blocks != null)
+			for (int y = 0; y < patch.blocks.length; y++)
+			    for (int x = 0; x < patch.blocks[y].length; x++)
+				blocks[y + patch.offY - y1][x + patch.offX - x1] = patch.blocks[y][x];
+		}
+		
+		patches.clear();
+		Blackboard.broadcastMessage(new Blackboard.MatrixPatch(erase, blocks, y1, x1));
 	    }
-	    
-	    patches.clear();
-	    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(erase, blocks, y1, x1));
+	    else
+		System.err.println("Shouldn't the matrix patches actually contain something?");
 	}
 	else
 	    System.err.println("Shouldn't there be matrix patches here?");
