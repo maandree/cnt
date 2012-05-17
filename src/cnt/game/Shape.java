@@ -131,10 +131,10 @@ public abstract class Shape implements Cloneable, Serializable
     {
 	boolean[][] matrix = new boolean[shape.length][shape[0].length];
 
-	for (int col = 0; col < shape.length; col++)
-	    for (int row = 0; row < shape[0].length; row++)
-		if (shape[col][row] != null)
-		    matrix[col][row] = true;
+	for (int row = 0; row < shape.length; row++)
+	    for (int col = 0; col < shape[row].length; col++)
+		if (shape[row][col] != null)
+		    matrix[row][col] = true;
 		
 	return matrix;
     }

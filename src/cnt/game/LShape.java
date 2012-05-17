@@ -37,7 +37,9 @@ public class LShape extends Shape
 	this.states = new Block[4][3][3];
 	this.shape = new Block[3][3];
 		
-	int[][] placement = new int[][] {{1,0},{1,1},{1,2},{2,2}};
+	int[][] placement = new int[][] {{0,1},
+					 {1,1},
+					 {2,1}, {2,2}};
 	for (int[] place : placement)
 	    this.shape[place[0]][place[1]] = new Block();
 	
@@ -45,9 +47,9 @@ public class LShape extends Shape
 	
 	int[][][] coords = new int[3][4][2];
 	
-	coords[0] = new int[][] {{0,1},{1,1},{2,1},{0,2}};
-	coords[1] = new int[][] {{0,0},{1,0},{1,1},{1,2}};
-	coords[2] = new int[][] {{2,0},{0,1},{1,1},{2,1}};
+	coords[0] = new int[][] {{1,0},{1,1},{1,2},{2,0}};
+	coords[1] = new int[][] {{0,0},{0,1},{1,1},{2,1}};
+	coords[2] = new int[][] {{0,2},{1,0},{1,1},{1,2}};
 	
 	int i = 1;
 	for (int[][] coord : coords)

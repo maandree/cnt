@@ -37,7 +37,8 @@ public class SShape extends Shape
 	this.flat = true;
 	this.shape = new Block[3][3];
 	
-	int[][] placement = new int[][] {{1,0},{2,0},{0,1},{1,1}};
+	int[][] placement = new int[][] {       {0,1}, {0,2},
+					 {1,0}, {1,1}       };
 	for (int[] place : placement)
 	    this.shape[place[0]][place[1]] = new Block();
     }
