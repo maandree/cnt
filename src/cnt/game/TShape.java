@@ -125,10 +125,10 @@ public class TShape extends Shape
     {
 	Block[][] matrix = new Block[3][3];
 	
-	if (this.shape[1][0] != null)  matrix[2][1] = this.shape[1][0];
-	if (this.shape[2][1] != null)  matrix[1][2] = this.shape[2][1];
-	if (this.shape[1][2] != null)  matrix[0][1] = this.shape[1][2];
-	if (this.shape[0][1] != null)  matrix[1][0] = this.shape[0][1];
+	if (this.shape[0][1] != null)  matrix[1][2] = this.shape[0][1];
+	if (this.shape[1][2] != null)  matrix[2][1] = this.shape[1][2];
+	if (this.shape[2][1] != null)  matrix[1][0] = this.shape[2][1];
+	if (this.shape[1][0] != null)  matrix[0][1] = this.shape[1][0];
 	
 	matrix[1][1] = this.shape[1][1];
 	

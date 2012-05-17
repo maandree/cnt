@@ -135,7 +135,7 @@ public class IShape extends Shape
 	    placement = new int[][]{{0,0},{1,0},{2,0},{3,0}};
 	    this.flat = true;
 	}
-		
+	
 	for (int[] place : placement)
 	    matrix[place[0]][place[1]] = this.shape[place[1]][place[0]];
 	
