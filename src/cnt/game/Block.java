@@ -80,6 +80,7 @@ public class Block implements Serializable
 	    return false;
     }
     
+    
     /**
      * Returns block color as an integer
      * 
@@ -98,6 +99,7 @@ public class Block implements Serializable
 	return Integer.toHexString(this.color);
     }
     
+    
     /**
      * Helper method to convert "hex" string to integer
      *
@@ -113,4 +115,31 @@ public class Block implements Serializable
 	    throw new Error("Trying to parse String into a color failed for unknown reason.");
 	}
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+	return "[" + this.getHexColor() + "]";
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(final Object obj)
+    {
+	if ((obj == null) || (obj instanceof Block == false))
+	    return false;
+	
+	return ((Block)obj).color == this.color;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public int hashCode() {
+	return this.color;
+    }
+    
 }
