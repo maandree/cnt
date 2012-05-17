@@ -332,6 +332,14 @@ public class Blackboard
 	 */
 	public final int offX;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return "Matrix patch!";
+	}
     }
     
     
@@ -357,6 +365,8 @@ public class Blackboard
 	 */
 	public ChatMessage(final Player player, final String message)
 	{
+	    assert message != null : "Null message is not allowed";
+	    assert player != null : "Null player is not allowed";
 	    this.player = player;
 	    this.message = message;
 	}
@@ -372,6 +382,25 @@ public class Blackboard
 	 * The message
 	 */
 	public final String message;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+	    if ((this.player == null) && (this.message == null))
+		return "[no message from nobody, that's weired]";
+	    
+	    if (this.player == null)
+		return "[message from nobody, that's weired]";
+	    
+	    if (this.message == null)
+		return "[no message from somebody, that's weired]";
+	    
+	    return "Message from " + this.player.toString() + ": " + this.message;
+	}
 	
     }
     
@@ -398,6 +427,7 @@ public class Blackboard
 	 */
 	public SystemMessage(final Player player, final String message)
 	{
+	    assert message != null : "Null message is not allowed";
 	    this.player = player;
 	    this.message = message;
 	}
@@ -413,6 +443,17 @@ public class Blackboard
 	 * The message
 	 */
 	public final String message;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{
+	    final String assoc = this.player == null ? "without associated player" : ("associated with " + this.player.toString());
+	    return this.message == null ? "[no message, that's weird]" : ("System message " + assoc + ": " + this.message);
+	}
 	
     }
     
@@ -438,6 +479,7 @@ public class Blackboard
 	 */
 	public UserMessage(final String message)
 	{
+	    assert message != null : "Null is not allowed";
 	    this.message = message;
 	}
 	
@@ -447,6 +489,15 @@ public class Blackboard
 	 * The message
 	 */
 	public final String message;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.message == null ? "[no message, that's weird]" : ("Message from local player: " + this.message);
+	}
 	
     }
     
@@ -475,6 +526,7 @@ public class Blackboard
 	 */
 	public GamePlayCommand(final Move move)
 	{
+	    assert move != null : "Null is not allowed";
 	    this.move = move;
 	}
 	
@@ -495,35 +547,70 @@ public class Blackboard
 	    /**
 	     * Move the block one step left
 	     */
-	    LEFT,
+	    LEFT ("Left (←)"),
 	    
 	    /**
 	     * Move the block one step right
 	     */
-	    RIGHT,
+	    RIGHT ("Right (→)"),
 	    
 	    /**
 	     * Move the block one step down
 	     */
-	    DOWN,
+	    DOWN ("Down (↓)"),
 	    
 	    /**
 	     * Drop the block all the way down
 	     */
-	    DROP,
+	    DROP ("Drop (↡)"),
 	    
 	    /**
 	     * Rotate the block 90° clockwise
 	     */
-	    CLOCKWISE,
+	    CLOCKWISE ("90° clockwise (↷)"),
 	    
 	    /**
 	     * Rotate the block 90° anti-clockwise
 	     */
-	    ANTICLOCKWISE,
+	    ANTICLOCKWISE ("90° anti-clockwise (↶)");
 	    
+	    
+	    
+	    /**
+	     * Constructor
+	     * 
+	     * @param  String  Return value for {@link #toString()}
+	     */
+	    Move(final String string)
+	    {
+		this.string = string;
+	    }
+	    
+	    
+	    
+	    /**
+	     * Return value for {@link #toString()}
+	     */
+	    private final String string;
+	    
+	    
+	    
+	    /**
+	     * {@inheritDoc}
+	     */
+	    public String toString() {
+		return string;
+	    }
 	}
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.move == null ? "[no move, that's wierd]" : ("Move: " + this.move.toString());
+	}
     }
     
     /**
@@ -547,6 +634,7 @@ public class Blackboard
 	 */
 	public PlayerDropped(final Player player)
 	{
+	    assert player != null : "Null is not allowed";
 	    this.player = player;
 	}
 	
@@ -557,6 +645,14 @@ public class Blackboard
 	 */
 	public final Player player;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.player == null ? "[no player, that's wierd]" : ("Dropped player: " + this.player.toString());
+	}
     }
     
     /**
@@ -590,6 +686,15 @@ public class Blackboard
 	 */
 	public final Player player;
 	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.player == null ? "Request for next player" : ("Next player: " + this.player.toString());
+	}
+	
     }
     
     /**
@@ -607,7 +712,16 @@ public class Blackboard
 	
 	
 	//Has default constructor
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return "Game over!";
+	}
+	
     }
     
 }
-
