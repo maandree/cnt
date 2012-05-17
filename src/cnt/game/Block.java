@@ -15,7 +15,7 @@ import java.io.Serializable;
 /**
 * Class representing a single block in the playing field
 * 
-* @author Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 public class Block implements Serializable
 {
@@ -62,7 +62,7 @@ public class Block implements Serializable
     {
 	//TODO: Set allowed colorspans
 	this.color = color;
-	// This makes more  sense when we are using allowed colors and false is actually an option to be sent back
+	// This makes more sense when we are using allowed colors and false is actually an option to be sent back
 	return true;
     }
     
@@ -73,7 +73,7 @@ public class Block implements Serializable
      */
     public boolean setColor(final String color)
     {
-	if (this.setColor(strToHex(color)))
+	if (this.setColor(hexToInt(color)))
 	    return true;
 	else
 	    return false;
@@ -96,14 +96,14 @@ public class Block implements Serializable
     }
     
     /**
-     * Helper method to convert hex string to integer
+     * Helper method to convert "hex" string to integer
      *
-     * @param strNum String to be converted to integer
+     * @param  strNum  String to be converted to integer
      */
-    private int strToHex(final String strNum)
+    private int hexToInt(final String strNum)
     {
 	int number = 0;
-	try 
+	try
 	{
 	    number = Integer.valueOf(strNum, 16).intValue();
 	}
