@@ -207,7 +207,10 @@ public abstract class Shape implements Cloneable, Serializable
     
     
     /**
-     * Sets the player whom is playing the shape
+     * <p>Sets the player whom is playing the shape.</p>
+     * <p>
+     *   It is a good idea to (try) do this once for every player and shape class.
+     * </p>
      * 
      * @param  value  The player whom is playing the shape
      */
@@ -233,8 +236,7 @@ public abstract class Shape implements Cloneable, Serializable
     /**
      * {@inheritDoc}
      */
-    public Shape clone() throws CloneNotSupportedException
-    {
+    public Shape clone() throws CloneNotSupportedException {
 	throw new CloneNotSupportedException();
     }
     
@@ -258,20 +260,32 @@ public abstract class Shape implements Cloneable, Serializable
      */
     public String toString()
     {
-	String strShape = "";
+	String strShape = "┌";
+	for (int x = 0; x < this.shape[y].length; x++)
+	    strShape += "──";
+	strShape += "┐\n";
 	
 	for (int y = 0; y < this.shape.length; y++)
 	{
+	    strShape += "│";
+	    
 	    for (int x = 0; x < this.shape[y].length; x++)
 		if (this.shape[y][x] != null)
-		    strShape += '*';
+		    strShape += "()";
 		else
-		    strShape += ' ';
+		    strShape += "  ";
 	    
-	    strShape += '\n';
+	    strShape += "│\n";
 	}
-		
+	
+	strShape += "└";
+	for (int x = 0; x < this.shape[y].length; x++)
+	    strShape += "──";
+	strShape += "┘";
 	return strShape;
     }
+    
+    
+    // Equality check for this class should be identity check, do not implement equals(Object) or hashCode().
     
 }
