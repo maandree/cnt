@@ -259,15 +259,16 @@ public abstract class Shape implements Cloneable, Serializable
     public String toString()
     {
 	String strShape = "";
-	for (int i = 0; i < this.shape[0].length; i++)
+	
+	for (int y = 0; y < this.shape.length; y++)
 	{
-	    for (int j = 0; j < this.shape.length; j++)
-		if (this.shape[j][i] != null)
-		    strShape += "*";
+	    for (int x = 0; x < this.shape[y].length; x++)
+		if (this.shape[y][x] != null)
+		    strShape += '*';
 		else
-		    strShape += " ";
+		    strShape += ' ';
 	    
-	    strShape += "\n";
+	    strShape += '\n';
 	}
 		
 	return strShape;
