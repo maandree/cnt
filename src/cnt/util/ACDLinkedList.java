@@ -96,10 +96,12 @@ public class ACDLinkedList<T> extends CDLinkedList<T>
      * @param   item  The item
      * @return        Whether the list contains an item
      */
-    public boolean contains(final T item)
-    {
+    public boolean contains(final T item) {
 	return this.nodeMap.containsKey(item);
     }
+    
+    
+    //inherit toString() from superclass.
 
 }
 

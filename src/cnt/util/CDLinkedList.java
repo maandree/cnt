@@ -32,8 +32,7 @@ public class CDLinkedList<T> implements Iterable<T>
     /**
      * Removes all elements in the list
      */
-    public void clear()
-    {
+    public void clear() {
 	this.head = null;
     }
     
@@ -43,8 +42,7 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @return  <code>true</code> if the list is empty, otherwise <code>false</code>
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
 	return this.head == null;
     }
     
@@ -54,11 +52,9 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @param  item  The item to add to the list
      */
-    public ListNode<T> insertAfter(final T item)
-    {
+    public ListNode<T> insertAfter(final T item) {
 	return insertAfter(item, this.head);
     }
-    
     
     /**
      * Inserts a new item after another
@@ -83,11 +79,9 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @param  item  The item to add to the list
      */
-    public ListNode<T> insertBefore(final T item)
-    {
+    public ListNode<T> insertBefore(final T item) {
 	return insertBefore(item, this.head);
     }
-    
     
     /**
      * Inserts a new item before another
@@ -110,11 +104,9 @@ public class CDLinkedList<T> implements Iterable<T>
     /**
      * Removes the current node from the list
      */
-    public void remove()
-    {
+    public void remove() {
 	remove(this.head);
     }
-    
     
     /**
      * Removes a node from the list
@@ -166,8 +158,7 @@ public class CDLinkedList<T> implements Iterable<T>
     /**
      * Rotate the list one step forward
      */
-    public void next()
-    {
+    public void next() {
 	if (this.head != null)
 	    this.head = this.head.next;
     }
@@ -176,8 +167,7 @@ public class CDLinkedList<T> implements Iterable<T>
     /**
      * Rotate the list one step backward
      */
-    public void previous()
-    {
+    public void previous() {
 	if (this.head != null)
 	    this.head = this.head.previous;
     }
@@ -188,8 +178,7 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @param  node  The node
      */
-    public void jump(final ListNode<T> node)
-    {
+    public void jump(final ListNode<T> node) {
 	this.head = node;
     }
     
@@ -199,19 +188,16 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @return  The current item
      */
-    public T get()
-    {
+    public T get() {
 	return this.getNode().item;
     }
-    
     
     /**
      * Gets the current node
      * 
      * @return  The current node
      */
-    public ListNode<T> getNode()
-    {
+    public ListNode<T> getNode() {
 	return this.head;
     }
     
@@ -221,19 +207,16 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @return  The next item
      */
-    public T getNext()
-    {
+    public T getNext() {
 	return this.getNextNode().item;
     }
-    
     
     /**
      * Gets the next node
      * 
      * @return  The next node
      */
-    public ListNode<T> getNextNode()
-    {
+    public ListNode<T> getNextNode() {
 	return this.head.next;
     }
     
@@ -243,19 +226,16 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @return  The previous item
      */
-    public T getPrevious()
-    {
+    public T getPrevious() {
 	return this.getPreviousNode().item;
     }
-    
     
     /**
      * Gets the previous node
      * 
      * @return  The previous node
      */
-    public ListNode<T> getPreviousNode()
-    {
+    public ListNode<T> getPreviousNode() {
 	return this.head.previous;
     }
     
@@ -266,11 +246,9 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @param  An enumeration of the elements
      */
-    public Enumeration<T> elements()
-    {
+    public Enumeration<T> elements() {
 	return new ListEnumerator<T>(this);
     }
-    
     
     /**
      * Returns an iterator over the elements. Use the {@link Iterator}
@@ -278,9 +256,32 @@ public class CDLinkedList<T> implements Iterable<T>
      * 
      * @param  An enumeration of the elements
      */
-    public Iterator<T> iterator()
-    {
+    public Iterator<T> iterator() {
 	return new ListEnumerator<T>(this);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+	if (this.head == null)
+	    return "[empty]";
+	
+	final StringBuilder buf = new StringBuilder("[items: ");
+	ListNode<T> cursor = this.head;
+	
+	for (;;)
+	{
+	    buf.append(cursor.getItem().toString());
+	    if ((cursor = cursor.next) == this.head)
+		break;
+	    buf.append(", ");
+	}
+	
+	buf.append("]");
+	return buf.toString();
     }
 
 }

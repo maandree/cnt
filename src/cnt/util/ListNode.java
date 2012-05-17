@@ -68,9 +68,20 @@ public class ListNode<T>
      * 
      * @return  The item of the node
      */
-    public T getItem()
-    {
+    public T getItem() {
 	return this.item;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+	return "[item: "           + this.item.toString() +
+	       ", next.item: "     + this.next.item.toString() +
+	       ", previous.item: " + this.previous.item.toString() +
+	       "]";
     }
     
 }

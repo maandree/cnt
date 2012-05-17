@@ -56,17 +56,14 @@ public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
     /**
      * {@inheritDoc}
      */
-    public boolean hasMoreElements()
-    {
+    public boolean hasMoreElements() {
 	return (cursor != null) && (first || (cursor != start));
     }
-    
     
     /**
      * {@inheritDoc}
      */
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
 	return hasMoreElements();
     }
     
@@ -86,12 +83,10 @@ public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
 	return item;
     }
     
-    
     /**
      * {@inheritDoc}
      */
-    public T next()
-    {
+    public T next() {
 	return nextElement();
     }
     
@@ -106,6 +101,19 @@ public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
 	this.first = true;
 	
 	cursor = (next == cursor) ? null : next;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+	return "[list: "    + this.list.toString() +
+	       ", cursor: " + this.cursor.toString() +
+	       ", start: "  + this.start.toString() +
+	       ", first: "  + Boolean.toString(this.first) +
+	       "]";
     }
     
 }
