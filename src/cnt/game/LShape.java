@@ -79,13 +79,13 @@ public class LShape extends Shape
 	{
 	    Block[][] os = original.states[z];
 	    Block[][] s = this.states[z] =
-		    new Block[h = original.states[z].length]
-		             [w = original.states[z][0].length];
+		    new Block[h = os.length]
+		             [w = os[0].length];
 	    
 	    for (int y = 0; y < h; y++)
 	    {
-		Block[] row = s[z];
-		Block[] orow = os[z];
+		Block[] row = s[y];
+		Block[] orow = os[y];
 		for (int x = 0; x < w; x++)
 		    if (orow[x] != null)
 			row[x] = new Block(orow[x].getColor());

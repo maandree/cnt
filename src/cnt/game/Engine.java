@@ -303,7 +303,11 @@ public class Engine implements Blackboard.BlackboardObserver
 	    do  {fallingShape.setY(fallingShape.getY() - 1); System.err.println("one up");}
 	      while (board.canPut(fallingShape, true) == false);
 	
+	System.out.println("##################################################################################################");
+	System.out.println("##                                       WE  HAVE  MOMENTO                                      ##");
+	System.out.println("##################################################################################################");
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
+	System.out.println(moveInitialMomento == null ? "  NO <-----------------" : "  YES <---------------");
 	
 	patchIn(fallingShape);
     }
@@ -319,6 +323,13 @@ public class Engine implements Blackboard.BlackboardObserver
     static boolean fall() throws InterruptedException
     {
 	Engine.sleep(0);
+	
+	if (fallingShape == null)
+	{
+	    System.err.println("What's happing, why do we not have a falling shape?");
+	    return true;
+	}
+	
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	fallingShape.setY(fallingShape.getY() + 1);
@@ -345,6 +356,12 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void drop() throws InterruptedException
     {
+	if (fallingShape == null)
+	{
+	    System.err.println("What's happing, why do we not have a falling shape?");
+	    return;
+	}
+	
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -370,6 +387,12 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void rotate(final boolean clockwise)
     {
+	if (fallingShape == null)
+	{
+	    System.err.println("What's happing, why do we not have a falling shape?");
+	    return;
+	}
+	
 	fallingShape.rotate(clockwise);
 	
 	if (board.canPut(fallingShape, false))
@@ -388,6 +411,12 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void move(final int incrX)
     {
+	if (fallingShape == null)
+	{
+	    System.err.println("What's happing, why do we not have a falling shape?");
+	    return;
+	}
+	
 	fallingShape.setX(fallingShape.getX() + incrX);
 	
 	if (board.canPut(fallingShape, false))
