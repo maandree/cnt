@@ -6,6 +6,7 @@ cp src/*.png bin/
 cp src/*.png ./
 
 dia Documentation/CNT_class_diagram.dia -e Documentation/CNT_class_diagram.pdf 2>/dev/null
+dia Documentation/CNT_join_diagram.dia -e Documentation/CNT_join_diagram.pdf 2>/dev/null
 
 jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar"
 
