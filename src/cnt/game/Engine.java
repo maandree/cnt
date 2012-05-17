@@ -8,7 +8,8 @@
 package cnt.game;
 import cnt.*;
 
-import java.util.ArrayList;
+import java.lang.ref.*;
+import java.util.*;
 
 
 /**
@@ -94,6 +95,11 @@ public class Engine implements Blackboard.BlackboardObserver
      * All queued matrix patches for {@link Blackboard}
      */
     private static final ArrayList<Blackboard.MatrixPatch> patches = new ArrayList<Blackboard.MatrixPatch>();
+    
+    /**
+     * Shape for shapes with set player
+     */
+    private static final WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
     
     
     
@@ -249,9 +255,35 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void newTurn(final Player player)
     {
+	currentPlayer = player;
+	
 	try
 	{
-	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length)].clone();
+	    fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length].clone();
+	    fallingShape.setPlayer(player);
+	    
+	    /*fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length];
+	    
+	    HashMap<Shape, SoftReference<Shape>> playerShapeCache = shapeCache.get(player);
+	    Shape nshape;
+	    if (playerShapeCache == null)
+	    {
+		playerShapeCache = new HashMap<Shape, SoftReference<Shape>>();
+		nshape = fallingShape.clone();
+		nshape.setPlayer(player);
+		playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape));
+	    }
+	    else
+	    {
+		SoftReference<Shape> ref = playerShapeCache.get(fallingShape);
+		if ((ref == null) || ((nshape = ref.get()) == null))
+		{
+		    nshape = fallingShape.clone();
+		    nshape.setPlayer(player);
+		    playerShapeCache.put(fallingShape, new SoftReference<Shape>(nshape));
+		}
+	    }
+	    fallingShape = nshape;*/
 	}
 	catch (final CloneNotSupportedException err)
 	{
@@ -261,9 +293,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	{
 	    throw new Error("*Shape.clone() is not implemented correctly");
 	}
-	
-	currentPlayer = player;
-	fallingShape.setPlayer(currentPlayer);
 	
 	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
 	    fallingShape.rotate(true);

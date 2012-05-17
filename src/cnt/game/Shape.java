@@ -251,7 +251,18 @@ public abstract class Shape implements Cloneable, Serializable
 	shape.x = this.x;
 	shape.y = this.y;
 	shape.player = this.player;
-	shape.shape = this.shape;
+	
+	int w, h;
+	shape.shape = new Block[h = this.shape.length][w = this.shape[0].length];
+	
+	for (int y = 0; y < h; y++)
+	{
+	    final Block[] row = shape.shape[y];
+	    final Block[] orow = this.shape[y];
+	    for (int x = 0; x < w; x++)
+		if (orow[x] != null)
+		    row[x] = new Block(orow[x].getColor());
+	}
     }
     
     

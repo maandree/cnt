@@ -70,8 +70,27 @@ public class JShape extends Shape
     private JShape(final JShape original)
     {
 	original.cloneData(this);
-	this.states = original.states;
 	this.currState = original.currState;
+	
+	int d, w, h;
+	this.states = new Block[d = original.states.length][][];
+	
+	for (int z = 0; z < d; z++)
+	{
+	    Block[][] os = original.states[z];
+	    Block[][] s = this.states[z] =
+		    new Block[h = original.states[z].length]
+		             [w = original.states[z][0].length];
+	    
+	    for (int y = 0; y < h; y++)
+	    {
+		Block[] row = s[z];
+		Block[] orow = os[z];
+		for (int x = 0; x < w; x++)
+		    if (orow[x] != null)
+			row[x] = new Block(orow[x].getColor());
+	    }
+	}
     }
     
     
