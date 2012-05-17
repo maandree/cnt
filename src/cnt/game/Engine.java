@@ -303,11 +303,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    do  {fallingShape.setY(fallingShape.getY() - 1); System.err.println("one up");}
 	      while (board.canPut(fallingShape, true) == false);
 	
-	System.out.println("##################################################################################################");
-	System.out.println("##                                       WE  HAVE  MOMENTO                                      ##");
-	System.out.println("##################################################################################################");
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
-	System.out.println(moveInitialMomento == null ? "  NO <-----------------" : "  YES <---------------");
 	
 	patchIn(fallingShape);
     }

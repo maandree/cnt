@@ -29,17 +29,6 @@ public class ZShape extends Shape
     
     
     
-    /**
-     * How much to change {@link #x} by at each 90° clockwise rotation, depending rotation count
-     */
-    private static final int[] xrot = {1, -1,  0, 0};
-    
-    /**
-     * How much to change {@link #y} by at each 90° clockwise rotation, depending rotation count
-     */
-    private static final int[] yrot = {0,  1, -1, 0};
-    
-    
     
     /**
      * Constructor
@@ -70,7 +59,6 @@ public class ZShape extends Shape
     {
 	original.cloneData(this);
 	this.currState = original.currState;
-	this.crot = original.crot;
 	
 	int d, w, h;
 	this.states = new Block[d = original.states.length][][];
@@ -105,12 +93,6 @@ public class ZShape extends Shape
      */
     int currState = 0;
     
-    /**
-     * The number of clockwise rotations made, minus the number
-     * of anti-clockwise rotations make; modulo 4.
-     */
-    int crot = 0;
-    
     
     
     /**
@@ -127,7 +109,6 @@ public class ZShape extends Shape
         {
             super(shape);
             this.currState = shape.currState;
-	    this.crot = shape.crot;
         }
 	
 	
@@ -136,11 +117,6 @@ public class ZShape extends Shape
 	 * See {@link ZShape#flat}
 	 */
         private final int currState;
-	
-	/**
-	 * See {@link ZShape#crot}
-	 */
-        private final int crot;
     
 	
 	
@@ -155,7 +131,6 @@ public class ZShape extends Shape
                 throw new Error("Wrong shape type: you have " + shape.getClass().toString());
             super.restore(shape);
             ((ZShape)shape).currState = this.currState;
-            ((ZShape)shape).crot = this.crot;
         }
     }
     
@@ -181,24 +156,8 @@ public class ZShape extends Shape
      */
     public void rotate(final boolean clockwise)
     {
-	if (clockwise)
-	{
-	    super.x += xrot[this.crot];
-	    super.y += yrot[this.crot];
-	    this.crot = (this.crot + 1) % 4;
-	}
-	
 	this.currState = 1 - this.currState;
 	this.shape = this.states[this.currState];
-	
-	if (clockwise == false)
-	{
-	    this.crot--;
-	    if (this.crot < 0)
-		this.crot += 4;
-	    super.x -= xrot[this.crot];
-	    super.y -= yrot[this.crot];
-	}
     }
     
     /**

@@ -23,7 +23,7 @@ elif [[ $1 = "main-da" ]]; then
     javaSeven -da -cp bin$jars cnt.Program
 
 elif [[ $1 = "engine" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo
+    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo $2
 
 elif [[ $1 = "frame" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.MainFrameDemo
@@ -53,7 +53,11 @@ elif [[ $1 = "--completion--" ]]; then
 	local cur prev words cword
 	_init_completion -n = || return
 	
-	COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat upnp shape linkedlist' -- "$cur" ) )
+	if [[ "$prev" = "engine" ]]; then
+	    COMPREPLY=( $( compgen -W 'clockwise anti-clockwise' -- "$cur" ) )
+	else
+	    COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat upnp shape linkedlist' -- "$cur" ) )
+	fi
     }
     
     complete -o default -F _run run

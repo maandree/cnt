@@ -32,21 +32,19 @@ public class IShape extends Shape
     /**
      * How much to change {@link #x} by at each 90° clockwise rotation, depending rotation count
      */
-    private static final int[] xrot = {2,  -2,  1, -1};
+    private static final int[] xrot = {-1,  2, -2,  1};
     
     /**
      * How much to change {@link #y} by at each 90° clockwise rotation, depending rotation count
      */
-    private static final int[] yrot = {-1,  2, -2,  1};
+    private static final int[] yrot = { 1, -1,  2, -2};
     
-    /*  Quite a different pattern  *\
-	
-	....   ..x.   ....   .x..
-        xxxx   ..x.   ....   .x..
-        ....   ..x.   xxxx   .x..
-        ....   ..x.   ....   .x..
-      
-    \*                             */
+    /*                         *\
+      .x..   ....   ..x.   ....
+      .x..   xxxx   ..x.   ....
+      .x..   ....   ..x.   xxxx
+      .x..   ....   ..x.   ....
+    \*                         */
     
     
     
