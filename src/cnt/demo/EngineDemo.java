@@ -33,7 +33,7 @@ public class EngineDemo
     /**
      * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments, you may enter 'clockwise' or 'anti-clockwise' constant rotations
+     * @param  args  Startup arguments, you may enter 'clockwise' or 'anti-clockwise' constant rotations
      * 
      * @thorws  InterruptedException  On thread interruption
      */

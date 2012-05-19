@@ -34,16 +34,20 @@ public class GameDemo
     /**
      * This is the main entry point of the demo
      * 
-     * @param  args  Start up arguments, you may enter 'clockwise' or 'anti-clockwise' constant rotations
+     * @param  args  Startup arguments, unused
      * 
      * @thorws  IOException  On total failure
      */
     public static void main(final String... args) throws IOException
     {
+	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
+	
 	final Color colour = new Color(36, 149, 190);
 	final Player player = new Player("The One", colour.getRGB());
 	
 	(new MainFrame()).setVisible(true);
+	
+	rec.start();
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -79,6 +83,8 @@ public class GameDemo
 		case 'C':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT));          break;  //right arrow
 		case 'D':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));           break;  //left arrow
 	    }
+	
+	rec.stop();
     }
     
 }

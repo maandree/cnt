@@ -52,6 +52,9 @@ elif [[ $1 = "game" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.GameDemo
     stty icanon
 
+elif [[ $1 = "replay" ]]; then
+    javaSeven -ea -cp bin$jars cnt.Replayer /dev/shm/recording.cnt
+
 elif [[ $1 = "--completion--" ]]; then
     _run()
     {
@@ -61,7 +64,7 @@ elif [[ $1 = "--completion--" ]]; then
 	if [[ "$prev" = "engine" ]]; then
 	    COMPREPLY=( $( compgen -W 'clockwise anti-clockwise' -- "$cur" ) )
 	else
-	    COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat upnp shape linkedlist game' -- "$cur" ) )
+	    COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat upnp shape linkedlist game replay' -- "$cur" ) )
 	fi
     }
     
