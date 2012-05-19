@@ -101,6 +101,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static final WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
     
+    /**
+     * The current game score
+     */
+    private static int score;
+    
     
     
     /**
@@ -119,6 +124,8 @@ public class Engine implements Blackboard.BlackboardObserver
 					   Blackboard.PlayerDropped.class);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
 					   Blackboard.NextPlayer.class);
+	
+	Blackboard.broadcastMessage(new Blackboard.GameScore(score = 0));
 	
 	thread = new Thread()
 	        {
@@ -474,6 +481,8 @@ public class Engine implements Blackboard.BlackboardObserver
 		}
 		sleep(0);
 	    }
+	    
+	    Blackboard.broadcastMessage(new Blackboard.GameScore(score += full.length * 10));
 	}
 	
 	currentPlayer = null;
