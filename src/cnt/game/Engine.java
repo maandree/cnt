@@ -148,27 +148,39 @@ public class Engine implements Blackboard.BlackboardObserver
 			    for (;;)
 			    {
 				try
-				{
-				    Engine.sleep(Engine.sleepTime);
+				{   Engine.sleep(Engine.sleepTime >> 1);
 				}
 				catch (final InterruptedException err)
-				{
-				    if (Engine.currentPlayer == null)
+				{   if (Engine.currentPlayer == null)
 					break;
 				    continue;
 				}
 				
 				try
-				{
-				    synchronized (Engine.class)
-				    {
-					if (Engine.fall() == false)
+				{   synchronized (Engine.class)
+				    {   if (Engine.fall() == false)
 					    break;
-				    }
+				}   }
+				catch (final InterruptedException err)
+			        {   System.err.println("Are you leaving?");
+				    return;
+				}
+				
+				try
+				{   Engine.sleep(Engine.sleepTime >> 1);
 				}
 				catch (final InterruptedException err)
-			        {
-				    System.err.println("Are you leaving?");
+				{   if (Engine.currentPlayer == null)
+					break;
+				    continue;
+				}
+				
+				try
+				{   synchronized (Engine.class)
+				    {   Engine.move();
+				}   }
+				catch (final InterruptedException err)
+			        {   System.err.println("Are you leaving?");
 				    return;
 				}
 			    }
@@ -326,7 +338,7 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * Makes the falling block drop on step and apply the, if any, registrered modification
      * 
-     * @param   return  Whether the fall was not interrupted
+     * @return  Whether the fall was not interrupted
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
@@ -336,7 +348,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	if (fallingShape == null)
 	{
-	    System.err.println("What's happing, why do we not have a falling shape?");
+	    System.err.println("What's happening, why do we not have a falling shape?");
 	    return true;
 	}
 	
@@ -368,7 +380,7 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	if (fallingShape == null)
 	{
-	    System.err.println("What's happing, why do we not have a falling shape?");
+	    System.err.println("What's happening, why do we not have a falling shape?");
 	    return;
 	}
 	
@@ -391,6 +403,27 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     /**
+     * Applies any requested move, but does not make the shape fall
+     * 
+     * @throws  InterruptedException  Can only indicate the the player is leaving
+     */
+    static void move() throws InterruptedException
+    {
+	Engine.sleep(0);
+	
+	if (fallingShape == null)
+	{
+	    System.err.println("What's happening, why do we not have a falling shape?");
+	    return;
+	}
+	
+	patchAway(fallingShape);
+	fallingShape.restore(moveInitialMomento = moveAppliedMomento);	
+	patchIn(fallingShape);
+    }
+    
+    
+    /**
      * Registrers a rotation, if possible, to the falling block
      * 
      * @param  clockwise  Whether to rotate clockwise
@@ -399,7 +432,7 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	if (fallingShape == null)
 	{
-	    System.err.println("What's happing, why do we not have a falling shape?");
+	    System.err.println("What's happening, why do we not have a falling shape?");
 	    return;
 	}
 	
@@ -423,7 +456,7 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	if (fallingShape == null)
 	{
-	    System.err.println("What's happing, why do we not have a falling shape?");
+	    System.err.println("What's happening, why do we not have a falling shape?");
 	    return;
 	}
 	
