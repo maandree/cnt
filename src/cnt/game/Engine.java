@@ -483,6 +483,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	board.put(fallingShape);
 	
 	final int[] full = board.getFullRows();
+	Arrays.sort(full);
 	for (int i = 0, n = (full.length >> 1) - 1; i <= n; i++) //reversing
 	{
 	    full[i] ^= full[n - i];
@@ -502,17 +503,17 @@ public class Engine implements Blackboard.BlackboardObserver
 	    int sub = 0;
 	    for (final int row : full)
 	    {
-		sub++;
 		for (int y = 0; y <= row; y++)
 		{
 		    patchAway   (fullLine, 0, y);
 		    board.delete(fullLine, 0, y);
 		}
-		for (int y = 0; y < row; y++)
+		for (int y = sub; y < row; y++)
 		{
-		    patchIn  (new Block[][] {matrix[y]}, 0, y + sub);
-		    board.put(new Block[][] {matrix[y]}, 0, y + sub);
+		    patchIn  (new Block[][] {matrix[y - sub]}, 0, y + 1);
+		    board.put(new Block[][] {matrix[y - sub]}, 0, y + 1);
 		}
+		sub++;
 		sleep(0);
 	    }
 	    
