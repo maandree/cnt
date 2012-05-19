@@ -39,15 +39,29 @@ public class ChatPanel extends JPanel implements ActionListener
 	this.text = new JTextField(INSTRUCTION)
 	    {
 		/**
+		 * Whether the user is in the middle of writing is message
+		 */
+		protected boolean writing = false;
+		
+		
+		
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		protected void processFocusEvent(final FocusEvent e)
 		{
 		    if (e.getID() == FocusEvent.FOCUS_LOST)
-			this.setText(ChatPanel.INSTRUCTION);
+		    {
+			this.writing = this.getText().isEmpty() == false;
+			if (this.writing == false)
+			    this.setText(ChatPanel.INSTRUCTION);
+		    }
 		    else
-			this.setText("");
+		    {
+			if (this.writing == false)
+			    this.setText("");
+		    }
 		    
 		    super.processFocusEvent(e);
 		}
