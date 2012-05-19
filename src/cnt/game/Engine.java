@@ -28,7 +28,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * The value to multiply the sleep time each time the game speeds up;
      * should be slighly less than 1.
      */
-    private static final double SLEEP_TIME_MULTIPLER = 0.98;
+    private static final double SLEEP_TIME_MULTIPLER = 0.99;
     
     /**
      * The possible, initial, shapes
@@ -186,7 +186,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	patchAway(blocks, offX, offY);
     }
     
-    
     /**
      * Broadcasts a matrix patch that removes a set of blocks
      * 
@@ -213,7 +212,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	final Block[][] blocks = shape.getBlockMatrix();
 	patchIn(blocks, offX, offY);
     }
-    
     
     /**
      * Broadcasts a matrix patch that adds a set of blocks
@@ -306,6 +304,15 @@ public class Engine implements Blackboard.BlackboardObserver
 	moveAppliedMomento = moveInitialMomento = fallingShape.store();
 	
 	patchIn(fallingShape);
+	if (gameOver)
+	    try
+	    {
+		sleep(0);
+	    }
+	    catch (final InterruptedException err)
+	    {
+		//Do nothing
+	    }
     }
     
     
@@ -442,35 +449,31 @@ public class Engine implements Blackboard.BlackboardObserver
 	    full[i] ^= full[n - i];
 	}
 	
+	sleep(0);
 	if (full.length > 0)
 	{
 	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
 	    for (int x = 0; x < Board.WIDTH; x++)
 		fullLine[0][x] = true;
 	    
+	    final Block[][] matrix = board.getMatrix();
+	    
+	    int sub = 0;
 	    for (final int row : full)
 	    {
-		patchAway(fullLine, 0, row);
-		board.delete(fullLine, 0, row);
+		sub++;
+		for (int y = 0; y <= row; y++)
+		{
+		    patchAway   (fullLine, 0, y);
+		    board.delete(fullLine, 0, y);
+		}
+		for (int y = 0; y < row; y++)
+		{
+		    patchIn  (new Block[][] {matrix[y]}, 0, y + sub);
+		    board.put(new Block[][] {matrix[y]}, 0, y + sub);
+		}
+		sleep(0);
 	    }
-	}
-	
-	final Block[][] matrix = board.getMatrix();
-	
-	int sub = 0;
-	for (final int row : full)
-	{
-	    Engine.sleep(sleepTime);
-	    
-	    final Block[][] move = new Block[row - sub][];
-		
-	    for (int y = 0, n = row - sub; y < n; y++)
-		move[y] = matrix[y + sub];
-	    
-	    sub++;
-	    
-	    patchIn(move, 0, sub);
-	    board.put(move, 0, sub);
 	}
 	
 	currentPlayer = null;

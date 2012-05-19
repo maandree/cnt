@@ -141,7 +141,7 @@ public class Board
     {
 	Block[][] clone = new Block[HEIGHT][WIDTH];
 	
-    	for (int y = 0; y <HEIGHT; y++)
+    	for (int y = 0; y < HEIGHT; y++)
 	    System.arraycopy(blocks[y], 0, clone[y], 0, WIDTH);
 	
 	return clone;
