@@ -384,6 +384,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    return;
 	}
 	
+	Engine.sleep(0);
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
