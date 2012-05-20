@@ -43,6 +43,9 @@ elif [[ $1 = "upnp" ]]; then
 elif [[ $1 = "shape" ]]; then
     javaSeven -ea -cp bin$jars cnt.test.ShapeTest
 
+elif [[ $1 = "pipe" ]]; then
+    javaSeven -ea -cp bin$jars cnt.test.PipeTest
+
 elif [[ $1 = "linkedlist" ]]; then
     javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
     javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
@@ -70,7 +73,7 @@ elif [[ $1 = "--completion--" ]]; then
 	    COMPREPLY=( $( compgen -W 'clockwise anti-clockwise' -- "$cur" ) )
 	else
 	    COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat' -- "$cur" ) \
-		        $( compgen -W 'upnp shape linkedlist game replay peergame' -- "$cur" ))
+		        $( compgen -W 'upnp shape pipe linkedlist game replay peergame' -- "$cur" ))
 	fi
     }
     

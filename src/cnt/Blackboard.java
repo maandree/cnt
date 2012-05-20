@@ -193,8 +193,11 @@ public class Blackboard
      */
     public static void registerObserver(final BlackboardObserver observer)
     {
-	System.err.println("BLACKBOARD.registerObserver(" + observer + ")");
-	observers.put(observer, null);
+	synchronized (Blackboard.class)
+	{
+	    System.err.println("BLACKBOARD.registerObserver(" + observer + ")");
+	    observers.put(observer, null);
+	}
     }
     
     
@@ -205,9 +208,12 @@ public class Blackboard
      */
     public static void unregisterObserver(final BlackboardObserver observer)
     {
-	System.err.println("BLACKBOARD.unregisterObserver(" + observer + ")");
-	observers.remove(observer);
-	observationThreading.remove(observer);
+	synchronized (Blackboard.class)
+	{
+	    System.err.println("BLACKBOARD.unregisterObserver(" + observer + ")");
+	    observers.remove(observer);
+	    observationThreading.remove(observer);
+	}
     }
     
     
@@ -237,14 +243,17 @@ public class Blackboard
     @SuppressWarnings("unchecked")
     public static void registerThreadingPolicy(final BlackboardObserver observer, final ThreadingPolicy policy, final Class... messageTypes)
     {
-	HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
-	if (map == null)
+	synchronized (Blackboard.class)
 	{
-	    map = new HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>();
-	    observationThreading.put(observer, map);
+	    HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
+	    if (map == null)
+	    {
+		map = new HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>();
+		observationThreading.put(observer, map);
+	    }
+	    for (final Class<? extends BlackboardMessage> messageType : messageTypes)
+		map.put(messageType, policy);
 	}
-	for (final Class<? extends BlackboardMessage> messageType : messageTypes)
-	    map.put(messageType, policy);
     }
     
     
@@ -253,42 +262,45 @@ public class Blackboard
      * 
      * @param  message  The message to broadcast
      */
-    public synchronized static void broadcastMessage(final BlackboardMessage message)
+    public static void broadcastMessage(final BlackboardMessage message)
     {
-	System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
-	final ArrayList<Thread> threads = new ArrayList<Thread>();
-	
-	for (final BlackboardObserver observer : observers.keySet())
+	synchronized (Blackboard.class)
 	{
-	    System.err.println("BLACKBOARD.broadcastMessage() ==> " + observer.toString());
-	    final ThreadingPolicy policy;
-	    final Runnable runnable = new Runnable()
-		    {
-			/**
-			 * {@inheritDoc}
-			 */
-			public void run()
-			{
-			    observer.messageBroadcasted(message);
-			}
+	    System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
+	    final ArrayList<Thread> threads = new ArrayList<Thread>();
+	    
+	    for (final BlackboardObserver observer : observers.keySet())
+	    {
+		System.err.println("BLACKBOARD.broadcastMessage() ==> " + observer.toString());
+		final ThreadingPolicy policy;
+		final Runnable runnable = new Runnable()
+		        {
+			    /**
+			     * {@inheritDoc}
+			     */
+			    public void run()
+			    {
+				observer.messageBroadcasted(message);
+			    }
 		    };
+		
+		final HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
+		if (map == null)
+		    policy = null;
+		else
+		    policy = map.get(message.getClass());
+		
+		if (policy == null)
+		    runnable.run();
+		else
+		    threads.add(policy.createThread(runnable));
+	    }
 	    
-	    final HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
-	    if (map == null)
-		policy = null;
-	    else
-		policy = map.get(message.getClass());
+	    for (final Thread thread : threads)
+		thread.start();
 	    
-	    if (policy == null)
-		runnable.run();
-	    else
-		threads.add(policy.createThread(runnable));
+	    System.err.println("BLACKBOARD.broadcastMessage() <<<<");
 	}
-	
-	for (final Thread thread : threads)
-	    thread.start();
-	
-	System.err.println("BLACKBOARD.broadcastMessage() <<<<");
     }
     
 }

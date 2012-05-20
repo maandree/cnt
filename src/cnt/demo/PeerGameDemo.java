@@ -54,6 +54,8 @@ public class PeerGameDemo
 	final Player me = new Player(args[0], args[0].hashCode() | (255 << 24));
 	final Object monitor = new Object();
 	
+	final Player[] lowest = {null};
+	
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -75,7 +77,11 @@ public class PeerGameDemo
 			{   player[0] = ((NextPlayer)message).player;
 			}
 			else if (message instanceof PlayerJoined)
-			{   players++;
+			{
+			    final Player player = ((PlayerJoined)message).player;
+			    if ((lowest[0] == null) || (lowest[0].getColor() > player.getColor()))
+				lowest[0] = player;
+			    players++;
 			    if (players == 2)
 				synchronized (monitor)
 			        {    monitor.notify();
@@ -112,10 +118,13 @@ public class PeerGameDemo
 			    {   monitor.wait();
 			    }
 			    
-			    //Engine.start();
+			    if (me.equals(lowest[0]))
+				Engine.start();
 			    
-			    /*for (int d; (d = System.in.read()) != -1;)
-				if (me.equals(player[0])) //order is important
+			    for (int d; (d = System.in.read()) != -1;)
+			        if (me.equals(player[0])) //order is important
+				{
+				    System.out.println("\033[32m" + me + " == " + player[0] + "\033[39m");
 				    switch (d)
 				    {
 				        case 'q':  return;
@@ -126,7 +135,10 @@ public class PeerGameDemo
 					case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
 					case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
 					case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-				    }*/
+				    }
+				}
+				else
+				    System.out.println("\033[31m" + me + " != " + player[0] + "\033[39m");
 			}
 			catch (final Throwable err)
 			{
@@ -139,7 +151,8 @@ public class PeerGameDemo
 	
 	Blackboard.broadcastMessage(new LocalPlayer(me));
 	Blackboard.broadcastMessage(new PlayerJoined(me));
-
+	
+	
 	for (;;)
 	    blackboardNetworking.receiveAndBroadcast();
     }

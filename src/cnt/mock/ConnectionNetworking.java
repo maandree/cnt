@@ -6,6 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.mock;
+//import cnt.util.PipedInputStream;
+//import cnt.util.PipedOutputStream;
 
 import java.io.*;
 import java.net.*;
