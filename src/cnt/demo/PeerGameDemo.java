@@ -40,13 +40,11 @@ public class PeerGameDemo
      */
     public static void main(final String... args) throws Exception
     {
-	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
-	
 	(new MainFrame()).setVisible(true);
 	final PlayerRing ring = new PlayerRing();
 	final Player[] player = { null };
 	
-	rec.start();
+	Thread.sleep(250);
 	
 	
 	final char name = args[0].charAt(0);
@@ -134,7 +132,7 @@ public class PeerGameDemo
 		    {
 			try
 			{
-			    synchronized (monitor)
+			    /*synchronized (monitor)
 			    {   monitor.wait();
 			    }
 			    
@@ -153,7 +151,7 @@ public class PeerGameDemo
 					case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
 					case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
 					case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-				    }
+					}*/
 			}
 			catch (final Throwable err)
 			{
@@ -167,13 +165,19 @@ public class PeerGameDemo
 	Blackboard.broadcastMessage(new LocalPlayer(me));
 	Blackboard.broadcastMessage(new PlayerJoined(me));
 	
+	/** /
 	synchronized (playThread)
 	{
 	    playThread.wait();
 	}
+	/**/ /**/
+	synchronized (PeerGameDemo.class)
+	{
+	    PeerGameDemo.class.wait();
+	}
+	/**/
 	
 	ring.stop();
-	rec.stop();
     }
     
 }

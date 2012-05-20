@@ -95,8 +95,8 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    System.arraycopy(this.colourSorted, ~pos, this.colourSorted, -pos, this.playerCount - ~pos); //safe for atleast sun-java 5,6 and openjdk 7
 	    this.colourSorted[~pos] = player;
 	    
-	    if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
-		Blackboard.broadcastMessage(new PlayerOrder(this.ring));
+	    //if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
+	    //  Blackboard.broadcastMessage(new PlayerOrder(this.ring));
 	}
 	else if (message instanceof PlayerDropped)
 	{
@@ -129,6 +129,7 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    final ACDLinkedList<Player> newRing = ((PlayerOrder)message).order;
 	    if (newRing == this.ring)
 		return;
+	    System.err.println("\033[1;32mGot new player ring\033[0m");
 	    this.ring = newRing;
 	    int pc = 0;
 	    for (final Player player : this.ring)
@@ -153,8 +154,6 @@ public class PlayerRing implements Blackboard.BlackboardObserver
     {
 	Blackboard.unregisterObserver(this);
     }
-    
-    
 
 }
 
