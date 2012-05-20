@@ -95,8 +95,8 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    System.arraycopy(this.colourSorted, ~pos, this.colourSorted, -pos, this.playerCount - ~pos); //safe for atleast sun-java 5,6 and openjdk 7
 	    this.colourSorted[~pos] = player;
 	    
-	    //if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
-	    //  Blackboard.broadcastMessage(new PlayerOrder(this.ring));
+	    if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
+		Blackboard.broadcastMessage(new PlayerOrder(this.ring));
 	}
 	else if (message instanceof PlayerDropped)
 	{
