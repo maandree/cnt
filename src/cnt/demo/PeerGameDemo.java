@@ -118,7 +118,7 @@ public class PeerGameDemo
 				if (me.equals(player[0])) //order is important
 				    switch (d)
 				    {
-					case 'q':  return;
+				        case 'q':  return;
 					case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
 					case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
 					case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
