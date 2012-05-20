@@ -44,8 +44,6 @@ public class PeerGameDemo
 	final PlayerRing ring = new PlayerRing();
 	final Player[] player = { null };
 	
-	Thread.sleep(250);
-	
 	
 	final char name = args[0].charAt(0);
 	final boolean serverauth = args[1].charAt(0) == 's';
@@ -100,28 +98,6 @@ public class PeerGameDemo
 	System.err.println("BlackboardNetworking created");
 	
 	
-	final Thread readThread = new Thread()
-	        {
-		    /**
-		     * {@inheritDoc}
-		     */
-		    @Override
-		    public void run()
-		    {
-			try
-			{
-			    for (;;)
-				blackboardNetworking.receiveAndBroadcast();
-			}
-			catch (final Throwable err)
-			{
-			    err.printStackTrace(System.err);
-			}
-		    }
-	        };
-	readThread.setDaemon(true);
-	readThread.start();
-	
 	final Thread playThread = new Thread()
 	        {
 		    /**
@@ -132,14 +108,13 @@ public class PeerGameDemo
 		    {
 			try
 			{
-			    /*synchronized (monitor)
+			    synchronized (monitor)
 			    {   monitor.wait();
 			    }
 			    
-			    Thread.sleep(250);
-			    Engine.start();
+			    //Engine.start();
 			    
-			    for (int d; (d = System.in.read()) != -1;)
+			    /*for (int d; (d = System.in.read()) != -1;)
 				if (me.equals(player[0])) //order is important
 				    switch (d)
 				    {
@@ -151,7 +126,7 @@ public class PeerGameDemo
 					case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
 					case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
 					case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-					}*/
+				    }*/
 			}
 			catch (final Throwable err)
 			{
@@ -164,20 +139,9 @@ public class PeerGameDemo
 	
 	Blackboard.broadcastMessage(new LocalPlayer(me));
 	Blackboard.broadcastMessage(new PlayerJoined(me));
-	
-	/** /
-	synchronized (playThread)
-	{
-	    playThread.wait();
-	}
-	/**/ /**/
-	synchronized (PeerGameDemo.class)
-	{
-	    PeerGameDemo.class.wait();
-	}
-	/**/
-	
-	ring.stop();
+
+	for (;;)
+	    blackboardNetworking.receiveAndBroadcast();
     }
     
 }

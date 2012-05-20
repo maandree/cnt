@@ -56,16 +56,16 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    if (ignore.containsKey(message))
 	    {
 		final int count = this.ignore.get(message).intValue();
-		
+		    
 		if (count == 1)  this.ignore.remove(message);
 		else             this.ignore.put(message, new Integer(count - 1));
-		
+		    
 		return;
 	    }
 	}
-	
+	    
 	try
-        {
+	{
 	    System.err.println("Potationally forwarding: " + message);
 	    if      (message instanceof GamePlayCommand)  this.gameNetworking.forward(message);
 	    else if (message instanceof MatrixPatch)      this.gameNetworking.forward(message);
@@ -92,6 +92,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	}
 	catch (final IOException err)
 	{
+	    err.printStackTrace(System.err);
 	    //FIXME error!
 	}
     }
