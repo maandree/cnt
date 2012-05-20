@@ -28,7 +28,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * The value to multiply the sleep time each time the game speeds up;
      * should be slighly less than 1.
      */
-    private static final double SLEEP_TIME_MULTIPLER = 0.99;
+    private static final double SLEEP_TIME_MULTIPLER = 0.995;
     
     /**
      * The possible, initial, shapes

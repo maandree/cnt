@@ -7,6 +7,7 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
+import cnt.network.PlayerRing;
 import cnt.game.*;
 import cnt.*;
 
@@ -42,28 +43,29 @@ public class GameDemo
     {
 	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
 	
-	final Color colour = new Color(36, 149, 190);
-	final Player player = new Player("The One", colour.getRGB());
-	
 	(new MainFrame()).setVisible(true);
+	final PlayerRing ring = new PlayerRing();
 	
 	rec.start();
 	
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Mattias", "Mattias".hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Peyman",  "Peyman" .hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Calle",   "Calle"  .hashCode() | (255 << 24))));
+	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
+		    private int score = 0;
+		    
 		    /**
 		     * {@inheritDoc}
 		     */
 		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
 		    {
-			if (message instanceof Blackboard.NextPlayer) /*do not thread*/
-			{
-			    if (((Blackboard.NextPlayer)message).player == null)
-				Blackboard.broadcastMessage(new Blackboard.NextPlayer(player));
+			if (message instanceof Blackboard.GameScore)
+			{   this.score = ((Blackboard.GameScore)message).score;
 			}
 			else if (message instanceof Blackboard.GameOver)
-			{
-			    System.out.println("\033[33mGame over!\033[0m");
+			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
 			}
 		    }
 	        });
@@ -84,6 +86,7 @@ public class GameDemo
 		case 'D':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));           break;  //left arrow
 	    }
 	
+	ring.stop();
 	rec.stop();
     }
     
