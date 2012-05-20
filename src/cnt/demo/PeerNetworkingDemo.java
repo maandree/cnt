@@ -52,13 +52,13 @@ public class PeerNetworkingDemo
 	
 	
 	final ConnectionNetworking connectionNetworking = new ConnectionNetworking(name, serverauth, pubip, serverport, remote);
-	System.out.println("ConnectionNetworking created");
+	System.err.println("ConnectionNetworking created");
 	
 	final ObjectNetworking     objectNetworking     = new ObjectNetworking(connectionNetworking.globalIn, connectionNetworking.globalOut);
-	System.out.println("ObjectNetworking created");
+	System.err.println("ObjectNetworking created");
 	
 	final GameNetworking       gameNetworking       = new GameNetworking(objectNetworking);
-	System.out.println("GameNetworking created");
+	System.err.println("GameNetworking created");
 	
 	final BlackboardNetworking blackboardNetworking = new BlackboardNetworking(gameNetworking)
 	        {
@@ -71,11 +71,11 @@ public class PeerNetworkingDemo
 			System.out.println("received blackboard message: " + message.getClass().toString());
 		    }
 	      };
-	System.out.println("BlackboardNetworking created");
+	System.err.println("BlackboardNetworking created");
 	
 	
 	Blackboard.broadcastMessage(new LocalPlayer(new Player(args[0], args[0].hashCode() | (255 << 24))));
-	System.out.println("Local player set");
+	System.err.println("Local player set");
 	
 	
 	final Thread readThread = new Thread()
@@ -98,7 +98,7 @@ public class PeerNetworkingDemo
 		    }
 	        };
 	readThread.start();
-	System.out.println("Thread created");
+	System.err.println("Thread created");
 	
 	
 	final Scanner sc = new Scanner(System.in);

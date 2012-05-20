@@ -7,6 +7,8 @@
  */
 package cnt.util;
 
+import java.io.Serializable;
+
 
 /**
  * Doubly linked node
@@ -14,8 +16,15 @@ package cnt.util;
  * @author  Peyman Eshtiagh
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ListNode<T>
+public class ListNode<T> implements Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * <p>Constructor</p>
      * <p>

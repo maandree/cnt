@@ -8,6 +8,7 @@
 package cnt.util;
 
 import java.util.*;
+import java.io.Serializable;
 
 
 /**
@@ -16,8 +17,15 @@ import java.util.*;
  * @author  Peyman Eshtiagh
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>
+public class ListEnumerator<T> implements Enumeration<T>, Iterator<T>, Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * Constructor
      * 

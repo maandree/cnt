@@ -291,7 +291,7 @@ public class ConnectionNetworking
 					
 					if (peers[0].equals(oldpeers) == false)
 					{
-					    System.out.println("I can send to: " + peers[0]);
+					    System.err.println("I can send to: " + peers[0]);
 					    
 					    monitor.notify();
 					}

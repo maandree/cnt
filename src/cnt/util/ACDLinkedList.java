@@ -8,6 +8,7 @@
 package cnt.util;
 
 import java.util.*;
+import java.io.Serializable;
 
 
 /**
@@ -20,6 +21,13 @@ import java.util.*;
  */
 public class ACDLinkedList<T> extends CDLinkedList<T>
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     //Has default constructor
     
     

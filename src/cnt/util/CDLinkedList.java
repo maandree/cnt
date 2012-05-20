@@ -8,6 +8,7 @@
 package cnt.util;
 
 import java.util.*;
+import java.io.Serializable;
 
 
 /**
@@ -16,8 +17,15 @@ import java.util.*;
  * @author  Peyman Eshtiagh
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class CDLinkedList<T> implements Iterable<T>
+public class CDLinkedList<T> implements Iterable<T>, Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     //Has default constructor
     
     
