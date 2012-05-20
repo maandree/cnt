@@ -67,10 +67,10 @@ public class NetworkingDemo
 			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED.getRGB()), "sending a message"));
 			    
 			    System.out.println("network0: sending message: SystemMessage");
-			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "system message"));
+			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "system message (ignored)"));
 			    
 			    System.out.println("network0: sending message: UserMessage");
-			    Blackboard.broadcastMessage(new Blackboard.UserMessage("local user chat message"));
+			    Blackboard.broadcastMessage(new Blackboard.UserMessage("local user chat message (converted)"));
 			    
 			    System.out.println("network0: sending message: MatrixPatch");
 			    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(new boolean[2][2], new Block[2][2], 0, 0));
@@ -111,7 +111,7 @@ public class NetworkingDemo
 			    Blackboard.unregisterObserver(network1);
 			    
 			    
-			    for (int i = 0; i < 4; i++)
+			    for (int i = 0; i < 3; i++)
 				network1.receiveAndBroadcast();
 			}
 			catch (final Throwable err)
