@@ -52,7 +52,7 @@ public class ObjectNetworking
      *
      * @throws  IOException  Thrown if the program fails to send the message
      */
-    public void send(final Serializable object) throws IOException
+    public synchronized void send(final Serializable object) throws IOException
     {
 	this.output.writeObject(object);
 	this.output.flush();
@@ -63,7 +63,7 @@ public class ObjectNetworking
      *
      * @throws  IOException  Thrown if the program fails to send the message
      */
-    public void sendUnique(final Serializable object) throws IOException
+    public synchronized void sendUnique(final Serializable object) throws IOException
     {
 	this.output.writeUnshared(object);
 	this.output.flush();

@@ -63,7 +63,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 		return;
 	    }
 	}
-	    
+	
 	try
 	{
 	    System.err.println("Potationally forwarding: " + message);
