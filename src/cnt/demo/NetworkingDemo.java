@@ -61,7 +61,7 @@ public class NetworkingDemo
 			    final OutputStream out = sock.getOutputStream();
 			    
 			    final BlackboardNetworking network0 = new BlackboardNetworking(new GameNetworking(new ObjectNetworking(in, out)));
-			    
+			    Blackboard.broadcastMessage(new Blackboard.LocalPlayer(new Player("Mattias", Color.RED.getRGB())));
 			    
 			    System.out.println("network0: sending message: ChatMessage");
 			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED.getRGB()), "sending a message"));

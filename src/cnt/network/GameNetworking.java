@@ -27,19 +27,7 @@ public class GameNetworking
      */
     public GameNetworking(final ObjectNetworking objectNetworking)
     {
-	this(objectNetworking, new Player("You", Color.PINK.getRGB()));
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param  objectNetworking  The next layer in the protocol stack
-     * @param  player            The local player
-     */
-    public GameNetworking(final ObjectNetworking objectNetworking, final Player player)
-    {
 	this.objectNetworking = objectNetworking;
-	this.player = player;
     }
     
     
@@ -52,7 +40,7 @@ public class GameNetworking
     /**
      * The local player
      */
-    private final Player player;
+    private Player player = null;
     
     
     
@@ -76,7 +64,19 @@ public class GameNetworking
      */
     public void chat(final String message)
     {
-	Blackboard.broadcastMessage(new Blackboard.ChatMessage(player, message));
+	if (this.player != null)
+	    Blackboard.broadcastMessage(new Blackboard.ChatMessage(this.player, message));
+    }
+    
+    
+    /**
+     * Sets local player
+     * 
+     * @param  player  The local player
+     */
+    public void setLocalPlayer(final Player player)
+    {
+	this.player = player;
     }
     
     

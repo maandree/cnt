@@ -59,11 +59,14 @@ public class ChatDemo
 	final ObjectNetworking     objectNetworking     = new ObjectNetworking(connectionNetworking.globalIn, connectionNetworking.globalOut);
 	System.out.println("ObjectNetworking created");
 	
-	final GameNetworking       gameNetworking       = new GameNetworking(objectNetworking, new Player(args[0], args[0].hashCode() | (255 << 24)));
+	final GameNetworking       gameNetworking       = new GameNetworking(objectNetworking);
 	System.out.println("GameNetworking created");
 	
 	final BlackboardNetworking blackboardNetworking = new BlackboardNetworking(gameNetworking);
 	System.out.println("BlackboardNetworking created");
+	
+	
+	Blackboard.broadcastMessage(new Blackboard.LocalPlayer(new Player(args[0], args[0].hashCode() | (255 << 24))));
 	
 	
 	final Thread readThread = new Thread()

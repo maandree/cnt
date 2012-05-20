@@ -678,6 +678,7 @@ public class Blackboard
 	}
     }
     
+    
     /**
      * This message is broadcasted when a player has dropped out
      * 
@@ -726,6 +727,7 @@ public class Blackboard
 	    return Boolean.valueOf(this.player != null);
 	}
     }
+    
     
     /**
      * This message is broadcasted when a player has joined the game session
@@ -776,6 +778,7 @@ public class Blackboard
 	}
     }
     
+    
     /**
      * This message is broadcasted when the next player is request, and as a response
      * 
@@ -824,6 +827,7 @@ public class Blackboard
 	}
     }
     
+    
     /**
      * Game over!
      * 
@@ -857,6 +861,7 @@ public class Blackboard
 	}
 	
     }
+    
     
     /**
      * Game score update message
@@ -903,9 +908,59 @@ public class Blackboard
 	 * {@inheritDoc}
 	 */
 	public Boolean checkIntegrity() {
-	    return Boolean.TRUE;
+	    return Boolean.valueOf(score >= 0);
 	}
 	
+    }
+    
+    
+    /**
+     * Message to inform the subsystems which player the local user is
+     * 
+     * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
+     */
+    public static final class LocalPlayer implements BlackboardMessage
+    {
+	/**
+	 * Compatibility versioning for {@link Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param  player  The player
+	 */
+	public LocalPlayer(final Player player)
+	{
+	    assert player != null : "Null is not allowed";
+	    this.player = player;
+	}
+	
+	
+	
+	/**
+	 * The player
+	 */
+	public final Player player;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString() {
+	    return this.player == null ? "[no player, that's wierd]" : ("Local player: " + this.player.toString());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Boolean checkIntegrity() {
+	    return false; //For machine local use only
+	}
     }
     
 }

@@ -68,12 +68,20 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    if      (message instanceof Blackboard.GamePlayCommand)  this.gameNetworking.forward(message);
 	    else if (message instanceof Blackboard.MatrixPatch)      this.gameNetworking.forward(message);
 	    else if (message instanceof Blackboard.ChatMessage)      this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.PlayerJoined)     this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.PlayerDropped)    this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.GameScore)        this.gameNetworking.forward(message);
+	    else if (message instanceof Blackboard.SystemMessage)    ; /* Do nothing */
 	    else if (message instanceof Blackboard.UserMessage)
 	    {
 		Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
 		this.gameNetworking.chat(msg.message);
 	    }
-	    else if (message instanceof Blackboard.SystemMessage) ; /* Do nothing */
+	    else if (message instanceof Blackboard.LocalPlayer)
+	    {
+		Blackboard.LocalPlayer msg = (Blackboard.LocalPlayer)message;
+		this.gameNetworking.setLocalPlayer(msg.player);
+	    }
 	    else
 		assert false : "Update message types in BlackboardNetworking";
 	}
