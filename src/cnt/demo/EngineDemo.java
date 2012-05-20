@@ -8,6 +8,7 @@
 package cnt.demo;
 import cnt.interaction.desktop.*;
 import cnt.game.*;
+import cnt.messages.*;
 import cnt.*;
 
 import java.awt.Color;
@@ -51,23 +52,23 @@ public class EngineDemo
 		     */
 		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
 		    {
-			if (message instanceof Blackboard.NextPlayer) /*do not thread*/
+			if (message instanceof NextPlayer) /*do not thread*/
 			{
-			    if (((Blackboard.NextPlayer)message).player == null)
+			    if (((NextPlayer)message).player == null)
 			    {
 				System.out.println("\033[33mNext player\033[0m");
-				Blackboard.broadcastMessage(new Blackboard.NextPlayer(player));
+				Blackboard.broadcastMessage(new NextPlayer(player));
 			    }
 			    else
 				System.out.println("\033[35m(Next player)\033[0m");
 			}
-			else if (message instanceof Blackboard.GameOver)
+			else if (message instanceof GameOver)
 			{
 			    System.out.println("\033[33mGame over!\033[0m");
 			}
-			else if (message instanceof Blackboard.MatrixPatch)
+			else if (message instanceof MatrixPatch)
 			{
-			    final Blackboard.MatrixPatch patch = (Blackboard.MatrixPatch)message;
+			    final MatrixPatch patch = (MatrixPatch)message;
 			    
 			    final boolean[][] erase = patch.erase;
 			    final Block[][] blocks = patch.blocks;
@@ -121,33 +122,33 @@ public class EngineDemo
 	
 	if ((args.length == 0) || (args[0].isEmpty()))
 	{
-	    Thread.sleep(500);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));
-	    Thread.sleep(200);   System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT));
+	    Thread.sleep(500);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));
+	    Thread.sleep(200);   System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));
 	    for (int i = 0; i < 10; i++)
-		{ Thread.sleep(1000);  System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT)); }
+		{ Thread.sleep(1000);  System.out.println("RIGHT -->");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT)); }
 	
-	    Thread.sleep(500);   System.out.println("    DROP");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DROP));
+	    Thread.sleep(500);   System.out.println("    DROP");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));
 	    
 	    for (int i = 0; i < 10; i++)
-		{ Thread.sleep(500);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT)); }
+		{ Thread.sleep(500);   System.out.println("LEFT <-- ");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT)); }
 	    
 	    for (int i = 0; i < 5; i++)
-		{ Thread.sleep(300);   System.out.println("  DOWN");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DOWN)); }
+		{ Thread.sleep(300);   System.out.println("  DOWN");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN)); }
 	    
 	    Thread.sleep(7000);
 	    
 	    for (int i = 0; i < 4; i++)
-		{ Thread.sleep(1000);  System.out.println("CLOCKWISE");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.CLOCKWISE)); }
+		{ Thread.sleep(1000);  System.out.println("CLOCKWISE");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE)); }
 	    
 	    for (int i = 0; i < 4; i++)
-		{ Thread.sleep(1000);  System.out.println("ANTI-CLOCKWISE");  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE)); }
+		{ Thread.sleep(1000);  System.out.println("ANTI-CLOCKWISE");  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE)); }
 	}
 	else if (args[0].toLowerCase().contains("counter") || args[0].equalsIgnoreCase("cc") || (args[0].charAt(0) == 'a') || (args[0].charAt(0) == 'A'))
 	    for (;;)
-		{ Thread.sleep(500);  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE)); }
+		{ Thread.sleep(500);  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE)); }
 	else
 	    for (;;)
-		{ Thread.sleep(500);  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.CLOCKWISE)); }
+		{ Thread.sleep(500);  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE)); }
     }
     
 }

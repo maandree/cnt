@@ -6,8 +6,9 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
-import cnt.game.Player;
-import cnt.Blackboard;
+import cnt.game.*;
+import cnt.messages.*;
+import cnt.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +38,7 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 	final JScrollPane pane = new JScrollPane(this.list);
 	
 	Blackboard.registerObserver(this);
-	Blackboard.registerThreadingPolicy(this, Blackboard.DAEMON_THREADING, Blackboard.PlayerDropped.class, Blackboard.PlayerJoined.class);
+	Blackboard.registerThreadingPolicy(this, Blackboard.DAEMON_THREADING, PlayerDropped.class, PlayerJoined.class);
 	
 	LookAndFeel.installBorder(pane, "BorderFactory.createEmptyBorder()");
 	
@@ -125,9 +126,9 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
     {
 	synchronized (this)
 	{
-	    if (message instanceof Blackboard.PlayerJoined)
+	    if (message instanceof PlayerJoined)
 	    {
-		final Player player = ((Blackboard.PlayerJoined)message).player;
+		final Player player = ((PlayerJoined)message).player;
 		int _colour = player.getColor();
 		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
@@ -135,9 +136,9 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		final String item = "<html><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
 		this.model.addElement(item);
 	    }
-	    else if (message instanceof Blackboard.PlayerDropped)
+	    else if (message instanceof PlayerDropped)
 	    {
-		final Player player = ((Blackboard.PlayerDropped)message).player;
+		final Player player = ((PlayerDropped)message).player;
 		this.model.removeElement(this.playerMap.get(player));
 	    }
 	}

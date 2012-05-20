@@ -7,6 +7,7 @@
  */
 package cnt.network;
 import cnt.game.*;
+import cnt.messages.*;
 import cnt.*;
 
 import java.awt.*;
@@ -65,7 +66,7 @@ public class GameNetworking
     public void chat(final String message)
     {
 	if (this.player != null)
-	    Blackboard.broadcastMessage(new Blackboard.ChatMessage(this.player, message));
+	    Blackboard.broadcastMessage(new ChatMessage(this.player, message));
     }
     
     

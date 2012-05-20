@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.messages.*;
 import cnt.*;
 
 import javax.swing.*;
@@ -99,7 +100,7 @@ public class ChatPanel extends JPanel implements ActionListener
 	if (msg.isEmpty())
 	    return;
 	
-	Blackboard.broadcastMessage(new Blackboard.UserMessage(msg));
+	Blackboard.broadcastMessage(new UserMessage(msg));
 	
 	this.text.setText("");
     }

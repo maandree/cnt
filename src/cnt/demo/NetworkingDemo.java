@@ -8,6 +8,7 @@
 package cnt.demo;
 import cnt.game.*;
 import cnt.network.*;
+import cnt.messages.*;
 import cnt.*;
 
 import java.awt.*;
@@ -61,19 +62,19 @@ public class NetworkingDemo
 			    final OutputStream out = sock.getOutputStream();
 			    
 			    final BlackboardNetworking network0 = new BlackboardNetworking(new GameNetworking(new ObjectNetworking(in, out)));
-			    Blackboard.broadcastMessage(new Blackboard.LocalPlayer(new Player("Mattias", Color.RED.getRGB())));
+			    Blackboard.broadcastMessage(new LocalPlayer(new Player("Mattias", Color.RED.getRGB())));
 			    
 			    System.out.println("network0: sending message: ChatMessage");
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(new Player("Mattias", Color.RED.getRGB()), "sending a message"));
+			    Blackboard.broadcastMessage(new ChatMessage(new Player("Mattias", Color.RED.getRGB()), "sending a message"));
 			    
 			    System.out.println("network0: sending message: SystemMessage");
-			    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "system message (ignored)"));
+			    Blackboard.broadcastMessage(new SystemMessage(null, "system message (ignored)"));
 			    
 			    System.out.println("network0: sending message: UserMessage");
-			    Blackboard.broadcastMessage(new Blackboard.UserMessage("local user chat message (converted)"));
+			    Blackboard.broadcastMessage(new UserMessage("local user chat message (converted)"));
 			    
 			    System.out.println("network0: sending message: MatrixPatch");
-			    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(new boolean[2][2], new Block[2][2], 0, 0));
+			    Blackboard.broadcastMessage(new MatrixPatch(new boolean[2][2], new Block[2][2], 0, 0));
 			}
 			catch (final Throwable err)
 			{

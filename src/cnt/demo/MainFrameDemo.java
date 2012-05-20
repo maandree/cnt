@@ -8,6 +8,7 @@
 package cnt.demo;
 import cnt.interaction.desktop.*;
 import cnt.game.*;
+import cnt.messages.*;
 import cnt.*;
 
 import java.awt.Color;
@@ -46,10 +47,10 @@ public class MainFrameDemo
 	
 	(new MainFrame()).setVisible(true);
 	
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(peyman));
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(calle));
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(magnus));
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(mattias));
+	Blackboard.broadcastMessage(new PlayerJoined(peyman));
+	Blackboard.broadcastMessage(new PlayerJoined(calle));
+	Blackboard.broadcastMessage(new PlayerJoined(magnus));
+	Blackboard.broadcastMessage(new PlayerJoined(mattias));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -58,15 +59,15 @@ public class MainFrameDemo
 		     */
 		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
 		    {
-			if (message instanceof Blackboard.UserMessage)
+			if (message instanceof UserMessage)
 			{
-			    final String msg = ((Blackboard.UserMessage)message).message;
-			    Blackboard.broadcastMessage(new Blackboard.ChatMessage(mattias, msg));
+			    final String msg = ((UserMessage)message).message;
+			    Blackboard.broadcastMessage(new ChatMessage(mattias, msg));
 			}
 		    }
 	        });
 	
-	Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "New game started."));
+	Blackboard.broadcastMessage(new SystemMessage(null, "New game started."));
 	
 	final Block[] blocks = {
 	        new Block((new Color(205, 101, 108)).getRGB()),  // NCS S 2050-R
@@ -83,7 +84,7 @@ public class MainFrameDemo
 	{
 	    Thread.sleep(500);
 	    
-	    Blackboard.broadcastMessage(new Blackboard.MatrixPatch(null, new Block[][] {{blocks[x]}}, 0, x));
+	    Blackboard.broadcastMessage(new MatrixPatch(null, new Block[][] {{blocks[x]}}, 0, x));
 	    
 	    final boolean[][] erase = {{true}};
 	    final Block[][] add = {{null}, {blocks[x]}};
@@ -91,7 +92,7 @@ public class MainFrameDemo
 	    for (int y = 0; y < 19; y++)
 	    {
 		Thread.sleep(500);
-		Blackboard.broadcastMessage(new Blackboard.MatrixPatch(erase, add, y, x));
+		Blackboard.broadcastMessage(new MatrixPatch(erase, add, y, x));
 	    }
 	}
     }

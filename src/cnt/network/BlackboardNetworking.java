@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
+import cnt.messages.*;
 import cnt.*;
 
 import java.util.*;
@@ -65,21 +66,21 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	
 	try
         {
-	    if      (message instanceof Blackboard.GamePlayCommand)  this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.MatrixPatch)      this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.ChatMessage)      this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.PlayerJoined)     this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.PlayerDropped)    this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.GameScore)        this.gameNetworking.forward(message);
-	    else if (message instanceof Blackboard.SystemMessage)    ; /* Do nothing */
-	    else if (message instanceof Blackboard.UserMessage)
+	    if      (message instanceof GamePlayCommand)  this.gameNetworking.forward(message);
+	    else if (message instanceof MatrixPatch)      this.gameNetworking.forward(message);
+	    else if (message instanceof ChatMessage)      this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerJoined)     this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerDropped)    this.gameNetworking.forward(message);
+	    else if (message instanceof GameScore)        this.gameNetworking.forward(message);
+	    else if (message instanceof SystemMessage)    ; /* Do nothing */
+	    else if (message instanceof UserMessage)
 	    {
-		Blackboard.UserMessage msg = (Blackboard.UserMessage)message;
+		UserMessage msg = (UserMessage)message;
 		this.gameNetworking.chat(msg.message);
 	    }
-	    else if (message instanceof Blackboard.LocalPlayer)
+	    else if (message instanceof LocalPlayer)
 	    {
-		Blackboard.LocalPlayer msg = (Blackboard.LocalPlayer)message;
+		LocalPlayer msg = (LocalPlayer)message;
 		this.gameNetworking.setLocalPlayer(msg.player);
 	    }
 	    else

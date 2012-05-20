@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
+import cnt.messages.*;
 import cnt.*;
 
 import java.lang.ref.*;
@@ -94,7 +95,7 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * All queued matrix patches for {@link Blackboard}
      */
-    private static final ArrayList<Blackboard.MatrixPatch> patches = new ArrayList<Blackboard.MatrixPatch>();
+    private static final ArrayList<MatrixPatch> patches = new ArrayList<MatrixPatch>();
     
     /**
      * Shape for shapes with set player
@@ -120,12 +121,12 @@ public class Engine implements Blackboard.BlackboardObserver
 	final Engine blackboardObserver = new Engine();
 	Blackboard.registerObserver(blackboardObserver);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
-					   Blackboard.GamePlayCommand.class,
-					   Blackboard.PlayerDropped.class);
+					   GamePlayCommand.class,
+					   PlayerDropped.class);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
-					   Blackboard.NextPlayer.class);
+					   NextPlayer.class);
 	
-	Blackboard.broadcastMessage(new Blackboard.GameScore(score = 0));
+	Blackboard.broadcastMessage(new GameScore(score = 0));
 	
 	thread = new Thread()
 	        {
@@ -140,7 +141,7 @@ public class Engine implements Blackboard.BlackboardObserver
 			    
 			    if (Engine.gameOver)
 			    {
-				Blackboard.broadcastMessage(new Blackboard.GameOver());
+				Blackboard.broadcastMessage(new GameOver());
 				Blackboard.unregisterObserver(blackboardObserver);
 				return;
 			    }
@@ -214,7 +215,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void patchAway(final boolean[][] blocks, final int offX, final int offY)
     {
-	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(blocks, null, offY, offX);
+	final MatrixPatch patch = new MatrixPatch(blocks, null, offY, offX);
 	patches.add(patch);
     }
     
@@ -241,7 +242,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void patchIn(final Block[][] blocks, final int offX, final int offY)
     {
-	final Blackboard.MatrixPatch patch = new Blackboard.MatrixPatch(null, blocks, offY, offX);
+	final MatrixPatch patch = new MatrixPatch(null, blocks, offY, offX);
 	patches.add(patch);
     }
     
@@ -517,7 +518,7 @@ public class Engine implements Blackboard.BlackboardObserver
 		sleep(0);
 	    }
 	    
-	    Blackboard.broadcastMessage(new Blackboard.GameScore(score += full.length * 10));
+	    Blackboard.broadcastMessage(new GameScore(score += full.length * 10));
 	}
 	
 	currentPlayer = null;
@@ -531,7 +532,7 @@ public class Engine implements Blackboard.BlackboardObserver
     static void nextTurn()
     {
 	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
-	Blackboard.broadcastMessage(new Blackboard.NextPlayer(null));
+	Blackboard.broadcastMessage(new NextPlayer(null));
     }
     
     
@@ -549,7 +550,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
 	    boolean del = false, add = false;
 	    
-	    for (final Blackboard.MatrixPatch patch : patches)
+	    for (final MatrixPatch patch : patches)
 	    {
 		if (x1 > patch.offX)  x1 = patch.offX;
 		if (y1 > patch.offY)  y1 = patch.offY;
@@ -586,7 +587,7 @@ public class Engine implements Blackboard.BlackboardObserver
 		final boolean[][] erase  = del ? new boolean[y2 - y1][x2 - x1] : null;
 		final Block  [][] blocks = add ? new Block  [y3 - y1][x3 - x1] : null;
 		
-		for (final Blackboard.MatrixPatch patch : patches)
+		for (final MatrixPatch patch : patches)
 		{
 		    if (patch.erase != null)
 			for (int y = 0; y < patch.erase.length; y++)
@@ -600,7 +601,7 @@ public class Engine implements Blackboard.BlackboardObserver
 		}
 		
 		patches.clear();
-		Blackboard.broadcastMessage(new Blackboard.MatrixPatch(erase, blocks, y1, x1));
+		Blackboard.broadcastMessage(new MatrixPatch(erase, blocks, y1, x1));
 	    }
 	    else
 		System.err.println("Shouldn't the matrix patches actually contain something?");
@@ -620,11 +621,11 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	try
 	{
-	    if (message instanceof Blackboard.GamePlayCommand)
+	    if (message instanceof GamePlayCommand)
 	    {
 		synchronized (Engine.class)
 		{
-		    switch (((Blackboard.GamePlayCommand)message).move)
+		    switch (((GamePlayCommand)message).move)
 		    {
 			case LEFT:           move(-1);       break;
 			case RIGHT:          move(1);        break;
@@ -646,13 +647,13 @@ public class Engine implements Blackboard.BlackboardObserver
 		    }
 		}
 	    }
-	    else if (message instanceof Blackboard.NextPlayer) /* do not thread */
+	    else if (message instanceof NextPlayer) /* do not thread */
 	    {
-		if (((Blackboard.NextPlayer)message).player != null)
-		    newTurn(((Blackboard.NextPlayer)message).player);
+		if (((NextPlayer)message).player != null)
+		    newTurn(((NextPlayer)message).player);
 	    }
-	    else if (message instanceof Blackboard.PlayerDropped)
-		playerDropped(((Blackboard.PlayerDropped)message).player);
+	    else if (message instanceof PlayerDropped)
+		playerDropped(((PlayerDropped)message).player);
 	}
 	catch (final InterruptedException err)
 	{

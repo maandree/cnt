@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 
@@ -32,7 +33,7 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setEditable(false);
 	
 	Blackboard.registerObserver(this);
-	Blackboard.registerThreadingPolicy(this, Blackboard.NICE_DAEMON_THREADING, Blackboard.ChatMessage.class);
+	Blackboard.registerThreadingPolicy(this, Blackboard.NICE_DAEMON_THREADING, ChatMessage.class, SystemMessage.class);
     }
     
     
@@ -44,14 +45,14 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
     {
 	synchronized (this)
 	{
-	    if (message instanceof Blackboard.ChatMessage)
+	    if (message instanceof ChatMessage)
 	    {
-		final Blackboard.ChatMessage msg = (Blackboard.ChatMessage)message;
+		final ChatMessage msg = (ChatMessage)message;
 		addUserText(msg.message, msg.player.getName(), new Color(msg.player.getColor()));
 	    }
-	    else if (message instanceof Blackboard.SystemMessage)
+	    else if (message instanceof SystemMessage)
 	    {
-		final Blackboard.SystemMessage msg = (Blackboard.SystemMessage)message;
+		final SystemMessage msg = (SystemMessage)message;
 		addSystemText(msg.message, msg.player == null ? null : new Color(msg.player.getColor()));
 	    }
 	}

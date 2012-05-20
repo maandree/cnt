@@ -8,6 +8,7 @@
 package cnt.demo;
 import cnt.interaction.desktop.*;
 import cnt.network.PlayerRing;
+import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 
@@ -48,9 +49,9 @@ public class GameDemo
 	
 	rec.start();
 	
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Mattias", "Mattias".hashCode() | (255 << 24))));
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Peyman",  "Peyman" .hashCode() | (255 << 24))));
-	Blackboard.broadcastMessage(new Blackboard.PlayerJoined(new Player("Calle",   "Calle"  .hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Mattias", "Mattias".hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman",  "Peyman" .hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",   "Calle"  .hashCode() | (255 << 24))));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -61,10 +62,10 @@ public class GameDemo
 		     */
 		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
 		    {
-			if (message instanceof Blackboard.GameScore)
-			{   this.score = ((Blackboard.GameScore)message).score;
+			if (message instanceof GameScore)
+			{   this.score = ((GameScore)message).score;
 			}
-			else if (message instanceof Blackboard.GameOver)
+			else if (message instanceof GameOver)
 			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
 			}
 		    }
@@ -77,13 +78,13 @@ public class GameDemo
 	    switch (d)
 	    {
 		case 'q':  return;
-		case 's':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE));  break;
-		case 'd':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.CLOCKWISE));      break;
-		case ' ':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DROP));           break;
-		case 'A':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
-		case 'B':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.DOWN));           break;  //down arrow
-		case 'C':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.RIGHT));          break;  //right arrow
-		case 'D':  Blackboard.broadcastMessage(new Blackboard.GamePlayCommand(Blackboard.GamePlayCommand.Move.LEFT));           break;  //left arrow
+		case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
+		case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
+		case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
+		case 'A':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
+		case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
+		case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
+		case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
 	    }
 	
 	ring.stop();

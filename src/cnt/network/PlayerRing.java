@@ -8,6 +8,7 @@
 package cnt.network;
 import cnt.util.*;
 import cnt.game.*;
+import cnt.messages.*;
 import cnt.*;
 
 
@@ -40,22 +41,22 @@ public class PlayerRing implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	if (message instanceof Blackboard.PlayerJoined)
+	if (message instanceof PlayerJoined)
         {
-	    final Player player = ((Blackboard.PlayerJoined)message).player;
+	    final Player player = ((PlayerJoined)message).player;
 	    this.ring.insertBefore(player);
 	}
-	else if (message instanceof Blackboard.PlayerDropped)
+	else if (message instanceof PlayerDropped)
 	{
-	    final Player player = ((Blackboard.PlayerDropped)message).player;
+	    final Player player = ((PlayerDropped)message).player;
 	    this.ring.remove(this.ring.find(player));
 	}
-	else if (message instanceof Blackboard.NextPlayer)
+	else if (message instanceof NextPlayer)
 	{
-	    final Player player = ((Blackboard.NextPlayer)message).player;
+	    final Player player = ((NextPlayer)message).player;
 	    if (player == null)
 	    {
-		Blackboard.broadcastMessage(new Blackboard.NextPlayer(this.ring.get()));
+		Blackboard.broadcastMessage(new NextPlayer(this.ring.get()));
 		this.ring.next();
 	    }
 	}

@@ -10,6 +10,7 @@ import cnt.interaction.desktop.*;
 import cnt.game.*;
 import cnt.network.*;
 import cnt.mock.ConnectionNetworking;
+import cnt.messages.*;
 import cnt.*;
 
 import java.awt.*;
@@ -66,7 +67,7 @@ public class ChatDemo
 	System.out.println("BlackboardNetworking created");
 	
 	
-	Blackboard.broadcastMessage(new Blackboard.LocalPlayer(new Player(args[0], args[0].hashCode() | (255 << 24))));
+	Blackboard.broadcastMessage(new LocalPlayer(new Player(args[0], args[0].hashCode() | (255 << 24))));
 	
 	
 	final Thread readThread = new Thread()

@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 
@@ -52,7 +53,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	if (this.pieceImage == null)
 	{
 	    System.err.println("WARNING: Can't load piece image!");
-	    Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, "Can't load piece image, your blocks will lose graphical quality!"));
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Can't load piece image, your blocks will lose graphical quality!"));
 	    this.pieceImageW = this.pieceImageH = 1; //initialising
 	}
 	else
@@ -161,9 +162,9 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	if (message instanceof Blackboard.MatrixPatch)
+	if (message instanceof MatrixPatch)
 	{
-	    final Blackboard.MatrixPatch patch = (Blackboard.MatrixPatch)message;
+	    final MatrixPatch patch = (MatrixPatch)message;
 	    update(patch.erase, patch.blocks, patch.offY, patch.offX);
 	}
     }
