@@ -253,7 +253,7 @@ public class Blackboard
      * 
      * @param  message  The message to broadcast
      */
-    public static void broadcastMessage(final BlackboardMessage message)
+    public synchronized static void broadcastMessage(final BlackboardMessage message)
     {
 	System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
 	final ArrayList<Thread> threads = new ArrayList<Thread>();

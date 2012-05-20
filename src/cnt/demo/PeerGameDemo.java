@@ -138,6 +138,7 @@ public class PeerGameDemo
 			    {   monitor.wait();
 			    }
 			    
+			    Thread.sleep(250);
 			    Engine.start();
 			    
 			    for (int d; (d = System.in.read()) != -1;)
@@ -164,10 +165,12 @@ public class PeerGameDemo
 	
 	
 	Blackboard.broadcastMessage(new LocalPlayer(me));
-	Thread.sleep(100);
 	Blackboard.broadcastMessage(new PlayerJoined(me));
 	
-	playThread.wait();
+	synchronized (playThread)
+	{
+	    playThread.wait();
+	}
 	
 	ring.stop();
 	rec.stop();
