@@ -47,7 +47,13 @@ public class Replayer //TODO: this class has only a rudamentary implementation
 	
 	while (tape.available() > 0)
 	{
-	    Thread.sleep(tape.readInt());
+	    int sleep = tape.readInt();
+	    while (sleep > 60000)
+	    {
+		Thread.sleep(60000);
+		sleep -= 60000;
+	    }
+	    Thread.sleep(sleep);
 	    Blackboard.broadcastMessage((Blackboard.BlackboardMessage)(tape.readObject()));
 	}
     }
