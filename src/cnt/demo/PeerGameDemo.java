@@ -124,7 +124,7 @@ public class PeerGameDemo
 			    for (int d; (d = System.in.read()) != -1;)
 			        if (me.equals(player[0])) //order is important
 				{
-				    System.out.println("\033[32m" + me + " == " + player[0] + "\033[39m");
+				    System.err.println("\033[32m" + me + " == " + player[0] + "\033[39m");
 				    switch (d)
 				    {
 				        case 'q':  return;
@@ -138,7 +138,7 @@ public class PeerGameDemo
 				    }
 				}
 				else
-				    System.out.println("\033[31m" + me + " != " + player[0] + "\033[39m");
+				    System.err.println("\033[31m" + me + " != " + player[0] + "\033[39m");
 			}
 			catch (final Throwable err)
 			{
