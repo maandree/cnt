@@ -44,6 +44,7 @@ public class PeerGameDemo
 	
 	(new MainFrame()).setVisible(true);
 	final PlayerRing ring = new PlayerRing();
+	final Player[] player = { null };
 	
 	rec.start();
 	
@@ -55,6 +56,37 @@ public class PeerGameDemo
 	final String remote = args[4];
 	
 	final Player me = new Player(args[0], args[0].hashCode() | (255 << 24));
+	final Object monitor = new Object();
+	
+	
+	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
+	        {
+		    private int score = 0;
+		    private int players = 0;
+		    
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+		    {
+			if (message instanceof GameScore)
+			{   this.score = ((GameScore)message).score;
+			}
+			else if (message instanceof GameOver)
+			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
+			}
+			else if (message instanceof NextPlayer)
+			{   player[0] = ((NextPlayer)message).player;
+			}
+			else if (message instanceof PlayerJoined)
+			{   players++;
+			    if (players == 2)
+				synchronized (monitor)
+			        {    monitor.notify();
+				}
+			}
+		    }
+	        });
 	
 	
 	final ConnectionNetworking connectionNetworking = new ConnectionNetworking(name, serverauth, pubip, serverport, remote);
@@ -89,46 +121,53 @@ public class PeerGameDemo
 			}
 		    }
 	        };
+	readThread.setDaemon(true);
 	readThread.start();
 	
-	
-	Blackboard.broadcastMessage(new LocalPlayer(me));
-	Blackboard.broadcastMessage(new PlayerJoined(me));
-	
-	
-	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
+	final Thread playThread = new Thread()
 	        {
-		    private int score = 0;
-		    
 		    /**
 		     * {@inheritDoc}
 		     */
-		    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+		    @Override
+		    public void run()
 		    {
-			if (message instanceof GameScore)
-			{   this.score = ((GameScore)message).score;
+			try
+			{
+			    synchronized (monitor)
+			    {   monitor.wait();
+			    }
+			    
+			    Engine.start();
+			    
+			    for (int d; (d = System.in.read()) != -1;)
+				if (me.equals(player[0])) //order is important
+				    switch (d)
+				    {
+					case 'q':  return;
+					case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
+					case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
+					case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
+					case 'A':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
+					case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
+					case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
+					case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
+				    }
 			}
-			else if (message instanceof GameOver)
-			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
+			catch (final Throwable err)
+			{
+			    err.printStackTrace(System.err);
 			}
 		    }
-	        });
+	        };
+	playThread.start();
 	
-	Engine.start();
 	
+	Blackboard.broadcastMessage(new LocalPlayer(me));
+	Thread.sleep(100);
+	Blackboard.broadcastMessage(new PlayerJoined(me));
 	
-	for (int d; (d = System.in.read()) != -1;)
-	    switch (d)
-	    {
-		case 'q':  return;
-		case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
-		case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
-		case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
-		case 'A':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
-		case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
-		case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
-		case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-	    }
+	playThread.wait();
 	
 	ring.stop();
 	rec.stop();

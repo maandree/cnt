@@ -73,15 +73,11 @@ public class PlayerRing implements Blackboard.BlackboardObserver
      */
     public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	System.out.println("\033[34m" + message.toString() + "\033[39m");
 	if (message instanceof PlayerJoined)
         {
 	    final Player player = ((PlayerJoined)message).player;
 	    if (this.ring.contains(player))
-		{
-		    System.out.println("\033[33m" + message.toString() + "\033[39m");
-		    return;
-		}
+		return;
 	    this.ring.insertBefore(player);
 	    if (this.playerCount == this.colourSorted.length)
 	    {
@@ -99,17 +95,14 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    System.arraycopy(this.colourSorted, ~pos, this.colourSorted, -pos, this.playerCount - ~pos); //safe for atleast sun-java 5,6 and openjdk 7
 	    this.colourSorted[~pos] = player;
 	    
-	    if ((++this.playerCount >= 2) && (this.colourSorted[0] == this.localPlayer))
+	    if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
 		Blackboard.broadcastMessage(new PlayerOrder(this.ring));
 	}
 	else if (message instanceof PlayerDropped)
 	{
 	    final Player player = ((PlayerDropped)message).player;
 	    if (this.ring.contains(player) == false)
-		{
-		    System.out.println("\033[33m" + message.toString() + "\033[39m");
-		    return;
-		}
+		return;
 	    this.ring.remove(this.ring.find(player));
 	    
 	    int pos = Arrays.binarySearch(this.colourSorted, 0, this.playerCount, player, this.comparator);
@@ -135,21 +128,22 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	{
 	    final ACDLinkedList<Player> newRing = ((PlayerOrder)message).order;
 	    if (newRing == this.ring)
-		{
-		    System.out.println("\033[33m" + message.toString() + "\033[39m");
-		    return;
-		}
+		return;
 	    this.ring = newRing;
-	    this.playerCount = 0;
+	    int pc = 0;
 	    for (final Player player : this.ring)
-		this.playerCount++;
+	    {
+		if (Arrays.binarySearch(this.colourSorted, 0, this.playerCount, player, this.comparator) < 0)
+		    Blackboard.broadcastMessage(new PlayerJoined(player));
+		pc++;
+	    }
+	    this.playerCount = pc;
 	    this.colourSorted = new Player[this.playerCount / 8 * 8 + 8];
 	    int ptr = 0;
 	    for (final Player player : this.ring)
 		this.colourSorted[ptr++] = player;
 	    Arrays.sort(this.colourSorted, 0, this.playerCount, this.comparator);
 	}
-	System.out.println("\033[32m" + message.toString() + "\033[39m");
     }
     
     /**

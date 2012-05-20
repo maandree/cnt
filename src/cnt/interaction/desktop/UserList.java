@@ -129,16 +129,22 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 	    if (message instanceof PlayerJoined)
 	    {
 		final Player player = ((PlayerJoined)message).player;
+		if (this.playerMap.containsKey(player))
+		    return;
 		int _colour = player.getColor();
 		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  0) & 255);
 		final String item = "<html><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
+		this.playerMap.put(player, item);
 		this.model.addElement(item);
 	    }
 	    else if (message instanceof PlayerDropped)
 	    {
 		final Player player = ((PlayerDropped)message).player;
+		if (this.playerMap.containsKey(player) == false)
+		    return;
+		this.playerMap.remove(player);
 		this.model.removeElement(this.playerMap.get(player));
 	    }
 	}

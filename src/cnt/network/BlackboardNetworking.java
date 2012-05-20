@@ -66,7 +66,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	
 	try
         {
-	    System.out.println(message);
+	    System.err.println("Potationally forwarding: " + message);
 	    if      (message instanceof GamePlayCommand)  this.gameNetworking.forward(message);
 	    else if (message instanceof MatrixPatch)      this.gameNetworking.forward(message);
 	    else if (message instanceof ChatMessage)      this.gameNetworking.forward(message);
@@ -106,6 +106,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     public void receiveAndBroadcast() throws IOException, ClassNotFoundException
     {
         final Serializable object = this.gameNetworking.receive();
+	System.err.println("Received forward: " + object);
 	if (object instanceof Blackboard.BlackboardMessage)
 	    broadcastMessage((Blackboard.BlackboardMessage)object);
     }
