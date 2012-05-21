@@ -8,9 +8,13 @@
 package cnt.mock;
 import cnt.mock.PipedInputStream;
 import cnt.mock.PipedOutputStream;
+import cnt.game.*;
+import cnt.messages.*;
+import cnt.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 
 /**
@@ -18,129 +22,54 @@ import java.net.*;
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ConnectionNetworking
+public class ConnectionNetworking import Blackboard.BlackboardOberserver
 {
     /**
-     * <p>Constructor.</p>
-     * <p>
-     *   The thread calling constructor must be keep alive, otherwise the pipes ({@link #globalIn} and {@link #globalOut}) breaks.
-     * </p>
+     * Constructor
      * 
      * @param  name        The name of the peer
-     * @param  serverauth  Whether the peer may be the network's server
-     * @param  pubip       The local public IP address
+     * @param  server      Whether the peer should be the network server
+     * @param  pubip       (unused)
      * @param  serverport  The port the servers use
-     * @param  remote      The remote public IP address
+     * @param  serverhost  The server host
      */
-    public ConnectionNetworking(final char name, final boolean serverauth, final String pubip, final int serverport, final String remote) throws IOException
+    public ConnectionNetworking(final char name, final boolean server, final String pubip, final int serverport, final String serverhost) throws IOException
     {
-	System.err.println("I am " + name + " on " + pubip);
-	if (serverauth == false)
-	    System.err.println("I may not be a server");
-	System.err.println("Servers use port " + serverport + ",");
-	System.err.println("And my remote peer is " + remote);
-	
-	ServerSocket _server = null;
-	
-	if (serverauth)
-	    try
-	    {
-		_server = new ServerSocket(serverport);
-	    }
-	    catch (final BindException err) //"Address already in use" | "Permission denied"
-	    {
-		_server = null;
-	    }
-	
-	final ServerSocket server = _server;
-	
-	final String[] peers = { Character.toString(name) };
-	final Object monitor = new Object();
-	
+	System.err.println("I am " + name);
+	Blackboard.registerObserver(this);
 	createPipes();
 	
-	if (server != null)
+	
+	if (server)
 	{
-	    System.err.println("I am a server");
-	    
-	    final Thread threadServer = new Thread()
-		    {
+	    final ServerSocket sock = new ServerSocket(serverhost, serverport);
+	    final Thread socketThread = new Thread()
+	            {
 			/**
 			 * {@inheritDoc}
 			 */
 			@Override
 			public void run()
 			{
-			    try
+			    for (;;)
 			    {
-				for (;;)
-				    connect(server.accept(), monitor, peers);
-			    }
-			    catch (final IOException err)
-			    {
-				System.err.println("Server error");
-			    }
-			};
-		    };
-	    
-	    final Thread threadClient = new Thread()
-		    {
-			/**
-			 * {@inheritDoc}
-			 */
-                        @Override
-			public void run()
-			{
-			    try
-			    {
-				if (remote.equals(pubip) == false)
-				    connect(new Socket(remote, serverport), monitor, peers);
-				else
-				    System.err.println("Remote server is local server");
-			    }
-			    catch (final Throwable err)
-			    {
-				System.err.println("No remote server to connect to");
+				final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
+				final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
+				connectServer(sock.accept());
+				handleQueues(inQueue, outQueue);
 			    }
 			}
-		    };
+	            };
 	    
-	    threadServer.start();
-	    threadClient.start();
+	    socketThread.setDaemon(true);
+	    socketThread.start();
 	}
-	else
-	{
-	    System.err.println("I am a client");
-	    
-	    final Thread threadClient = new Thread()
-		    {
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run()
-			{
-			    try
-			    {
-				connect(new Socket(pubip, serverport), monitor, peers);
-				System.err.println("I am connected to local server");
-			    }
-			    catch (final Throwable err)
-			    {
-				try
-				{
-				    connect(new Socket(remote, serverport), monitor, peers);
-				    System.err.println("I am connected to remote server");
-				}
-				catch (final Throwable ierr)
-				{
-				    System.err.println("I could not connect to any server");
-				}
-			    }
-			}
-		    };
-	    
-	    threadClient.start();
+ 	else
+        {
+	    final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
+	    final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
+	    connectClient(new Socket(serverhost, serverport), inQueue, outQueue);
+	    handleQueues(inQueue, outQueue);
 	}
     }
     
@@ -166,13 +95,37 @@ public class ConnectionNetworking
      */
     public  PipedOutputStream globalOut;
     
+    /**
+     * All joined players
+     */
+    public HashSet<Player> joinedPlayers;
+    
+    /**
+     * The local player
+     */
+    public Player localPlayer;
+    
     
     
     /**
-     * <p>Creates input and output pipes.</p>
-     * <p>
-     *   The thread calling method "must" be keep alive, otherwise the pipes ({@link #globalIn} and {@link #globalOut}) breaks.
-     * </p>
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	if (message instanceof LocalPlayer)
+        {   this.localPlayer = ((LocalPlayer)message).player;
+	}
+	else if (message instanceof PlayerJoined)
+	{   this.joinedPlayers.add(((PlayerJoined)message).player);
+	}
+	else if (message instanceof PlayerDropped)
+	{   this.joinedPlayers.remove(((PlayerDropped)message).player);
+	}
+    }
+    
+    
+    /**
+     * Creates input and output pipes
      *
      * @throws  IOException  On I/O error, this should not happen
      */
@@ -241,20 +194,13 @@ public class ConnectionNetworking
     
     
     /**
-     * Starts all threads needed for data transfers
+     * Handles system messaging
      * 
-     * @param  sock     The connected socket
-     * @param  monitor  Peer update monitor, it is shared for all invocation of the method by this instance of this class
-     * @param  peers    Reference array (singleton array) with all peers
-     * 
-     * @throws  IOException  Throws if you are experiencing problems with getting your socket's I/O streams
+     * @param  inQueue   Received system messages
+     * @param  outQueue  Enqueued system messages
      */
-    private void connect(final Socket sock, final Object monitor, final String[] peers) throws IOException
+    private void handleQueues(final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
     {
-	final InputStream in = sock.getInputStream();
-	final OutputStream out = sock.getOutputStream();
-	final Object mutex = new Object();
-	
 	final Thread threadIn = new Thread()
 	        {
 		    /**
@@ -263,18 +209,72 @@ public class ConnectionNetworking
 		    @Override
 		    public void run()
 		    {
-			try
+		    }
+	        };
+
+	
+	final Thread threadOut = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+                    @Override
+		    public void run()
+		    {
+		    }
+	        };
+        
+	
+        threadIn.setDaemon(true);
+        threadOut.setDaemon(true);
+	
+        threadIn.start();
+        threadOut.start();
+    }
+    
+    
+    /**
+     * Connects a client to a server
+     * 
+     * @param  socket    The connect Internet socket
+     * @param  inQueue   Received system messages
+     * @param  outQueue  Enqueued system messages
+     */
+    private void connectClient(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
+    {
+        final InputStream in = socket.getInputStream();
+        final OutputStream out = socket.getOutputStream();
+	final Object mutex = new Object();
+	
+	
+	final Thread threadIn = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+                    @Override
+		    public void run()
+		    {
+			byte[] buf = new byte[128];
+			
+                        try
 			{
 			    for (;;)
 			    {
-				final String oldpeers = peers[0];
-				
-				String newpeers = new String();
-				for (int p; (p = in.read()) != '\n';)
-				    newpeers += (char)p;
-				
-				if (newpeers.isEmpty())
+				int ptr = 0;
+				for (int d; (d = in.read()) != '\n';)
 				{
+				    if (ptr == buf.length)
+				    {
+					final byte[] nbuf = new byte[ptr + 128];
+					System.arraycopy(buf, 0, nbuf, 0, ptr);
+					buf = nbuf;
+				    }
+				    buf[ptr++] = (byte)d;
+				}
+                                
+				if (newpeers.isEmpty())
+			        {
 				    for (int p; (p = in.read()) != 0;)
 				    {
 					if (p == 27)
@@ -283,36 +283,29 @@ public class ConnectionNetworking
 				    }
 				    privateOut.flush();
 				}
-				else
+				else if (ptr > 0)
 				{
-				    synchronized (monitor)
+				    final int off = msg[0] == '+' ? 1 : 0;
+				    final byte[] msg = new byte[ptr];
+				    System.arraycopy(buf, off, msg, 0, ptr - off);
+				    synchronized (inQueue)
 				    {
-					for (int i = 0, n = newpeers.length(); i < n; i++)
-					    if (peers[0].indexOf(newpeers.charAt(i)) < 0)
-						peers[0] += newpeers.charAt(i);
-					
-					if (peers[0].equals(oldpeers) == false)
-					{
-					    System.err.println("I can send to: " + peers[0]);
-					    
-					    monitor.notify();
-					}
+					if (off == 0)
+					    inQueue.offerFirst(msg);
+					else
+					    inQueue.offerLast(msg);
+					inQueue.notifyAll();
 				    }
 				}
 			    }
 			}
-			catch (final IOException err)
+                        catch (final Exception err)
 			{
-			    synchronized (ConnectionNetworking.this)
-			    {
-				System.err.print("\033[31m");
-				System.err.println("error: IOException");
-				err.printStackTrace(System.err);
-				System.err.print("\033[0m");
-			    }
+			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
 			}
 		    }
 	        };
+	
 	
 	final Thread threadSysOut = new Thread()
 	        {
@@ -324,51 +317,37 @@ public class ConnectionNetworking
 		    {
 			try
 			{
-			    synchronized (monitor)
-			    {
-				for (;;)
+			    for (;;)
+				synchronized (outQueue)
 				{
+				    if (outQueue.isEmpty())
+					outQueue.wait();
+				    final byte[] data = outQueue.pollFirst();
 				    synchronized (mutex)
 				    {
-					for (int i = 0, n = peers[0].length(); i < n; i++)
-					    out.write(peers[0].charAt(i));
+					out.write(data);
 					out.write('\n');
 					out.flush();
 				    }
-				    
-				    monitor.wait();
 				}
-			    }
 			}
-			catch (final InterruptedException err)
-			{
-			    synchronized (ConnectionNetworking.this)
-			    {
-				System.err.println("error: InterruptedException");
-			    }
-			}
-			catch (final IOException err)
-			{
-			    synchronized (ConnectionNetworking.this)
-			    {
-				System.err.print("\033[33m");
-				System.err.println("error: IOException");
-				err.printStackTrace(System.err);
-				System.err.print("\033[0m");
-			    }
+                        catch (final Throwable err)
+		        {
+			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
 			}
 		    }
 	        };
+
 	
 	final Thread threadMsgOut = new Thread()
 	        {
 		    /**
 		     * {@inheritDoc}
 		     */
-		    @Override
+                    @Override
 		    public void run()
 		    {
-			try
+                        try
 			{
 			    for (;;)
 			    {
@@ -390,22 +369,21 @@ public class ConnectionNetworking
 				}
 			    }
 			}
-			catch (final IOException err)
+                        catch (final Throwable err)
 			{
-			    synchronized (ConnectionNetworking.this)
-			    {
-				System.err.print("\033[35m");
-				System.err.println("error: IOException");
-				err.printStackTrace(System.err);
-				System.err.print("\033[0m");
-			    }
+			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
 			}
 		    }
 	        };
+        
 	
-	threadIn.start();      // Socket input reading thread
-	threadSysOut.start();  // Peer update socket output thread
-	threadMsgOut.start();  // Message sending socket outout and reading pipe input thread
+        threadIn.setDaemon(true);
+        threadSysOut.setDaemon(true);
+        threadMsgOut.setDaemon(true);
+	
+        threadIn.start();
+        threadSysOut.start();
+        threadMsgOut.start();
     }
     
 }
