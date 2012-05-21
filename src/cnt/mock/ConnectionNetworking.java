@@ -22,7 +22,7 @@ import java.util.*;
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ConnectionNetworking import Blackboard.BlackboardOberserver
+public class ConnectionNetworking implements Blackboard.BlackboardObserver
 {
     /**
      * Constructor
@@ -42,8 +42,10 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 	
 	if (server)
 	{
-	    final Vector<ArrayDeque<byte[]>> outQueues = new Vector<ArrayDeque<byte[]>>()
-	    final ServerSocket sock = new ServerSocket(serverhost, serverport);
+	    final Vector<OutputStream> streams = new Vector<OutputStream>();
+	    mux(this.privateIn, streams);
+	    final Vector<ArrayDeque<byte[]>> outQueues = new Vector<ArrayDeque<byte[]>>();
+	    final ServerSocket sock = new ServerSocket(serverport);
 	    final Thread socketThread = new Thread()
 	            {
 			/**
@@ -53,16 +55,32 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			public void run()
 			{
 			    for (;;)
-			    {
-				final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
-				final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
-				synchronized (outQueues)
+				try
 				{
-				    outQueues.add(outQueue);
+				    final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
+				    final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
+				    synchronized (outQueues)
+				    {
+					outQueues.add(outQueue);
+				    }
+				    
+				    
+				    final PipedInputStream cin = new PipedInputStream();
+				    final PipedOutputStream cout = new PipedOutputStream(cin);
+				    synchronized (streams)
+				    {
+					streams.add(cout);
+				    }
+				    
+				    connectServer(sock.accept(), inQueue, outQueue, cin);
+				    handleQueues(inQueue, outQueues);
 				}
-				connectServer(sock.accept());
-				handleQueues(inQueue, outQueues);
-			    }
+				catch (final Throwable err)
+				{
+				    if (ConnectionNetworking.this.localPlayer != null)
+					Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
+				    return;
+				}
 			}
 	            };
 	    
@@ -220,10 +238,17 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			    synchronized (inQueue)
 			    {
 				if (inQueue.isEmpty())
-				    inQueue.wait();
+				    try
+				    {
+					inQueue.wait();
+				    }
+				    catch (final InterruptedException err)
+				    {
+					return;
+				    }
 				message = inQueue.pollFirst();
 			    }
-			    final byte[] message = ConnectionNetworking.this.getAnswer(message)
+			    final byte[] answer = ConnectionNetworking.this.getAnswer(message);
 			    if (answer != null)
 				synchronized (outQueue)
 				{
@@ -262,10 +287,17 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			    synchronized (inQueue)
 			    {
 				if (inQueue.isEmpty())
-				    inQueue.wait();
+				    try
+				    {
+					inQueue.wait();
+				    }
+				    catch (final InterruptedException err)
+				    {
+					return;
+				    }
 				message = inQueue.pollFirst();
 			    }
-			    final byte[] message = ConnectionNetworking.this.getAnswer(message)
+			    final byte[] answer = ConnectionNetworking.this.getAnswer(message);
 			    if (answer != null)
 				synchronized (outQueues)
 				{
@@ -286,16 +318,80 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
     }
     
     
+    
+    /**
+     * Multiplexes a stream
+     * 
+     * @param  origin   Stream to mux
+     * @param  streams  mux ends
+     */
+    private void mux(final InputStream origin, final Vector<OutputStream> streams)
+    {
+	final Thread thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			final ArrayDeque<OutputStream> crashed = new ArrayDeque<OutputStream>();
+			for (;;)
+			{
+			    final int d;
+			    synchronized (origin)
+			    {
+				try
+				{
+				    d = origin.read();
+				}
+				catch (final Throwable err)
+				{
+				    if (ConnectionNetworking.this.localPlayer != null)
+					Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
+				    return;
+				}
+			    }
+			    if (d < 0)
+				break;
+			    synchronized (streams)
+			    {
+				for (final OutputStream stream : streams)
+				    try
+				    {
+					stream.write(d);
+				    }
+				    catch (final Throwable err)
+				    {
+					crashed.offerLast(stream);
+				    }
+				
+				OutputStream crash;
+				while ((crash = crashed.pollLast()) != null)
+				    streams.remove(crash);
+			    }
+			}
+		    }
+	        };
+
+	
+        thread.setDaemon(true);
+        thread.start();
+    }
+    
+    
     /**
      * Connects a server to a client
      * 
      * @param  socket    The connect Internet socket
      * @param  inQueue   Received system messages
      * @param  outQueue  Enqueued system messages
+     * @param  cin       The clients mux:ed input stream
+     * 
+     * @thorws  IOException  On piping error
      */
-    private void connectServer(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
+    private void connectServer(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue, final InputStream cin) throws IOException
     {
-	final InputStream cin = this.privateIn;  //FIXME multiplex!
 	connect(socket, inQueue, outQueue, cin, this.privateOut, null);
     }
     
@@ -306,8 +402,10 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
      * @param  socket    The connect Internet socket
      * @param  inQueue   Received system messages
      * @param  outQueue  Enqueued system messages
+     * 
+     * @thorws  IOException  On piping error
      */
-    private void connectClient(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
+    private void connectClient(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue) throws IOException
     {
 	connect(socket, inQueue, outQueue, this.privateIn, this.privateOut, this.localPlayer);
     }
@@ -322,8 +420,10 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
      * @param  cin       The client's private message input stream
      * @param  cout      The client's private message output stream
      * @param  player    The player how droppes if the connection dies
+     * 
+     * @thorws  IOException  On piping error
      */
-    private void connect(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue, final InputStream cin, final OutputStream cout, final Player player)
+    private void connect(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue, final InputStream cin, final OutputStream cout, final Player player) throws IOException
     {
         final InputStream in = socket.getInputStream();
         final OutputStream out = socket.getOutputStream();
@@ -357,7 +457,7 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 				    buf[ptr++] = (byte)d;
 				}
                                 
-				if (newpeers.isEmpty())
+				if (ptr == 0)
 			        {
 				    for (int p; (p = in.read()) != 0;)
 				    {
@@ -369,7 +469,7 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 				}
 				else if (ptr > 0)
 				{
-				    final int off = msg[0] == '+' ? 1 : 0;
+				    final int off = buf[0] == '+' ? 1 : 0;
 				    final byte[] msg = new byte[ptr];
 				    System.arraycopy(buf, off, msg, 0, ptr - off);
 				    synchronized (inQueue)
