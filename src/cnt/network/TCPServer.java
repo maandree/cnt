@@ -70,9 +70,9 @@ public class TCPServer implements Runnable
 				// TODO: make some error handling happen
 			}
 
-			TCPReciver reciver = new TCPReciver(in_conn, this.objectNetworking, this.connectionNetworking);
+			TCPReceiver receiver = new TCPReceiver(in_conn, this.objectNetworking, this.connectionNetworking);
 			
-			Thread t = new Thread(reciver);
+			Thread t = new Thread(receiver);
 			t.start();
 	
 			
