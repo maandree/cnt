@@ -201,7 +201,7 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
      */
     private void handleQueues(final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
     {
-	final Thread threadIn = new Thread()
+	final Thread thread = new Thread()
 	        {
 		    /**
 		     * {@inheritDoc}
@@ -209,27 +209,29 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 		    @Override
 		    public void run()
 		    {
+			for (;;)
+			{
+			    final byte[] message;
+			    synchronized (inQueue)
+			    {
+				if (inQueue.isEmpty())
+				    inQueue.wait();
+				message = inQueue.pollFirst();
+			    }
+			    final byte[] message = ConnectionNetworking.this.getAnswer(message)
+			    if (answer != null)
+				synchronized (outQueue)
+				{
+				    outQueue.pollFirst(answer);
+				    outQueue.notifyAll();
+				}
+			}
 		    }
 	        };
 
 	
-	final Thread threadOut = new Thread()
-	        {
-		    /**
-		     * {@inheritDoc}
-		     */
-                    @Override
-		    public void run()
-		    {
-		    }
-	        };
-        
-	
-        threadIn.setDaemon(true);
-        threadOut.setDaemon(true);
-	
-        threadIn.start();
-        threadOut.start();
+        thread.setDaemon(true);
+        thread.start();
     }
     
     
@@ -384,6 +386,18 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
         threadIn.start();
         threadSysOut.start();
         threadMsgOut.start();
+    }
+    
+    
+    /**
+     * Handles a system message
+     * 
+     * @param   message  The message
+     * @return           Return message, <code>null</code> if none
+     */
+    protected synchronized byte[] getAnswer(final byte[] message)
+    {
+	return null;
     }
     
 }
