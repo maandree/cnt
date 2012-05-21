@@ -17,7 +17,7 @@ cp src/*.png bin/
 cp src/*.png ./
 
 ## the Jars used by cnt
-jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar"
+jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar:lib/libandree.jar"
 
 
 ## java compilor if default is for Java 7

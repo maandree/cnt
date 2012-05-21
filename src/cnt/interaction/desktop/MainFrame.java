@@ -65,6 +65,11 @@ public class MainFrame extends JFrame
     {
 	this.setLayout(new BorderLayout());
 	
+	final StatusPane status = new StatusPane();
+	status.add(new ScoreLabel(), "RIGHT");
+	status.add(new JPanel(), "FILL");
+	status.setPreferredSize(new Dimension(0, 20));
+	
 	final JPanel gamePanel   = new GamePanel();
 	final JPanel playerPanel = new UserList();
 	final JPanel chatPanel   = new ChatPanel();
@@ -72,6 +77,8 @@ public class MainFrame extends JFrame
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
 	
+	
+	this.add(status, BorderLayout.SOUTH);
 	this.add(vSplit, BorderLayout.CENTER);
 	
 	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
