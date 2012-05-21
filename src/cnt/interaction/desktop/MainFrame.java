@@ -51,7 +51,7 @@ public class MainFrame extends JFrame
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO only on demo
 	
 	this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)); //TODO temporary, should depend on screen
-	//TODO use system positioning
+	this.setLocationByPlatform(true);
 	
 	buildInterior();
     }
