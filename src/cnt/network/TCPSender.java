@@ -53,10 +53,15 @@ public class TCPSender implements Runnable
 	
 	public void run()
 	{
-		ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
-		out.flush(); // Program freezes otherwise
-
-		out.writeObject(message);
-		out.flush();
+		try {
+			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
+			out.flush(); // Program freezes otherwise
+	
+			out.writeObject(message);
+			out.flush();
+		} catch (Exception err)
+		{
+			// TODO: get som error handling happen
+		}
 	}
 }	

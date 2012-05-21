@@ -25,10 +25,12 @@ public class GameNetworking
      * Constructor
      * 
      * @param  objectNetworking  The next layer in the protocol stack
+     * @param  blackboardNetworkin The previous layer in the protocol stack
      */
-    public GameNetworking(final ObjectNetworking objectNetworking)
+    public GameNetworking(final BlackboardNetworking blackboardNetworking)
     {
-	this.objectNetworking = objectNetworking;
+	this.blackboardNetworking = blackboardNetworking;
+	this.objectNetworking = new ObjectNetworking(this);
     }
     
     
@@ -37,6 +39,11 @@ public class GameNetworking
      * The next layer in the protocol stack
      */
     private final ObjectNetworking objectNetworking;
+
+    /**
+     * The previous layer in the protocol stack
+     */
+    private final BlackboardNetworking blackboardNetworking;
     
     /**
      * The local player
@@ -89,9 +96,16 @@ public class GameNetworking
      * @throws  IOException             On networking exception
      * @throws  ClassNotFoundException  If the message type is not a part of the program
      */
-    public Serializable receive() throws IOException, ClassNotFoundException
+    public Integer receive(Serializable object)
     {
-        return this.objectNetworking.receive();
+	try 
+	{
+        	return this.blackboardNetworking.receiveAndBroadcast(object);
+	} catch (Exception err)
+	{
+		//TODO: fix error handling
+		return null;
+	}
     }
     
 }

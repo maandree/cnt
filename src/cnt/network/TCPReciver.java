@@ -58,22 +58,35 @@ public class TCPReciver implements Runnable
 
 	public void run()
 	{
-		ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
+		ObjectInputStream input = null;
 		try
 		{
+			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 			// Send message to ObjectNetworking layer, and wait for a ID number to be returned
-			int peer = this.objectNetworking.receive(input.readObject());
+			Integer peer = this.objectNetworking.receive((Serializable)input.readObject());
 			// Take ID and map the connection and peer in ConnectionNetworking
 			this.connectionNetworking.connections.put(peer, this.connection);
 			
 		} catch (IOException ioe) 
 		{
 			// TODO: make some error handling happen
+		} catch (ClassNotFoundException cnfe) 
+		{
+			// TODO: make some error handling happen
 		}
 		Serializable message;
-		while((message = (Serializable)input.readObject()) != null)
+		try 
 		{
-			this.objectNetworking.receive(message);
+			while((message = (Serializable)input.readObject()) != null)
+			{
+				this.objectNetworking.receive(message);
+			}
+		} catch (IOException ioe)
+		{
+			//TODO: make some error handling happen
+		} catch (ClassNotFoundException cnfe)
+		{
+			//TODO: make som error handling happen
 		}
 	}
 }

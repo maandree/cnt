@@ -21,29 +21,26 @@ public class ObjectNetworking
     /**
      * Constructor
      * 
-     * @param  input   Stream for reading from the network
-     * @param  output  Stream for writing to the network
+     * @param  gameNetworking The privous layer in the network stack
      *
-     * @throws  IOException  Thrown if the program fails to set up object input/output network streaming (unlikely)
      */
-    public ObjectNetworking(final InputStream input, final OutputStream output) throws IOException
+    public ObjectNetworking(GameNetworking gameNetworking)
     {
-	this.output = new ObjectOutputStream(new BufferedOutputStream(output));
-	this.output.flush(); //Program freezes otherwise
-	this.input  = new ObjectInputStream(new BufferedInputStream(input));
+	this.gameNetworking = gameNetworking;
+	this.connectionNetworking = new ConnectionNetworking(this);
     }
     
     
     
     /**
-     * Stream for reading from the network
+     * The previous layer in the network stack
      */
-    private final ObjectInputStream input;
-    
+    private final GameNetworking gameNetworking;
+
     /**
-     * Stream for writing to the network
+     * The next layer in the network stack
      */
-    private final ObjectOutputStream output;
+    private final ConnectionNetworking connectionNetworking;
     
     
     
@@ -52,32 +49,31 @@ public class ObjectNetworking
      *
      * @throws  IOException  Thrown if the program fails to send the message
      */
-    public void send(final Serializable object) throws IOException
+    public void send(final Serializable object)
     {
-	this.output.writeObject(object);
-	this.output.flush();
+	this.connectionNetworking.send(object);
     }
     
     /**
      * Sends an object, but does to perform back-referencing
+     * Does the same thing as send()
      *
      * @throws  IOException  Thrown if the program fails to send the message
      */
-    public void sendUnique(final Serializable object) throws IOException
+    public void sendUnique(final Serializable object)
     {
-	this.output.writeUnshared(object);
-	this.output.flush();
+	this.connectionNetworking.send(object);
     }
     
     /**
-     * Sends an object, but does to perform back-referencing
+     * Recive an object,
      *
      * @throws  IOException             Thrown if the program fails to receive data
      * @throws  ClassNotFoundException  Thrown if the received object is not a part of the program
      */
-    public Serializable receive() throws IOException, ClassNotFoundException
+    public Integer receive(Serializable object)
     {
-	return (Serializable)(this.input.readObject());
+	return this.gameNetworking.receive(object);
     }
     
 }
