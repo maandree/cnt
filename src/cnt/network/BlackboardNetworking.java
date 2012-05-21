@@ -8,6 +8,7 @@
 package cnt.network;
 import cnt.messages.*;
 import cnt.*;
+import cnt.game.Player;
 
 import java.util.*;
 import java.io.*;
@@ -23,13 +24,12 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     /**
      * Constructor
      * 
-     * @param  gameNetworking  The next layer the networking stack
      */
-    public BlackboardNetworking(final GameNetworking gameNetworking)
+    public BlackboardNetworking()
     {
-	this.gameNetworking = gameNetworking;
-	
 	Blackboard.registerObserver(this);
+
+	this.gameNetworking = new GameNetworking(this);
     }
     
     
@@ -108,12 +108,20 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
      * @throws  IOException             On networking exception
      * @throws  ClassNotFoundException  In the message type is not a part of the program
      */
-    public void receiveAndBroadcast() throws IOException, ClassNotFoundException
+    public Integer receiveAndBroadcast(final Serializable object) throws IOException, ClassNotFoundException
     {
         final Serializable object = this.gameNetworking.receive();
 	System.err.println("Received forward: " + object);
 	if (object instanceof Blackboard.BlackboardMessage)
 	    broadcastMessage((Blackboard.BlackboardMessage)object);
+            
+	// First message should contain a Player object so we can get a color-number
+	if (object instanceof PlayerJoined) {
+		PlayerJoined message = (PlayerJoined)object;
+		Player _player = message.player;
+		return new Integer(_player.getColor());
+	} else
+		return null;	
     }
     
     /**

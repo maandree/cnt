@@ -1,7 +1,4 @@
-
-	}
-
-	/**
+/**
  * Coop Network Tetris — A cooperative tetris over the Internet.
  * 
  * Copyright Ⓒ 2012  Mattias Andrée, Peyman Eshtiagh,
@@ -13,6 +10,7 @@ package cnt.network;
 
 // Blackboardclass to send messages with
 import cnt.Blackboard;
+import cnt.messages.*;
 
 // Classes needed for UPnP
 import org.teleal.cling.*;
@@ -26,6 +24,7 @@ import org.teleal.cling.support.igd.*;
 import org.teleal.cling.support.igd.callback.*;
 import org.teleal.cling.support.model.*;
 import org.teleal.cling.controlpoint.*;
+import cnt.util.IGDListener;
 
 // Classes needed for TCP sockets
 import java.util.*;
@@ -43,7 +42,7 @@ import java.net.*;
 * @author Calle Lejdbrandt, <a href="callel@kth.se">callel@kth.se</a>
 */
 
-public class ConnectionNetworking implements Runnable
+public class ConnectionNetworking
 {
 
 	/**
@@ -57,16 +56,16 @@ public class ConnectionNetworking implements Runnable
 	* The default constructor. Will try to make any kind of connection.
 	* Order of connection importance (high -&gt; low):
 	* Public TCP -&gt; Local TCP 
+	*</p>
 	* 
-	* @param objectNetworking the instance of the ObjectNetworking class to use
 	*
 	* @throws IOException Thrown in case of network errors.
 	*/
 	public ConnectionNetworking(ObjectNetworking objectNetworking)
 	{
-		// Set the ObjectNetworker to use
-		this.objectNetworker = objectNetworker;
 	
+		this.objectNetworking = objectNetworking;
+
 		// Check if public ip is same as internal ip
 		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
 		if (!getExternalIP().equals(getInternalIP()))
@@ -80,21 +79,49 @@ public class ConnectionNetworking implements Runnable
 			}
 		}
 	}
+	
+	/**
+	* Constructor with non-standard port
+	* <p>
+	* Constructor taking a non-standard port as port to listen on
+	*
+	* @param port port to use as listeningport
+	*
+	* @throws IOException Thrown in case of network errors.
+	*/
+	public ConnectionNetworking(int port, ObjectNetworking objectNetworking) 
+	{
+
+		this.objectNetworking = objectNetworking;
+
+		// Check if public ip is same as internal ip
+		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
+		if (!getExternalIP().equals(getInternalIP()))
+		{
+			if(createPortForward(port))
+			{
+				startTCP(port);
+			} else 
+			{
+				startLokalTCP();
+			}
+		}
+	}
 
 	/**
 	* ObjectNetworker to communicate with
 	*/
-	public final ObjectNetworker objectNetworker;
+	public final ObjectNetworking objectNetworking;
 
 	/**
 	* Public ip. Should not be final since an public ip might change at any time if dynamic
 	*/
-	public Inet4Adress externalIP;
+	public Inet4Address externalIP;
 
 	/**
 	* Lokal ip. Not as probable as Public IP, but same reason.
 	*/
-	public Inet4Adress internalIP;
+	public Inet4Address internalIP;
 
 	/**
 	* Flag to set wheter we can act as a server. I.e. do we have access on public ip?
@@ -102,14 +129,19 @@ public class ConnectionNetworking implements Runnable
 	public boolean isServer;
 
 	/**
-	* List of peers in cloud. Needs to be able to be access from packet, but doesn't need to be public.
+	* Map of current threaded connections to use to store connections
 	*/
-	final ACDLinkedList<T> peers = new ACDLinkedList<T>();
+	final HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
 
 	/**
-	* Map of current threaded connections to use if we are in lokal mode
+	* The time when we last updated our external ip. Provider ask us not to do so more then every 5min/host.
 	*/
-	final HashMap<T, Socket> connections = new HashMap<T, Socket>();
+	private Date lastUpdate;
+
+	/**
+	* The UPnP RemoteService being used for UPnP devices. 
+	*/
+	private UpnpService upnpService;
 
 	/**
 	* Make a TCP serversocket to listen on incoming connections
@@ -118,18 +150,19 @@ public class ConnectionNetworking implements Runnable
 	*/
 	private void startTCP(int port) 
 	{
+		ServerSocket _server = null;
 		try {
-			ServerSocket _server = new ServerSocket(port);
+			_server = new ServerSocket(port);
 		} catch (IOException err) 
 		{
-			Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Error: Cannot listen to port. Port is busy. Is another game instance running?"));
-			return
+			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Cannot listen to port. Port is busy. Is another game instance running?"));
+			return;
 		}
 		
 		this.isServer = true;
 		
-		final Thread serverThread = new Thread(new TCPServer(_server, this.objectNetworker, this);
-		serverThread.setDaemon(false);
+		final Thread serverThread = new Thread(new TCPServer(_server, this.objectNetworking, this));
+		serverThread.setDaemon(true);
 		serverThread.start();
 	}
 
@@ -140,29 +173,27 @@ public class ConnectionNetworking implements Runnable
 	{
 		this.isServer = false;
 		
-		Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Running in local mode. Needs access to at least one server in cloud."));
+		Blackboard.broadcastMessage(new SystemMessage(null, "Running in local mode. Needs access to at least one server in cloud."));
 		
-		// TODO: Start new thread that checks all live connections as they are connected and saved
+		// Do nothing else, we can only use outgoing connections
 	}
 	
 	/**
 	* Makes a connection to specefied IP and port
 	*
-	* @param host an Inet4Adress to connect to
+	* @param host an Inet4Address to connect to
 	* @param port an int to use as portnumber
+	* @param peer the peer to map the connection to
 	*
 	* @return <code>Socket</code> on successfull connection. <code>null</code> otherwise.
 	*/
-	private final Socket connect(Inet4Adress host, int port, ListNode<T> peer)
+	public final Socket connect(Inet4Address host, int port, int peer)
 	{
+		Socket connection = null;
 		try {
-			Socket connection = new Socket(host, port);
+			connection = new Socket(host, port);
 		} catch (IOException err) 
 		{
-			return null;
-		} catch (UnknownHostException uhe)
-		{
-			Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Unknown host: " + host.getCanonicalHostName() + "(" + host.getHostAdress() + ")"));
 			return null;
 		}
 		
@@ -177,15 +208,10 @@ public class ConnectionNetworking implements Runnable
 	*
 	* @param message Serialized object to send as message
 	*/
-	public void send(Serialized message)
+	public void send(Serializable message)
 	{
-		// number of remote clients we managed to send the message to
-		int numSent = 0;
-		// number of known failures
-		int numError = 0;
 
-
-		if (this.peers != null && this.peers.isEmpty() == false)
+		if (this.connections != null && this.connections.isEmpty() == false)
 		{
 			/**
 			* Create a arraylist of threads so we can start sending messages
@@ -196,46 +222,168 @@ public class ConnectionNetworking implements Runnable
 			*/
 			ArrayList<Thread> _threads = new ArrayList<Thread>();
 	
-			for (ListNode<T> peer : this.peers)
+			for (int peer : this.connections.keySet())
 			{
-				try 
-				{
-					// Always check to see if we have live connections. 
-					if (this.connections.containsKey(peer.getItem()))
-					{
 						
-						Thread _tmpThread = new Thread(new threadStreamer(this.connections.get(perr.getItem()), peer.getItem().getID(),  message));
-						_tmpThread.start();
-						_threads.add(_tmpThread);
+				try
+				{
+					TCPSender _sender = new TCPSender(this.connections.get(peer), message);
+					Thread _tmpThread = new Thread(_sender);
+					_tmpThread.start();
+					_threads.add(_tmpThread);
+				
+				} catch (IOException ioe)
+				{
+					Socket dead_socket = this.connections.get(peer);
+					this.connections.remove(peer);	
+					Socket _socket = this.connect((Inet4Address)dead_socket.getInetAddress(), dead_socket.getPort(), peer);
+					if (_socket != null)
+					{
+						try
+						{
+							TCPSender _sender = new TCPSender(_socket, message);
+							Thread _tmpThread = new Thread(_sender);
+                                        	        _tmpThread.start();
+                                        	        _threads.add(_tmpThread);
+						} catch (IOException sec_ioe) 
+						{
+							//TODO: Change to correct BlackboardMessage to send a PlayerDroped message
+							Blackboard.broadcastMessage(new SystemMessage(null, "Error sending [ " + message + " ] to " + peer));
+						}
 					} else
 					{
-						
-						Thread _tmpThread = new Thread(new threadStreamer(connect(Inet4Adress.getByHost(peer.getItem().getHost()), peer.getItem().getPort(), peer), peer.getItem().getID(), message));
-						_tmpThread.start();
-						_threads.add(_tmpThread);
+						//TODO: Change to correct BlackboardMessage to send a PlayerDroped message
+						Blackboard.broadcastMessage(new SystemMessage(null, "Error sending [ " + message + " ] to " + peer));
 					}
-				} catch (Exception err)
-				{
-					numError++;
-					Blackboard.broadcastMessage(new Blackboard.SystemMessage(null, null, "Error sending [ " + message + " ] to " + peer.getItem().getName()));
 				}
+			}
+		}
+	}
+		
+	/**
+	* Retrive the internatl IP from the local host.
+	*
+	* Sets the local ip, and also returns it as a Inet4Address object.
+	*
+	* @return internal ip
+	*/
+	private final Inet4Address getInternalIP()
+	{
+		try
+		{
+			this.internalIP = (Inet4Address)Inet4Address.getLocalHost();
+		} catch (UnknownHostException uhe)
+		{
+			this.internalIP = null;
+		}
+
+		return this.internalIP;
+	}
+	
+	/**
+	* Retrives the external ip adress by adress lookup.
+	*
+	* Lookups the external ip for the host. Uses a cache and only does lookups every 5min.
+	*
+	* @return external ip
+	*/
+	private Inet4Address getExternalIP()
+	{
+		Date current = new Date();
+		// 300'000 seconds = 5 minutes. note parantecis is more for clarity then function
+		if ((this.externalIP != null) && (this.lastUpdate != null) && (current.getTime() < (this.lastUpdate.getTime() + 300000)))
+			return this.externalIP;	
+		else
+		{
+			try {
+				URL whatismyip = new URL("http://automation.whatismyip.com/n09230945.asp");
+				BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+				
+				String ip = in.readLine();
+				in.close();
+		
+				this.externalIP = (Inet4Address)Inet4Address.getByName(ip);
+				return this.externalIP;
+
+			} catch (Exception err)
+			{
+				this.externalIP = null;
+				Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external ip"));
+				return null;
 			}
 			
-			// Loop thrue the arraylist with threads until all threads are done
-			while(true)
-			{
-				boolean done = false;
-				for (Thread current : (Thread)_threads)
-				{
-					if (current.isAlive() == true)
-						done = true;
-					else
-						numSent++;
-						_threads.
-				}
-				
-				if (done)
-					break;
-			}
+		}
+	}
 
-			// TODO: Do the checking if all clients got the message. Also to make "server" by makeing a thread that checks all live connections if we are lokal
+	/**
+	* Tries to find any UPNP enabled device that is a Internet Gateway Device.
+	* If found a portforward, try to make a portforward.
+	*
+	* @param port the port to be forwarded
+	*
+	* @return returns <code>true</code> on succes, <code>false</code> other whise.
+	*/
+	private boolean createPortForward(int port)
+	{
+		// NOTE: This UPNP implementation is multithreaded. 
+		// Any Device is found asynchronously.
+
+		// monitor object to be used for the search for a device
+		Object monitor = new Object();
+
+		this.upnpService = new UpnpServiceImpl();
+
+		//The IGDListener class is custom made and resides in util
+		this.upnpService.getRegistry().addListener(new IGDListener(upnpService, monitor, port));
+		// Set the service we want to search for (makes MUCH less network congestion if network has many UPnP devices)
+		ServiceType _type = new UDAServiceType("WANIPConnection");
+
+		//Initiate a standard search
+		this.upnpService.getControlPoint().search(new ServiceTypeHeader(_type));
+		try
+		{
+			// Devices are discovered asynchronously, but should be faster then 5 sec.
+			monitor.wait(5000);
+		} catch (InterruptedException ie)
+		{
+			// {ignore and continue}
+		}
+		
+		// If we found the correct device, we have also made a PortForardd. 
+		// If no PortForward could be done, device is removed before this check. 
+		// Probably... depending on timeout and asymchronous behaviour.
+		if (this.upnpService.getRegistry().getDevices(_type).size() > 0)
+			return true;
+		else
+			return false;
+		
+	}
+	
+	/**
+	* Removes the portforwaring on any UPnP device that was discovered during startup connecting
+	*
+	*/
+	private void removePortForward()
+	{
+		// Monitor object - see createPortForward
+		Object monitor = new Object();
+
+		// RemoteService we are interested in - see createPortForward
+		ServiceType _type = new UDAServiceType("WANIPConnection");
+		
+		// Se if we actually have a UpnpService and devices
+		if (this.upnpService != null && this.upnpService.getRegistry().getDevices(_type).size() > 0)
+		{
+			// For all IGDs, remove portmappings
+			for (RemoteDevice device : (RemoteDevice[])this.upnpService.getRegistry().getDevices(_type).toArray())
+			{
+				RemoteService portMap = device.findService(_type);
+				// This retrives the IGDListener instances and executes demapPort()
+				// the iterator is needed as it's unknown what kind of collection is retrived from Cling
+				
+				IGDListener _listener = (IGDListener)this.upnpService.getRegistry().getListeners().iterator().next();
+				_listener.demapPort(portMap, this.upnpService.getRegistry(), device);
+			}
+		}
+	}	
+}
