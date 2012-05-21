@@ -6,8 +6,10 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.network.Diagnostics;
 
 import javax.swing.*;
+import javax.swing.tree.*;
 import java.awt.*;
 
 
@@ -44,6 +46,49 @@ public class NetworkDialogue extends JDialog
      */
     private void buildInterior()
     {
+	this.setLayout(new BorderLayout());
+	
+	String data = Diagnostics.run();
+	
+	if (data.endsWith("\n"))
+	    data = data.substring(0, data.length());
+	String lines[] = data.split("\n");
+	final DefaultMutableTreeNode[] stack = new DefaultMutableTreeNode[lines.length];
+	int ptr = 0;
+	stack[ptr] = new DefaultMutableTreeNode("Diagnostics", true);
+	int indent = -1;
+	for (final String line : lines)
+	{
+	    int ind = 0;
+	    while (line.charAt(ind) == ' ')
+		ind++;
+	    
+	    final DefaultMutableTreeNode node = new DefaultMutableTreeNode(line.substring(ind), true);
+	    if (ind > indent)
+	    {
+		stack[ptr].add(node);
+		stack[++ptr] = node;
+	    }
+	    else if (ind == indent)
+	    {
+		stack[--ptr].add(node);
+		stack[++ptr] = node;
+	    }
+	    else
+	    {
+		ptr -= indent - ind;
+		indent -= indent - ind;
+		stack[--ptr].add(node);
+		stack[++ptr] = node;
+	    }
+	    indent = ind;
+	}
+	
+	
+	final JTree tree = new JTree();
+	((DefaultTreeModel)(tree.getModel())).setRoot(stack[0]);
+	final JScrollPane scrolls = new JScrollPane(tree);
+	this.add(scrolls, BorderLayout.CENTER);
     }
     
 }
