@@ -24,7 +24,7 @@ import java.net.*;
 * 
 * @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
-public class TCPReciver implements Runnable
+public class TCPReceiver implements Runnable
 {
 	/**
 	* Constructor - takes the incoming connection and an instance of ObjectNetworking and an instance of ConnectionNetworking
@@ -33,7 +33,7 @@ public class TCPReciver implements Runnable
 	* @param objectNetworking the ObjectNetworking instance to use for callback
 	* @param connectionNetworking the ConnectionNetworking instace to map peer and socket in
 	*/
-	public TCPReciver(Socket connection, ObjectNetworking objectNetworking, ConnectionNetworking connectionNetworking)
+	public TCPReceiver(Socket connection, ObjectNetworking objectNetworking, ConnectionNetworking connectionNetworking)
 	{
 		this.connection = connection;
 		this.objectNetworking = objectNetworking;
