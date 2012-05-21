@@ -75,7 +75,7 @@ public class ConnectionNetworking
 				startTCP(ConnectionNetworking.PORT);
 			} else 
 			{
-				startLokalTCP();
+				startLocalTCP();
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class ConnectionNetworking
 				startTCP(port);
 			} else 
 			{
-				startLokalTCP();
+				startLocalTCP();
 			}
 		}
 	}
@@ -119,7 +119,7 @@ public class ConnectionNetworking
 	public Inet4Address externalIP;
 
 	/**
-	* Lokal ip. Not as probable as Public IP, but same reason.
+	* Local ip. Not as probable as Public IP, but same reason.
 	*/
 	public Inet4Address internalIP;
 
@@ -167,9 +167,9 @@ public class ConnectionNetworking
 	}
 
 	/**
-	* Setup the client to be running lokaly. Without PublicIP or NAT.
+	* Setup the client to be running locally. Without PublicIP or NAT.
 	*/
-	private void startLokalTCP()
+	private void startLocalTCP()
 	{
 		this.isServer = false;
 		
@@ -296,19 +296,13 @@ public class ConnectionNetworking
 		else
 		{
 			try {
-				URL whatismyip = new URL("http://automation.whatismyip.com/n09230945.asp");
-				BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-				
-				String ip = in.readLine();
-				in.close();
-		
-				this.externalIP = (Inet4Address)Inet4Address.getByName(ip);
+			        this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
 				return this.externalIP;
 
 			} catch (Exception err)
 			{
 				this.externalIP = null;
-				Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external ip"));
+				Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external IP address:" + err));
 				return null;
 			}
 			

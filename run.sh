@@ -75,8 +75,10 @@ elif [[ $1 = "--completion--" ]]; then
 	if [[ "$prev" = "engine" ]]; then
 	    COMPREPLY=( $( compgen -W 'clockwise anti-clockwise' -- "$cur" ) )
 	else
-	    COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat' -- "$cur" ) \
-		        $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
+	    #COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat' -- "$cur" ) \
+	    #            $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
+	    
+	    COMPREPLY=( $( compgen -W 'main main-da engine frame chat upnp shape pipe linkedlist game repaly peergame' -- "$cur" ) )
 	fi
     }
     
