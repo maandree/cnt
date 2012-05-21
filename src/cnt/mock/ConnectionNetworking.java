@@ -42,8 +42,9 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	if (server)
 	{
-	    final Vector<OutputStream> streams = new Vector<OutputStream>();
-	    mux(this.privateIn, streams);
+	    this.outs = new Vector<OutputStream>();
+	    final Vector<OutputStream> istreams = new Vector<OutputStream>();
+	    mux(new BufferedInputStream(this.privateIn), istreams);
 	    final Vector<ArrayDeque<byte[]>> outQueues = new Vector<ArrayDeque<byte[]>>();
 	    final ServerSocket sock = new ServerSocket(serverport);
 	    final Thread socketThread = new Thread()
@@ -65,14 +66,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 				    }
 				    
 				    
-				    final PipedInputStream cin = new PipedInputStream();
-				    final PipedOutputStream cout = new PipedOutputStream(cin);
-				    synchronized (streams)
+				    final PipedInputStream iin = new PipedInputStream();
+				    final PipedOutputStream iout = new PipedOutputStream(iin);
+				    synchronized (istreams)
 				    {
-					streams.add(cout);
+					istreams.add(new BufferedOutputStream(iout));
 				    }
 				    
-				    connectServer(sock.accept(), inQueue, outQueue, cin);
+				    connectServer(sock.accept(), inQueue, outQueue, new BufferedInputStream(iin));
 				    handleQueues(inQueue, outQueues);
 				}
 				catch (final Throwable err)
@@ -89,6 +90,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	}
  	else
         {
+	    this.outs = null;
 	    final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
 	    final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
 	    connectClient(new Socket(serverhost, serverport), inQueue, outQueue);
@@ -121,12 +123,17 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * All joined players
      */
-    public HashSet<Player> joinedPlayers;
+    protected final HashSet<Player> joinedPlayers = new HashSet<Player>();
     
     /**
      * The local player
      */
-    public Player localPlayer;
+    protected Player localPlayer = null;
+    
+    /**
+     * Output streams for the server's clients
+     */
+    protected final Vector<OutputStream> outs;
     
     
     
@@ -172,7 +179,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    {
 			//* This is important *//
 			for (int i = off, n = off + len; i < n; i++)
-			    write((int)(data[i]) < 0 ? (256 + (int)(data[i])) : (int)(data[i]));
+			    write((int)(data[i]) & 255);
 		    }
 		    
 		    /**
@@ -338,12 +345,20 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 			final ArrayDeque<OutputStream> crashed = new ArrayDeque<OutputStream>();
 			for (;;)
 			{
-			    final int d;
+			    final byte[] data;
+			    int len;
 			    synchronized (origin)
 			    {
 				try
 				{
-				    d = origin.read();
+				    len = origin.available();
+				    while (len == 0)
+				    {
+				        Thread.sleep(50);
+					len = origin.available();
+				    }
+				    data = new byte[len];
+				    len = origin.read(data, 0, len);
 				}
 				catch (final Throwable err)
 				{
@@ -352,14 +367,13 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 				    return;
 				}
 			    }
-			    if (d < 0)
-				break;
 			    synchronized (streams)
 			    {
 				for (final OutputStream stream : streams)
 				    try
 				    {
-					stream.write(d);
+					stream.write(data, 0, len);
+					stream.flush();
 				    }
 				    catch (final Throwable err)
 				    {
@@ -425,10 +439,103 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      */
     private void connect(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue, final InputStream cin, final OutputStream cout, final Player player) throws IOException
     {
-        final InputStream in = socket.getInputStream();
+        final InputStream sin = socket.getInputStream();
         final OutputStream out = socket.getOutputStream();
 	final Object mutex = new Object();
 	final Player[] cplayer = { player };
+	
+	if (this.outs != null)
+	    synchronized (this.outs)
+	    {
+		this.outs.add(out);
+	    }
+	
+	final InputStream in;
+	class MyInputStream extends InputStream
+	{
+	    /**
+	     * Initialiser
+	     */
+	    {
+		final Thread thread = new Thread()
+		        {
+			    /**
+			     * {@inheritDoc}
+			     */
+			    @Override
+			    public void run()
+			    {
+				try
+				{
+				    for (;;)
+					synchronized (MyInputStream.this)
+					{
+					    MyInputStream.this.wait();
+					    synchronized (ConnectionNetworking.this.outs)
+					    {
+						for (final OutputStream os : ConnectionNetworking.this.outs)
+						    if (os != out)
+						    {
+							os.write(MyInputStream.this.buf, 0, MyInputStream.this.ptr);
+							os.flush();
+						    }
+					    }
+					    MyInputStream.this.ptr = 0;
+					}
+				}
+				catch (final Throwable err)
+				{
+				    System.err.println(err);
+				    return;
+				}
+			    }
+		        };
+		thread.setDaemon(true);
+		thread.start();
+	    }
+	    
+	    
+	    
+	    /**
+	     * Forward buffer
+	     */
+	    byte[] buf = new byte[128];
+	    
+	    /**
+	     * Forward pointer
+	     */
+	    int ptr = 0;
+	    
+	    
+	    
+	    /**
+	     * {@inheritDoc}
+	     */
+	    public int available() throws IOException
+	    {
+		return sin.available();
+	    }
+	    
+	    /**
+	     * {@inheritDoc}
+	     */
+	    public int read() throws IOException
+	    {
+		final int b = sin.read();
+		synchronized (this)
+		{
+		    if (this.ptr == this.buf.length)
+		    {
+			final byte[] nbuf = new byte[this.ptr + 128];
+			System.arraycopy(this.buf, 0, nbuf, 0, this.ptr);
+			this.buf = nbuf;
+		    }
+		    this.buf[this.ptr++] = (byte)b;
+		}
+		return b;
+	    }
+	}
+	in = this.outs == null ? sin : new MyInputStream();
 	
 	
 	final Thread threadIn = new Thread()
@@ -481,6 +588,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 					inQueue.notifyAll();
 				    }
 				}
+				in.notify();
 			    }
 			}
                         catch (final Exception err)
@@ -513,12 +621,13 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 				    if (outQueue.isEmpty())
 					outQueue.wait();
 				    final byte[] data = outQueue.pollFirst();
-				    synchronized (mutex)
-				    {
-					out.write(data);
-					out.write('\n');
-					out.flush();
-				    }
+				    if ((data != null) && (data.length > 0))
+					synchronized (mutex)
+					{
+					    out.write(data);
+					    out.write('\n');
+					    out.flush();
+					}
 				}
 			}
                         catch (final Throwable err)
