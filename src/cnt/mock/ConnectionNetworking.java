@@ -42,6 +42,7 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 	
 	if (server)
 	{
+	    final Vector<ArrayDeque<byte[]>> outQueues = new Vector<ArrayDeque<byte[]>>()
 	    final ServerSocket sock = new ServerSocket(serverhost, serverport);
 	    final Thread socketThread = new Thread()
 	            {
@@ -55,8 +56,12 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			    {
 				final ArrayDeque<byte[]> inQueue = new ArrayDeque<byte[]>();
 				final ArrayDeque<byte[]> outQueue = new ArrayDeque<byte[]>();
+				synchronized (outQueues)
+				{
+				    outQueues.add(outQueue);
+				}
 				connectServer(sock.accept());
-				handleQueues(inQueue, outQueue);
+				handleQueues(inQueue, outQueues);
 			    }
 			}
 	            };
@@ -222,7 +227,7 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			    if (answer != null)
 				synchronized (outQueue)
 				{
-				    outQueue.pollFirst(answer);
+				    outQueue.offerLast(answer);
 				    outQueue.notifyAll();
 				}
 			}
@@ -236,6 +241,66 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
     
     
     /**
+     * Handles system messaging
+     * 
+     * @param  inQueue s  Received system messages
+     * @param  outQueues  Enqueued system messages
+     */
+    private void handleQueues(final ArrayDeque<byte[]> inQueue, final Vector<ArrayDeque<byte[]>> outQueues)
+    {
+	final Thread thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			for (;;)
+			{
+			    final byte[] message;
+			    synchronized (inQueue)
+			    {
+				if (inQueue.isEmpty())
+				    inQueue.wait();
+				message = inQueue.pollFirst();
+			    }
+			    final byte[] message = ConnectionNetworking.this.getAnswer(message)
+			    if (answer != null)
+				synchronized (outQueues)
+				{
+				    for (final ArrayDeque<byte[]> outQueue : outQueues)
+					synchronized (outQueue)
+					{
+					    outQueue.offerLast(answer);
+					    outQueue.notifyAll();
+					}
+				}
+			}
+		    }
+	        };
+
+	
+        thread.setDaemon(true);
+        thread.start();
+    }
+    
+    
+    /**
+     * Connects a server to a client
+     * 
+     * @param  socket    The connect Internet socket
+     * @param  inQueue   Received system messages
+     * @param  outQueue  Enqueued system messages
+     */
+    private void connectServer(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
+    {
+	final InputStream cin = this.privateIn;  //FIXME multiplex!
+	connect(socket, inQueue, outQueue, cin, this.privateOut, null);
+    }
+    
+    
+    /**
      * Connects a client to a server
      * 
      * @param  socket    The connect Internet socket
@@ -244,9 +309,26 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
      */
     private void connectClient(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue)
     {
+	connect(socket, inQueue, outQueue, this.privateIn, this.privateOut, this.localPlayer);
+    }
+    
+    
+    /**
+     * Connects to a peer
+     * 
+     * @param  socket    The connect Internet socket
+     * @param  inQueue   Received system messages
+     * @param  outQueue  Enqueued system messages
+     * @param  cin       The client's private message input stream
+     * @param  cout      The client's private message output stream
+     * @param  player    The player how droppes if the connection dies
+     */
+    private void connect(final Socket socket, final ArrayDeque<byte[]> inQueue, final ArrayDeque<byte[]> outQueue, final InputStream cin, final OutputStream cout, final Player player)
+    {
         final InputStream in = socket.getInputStream();
         final OutputStream out = socket.getOutputStream();
 	final Object mutex = new Object();
+	final Player[] cplayer = { player };
 	
 	
 	final Thread threadIn = new Thread()
@@ -281,9 +363,9 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 				    {
 					if (p == 27)
 					    p = in.read();
-					privateOut.write(p);
+					cout.write(p);
 				    }
-				    privateOut.flush();
+				    cout.flush();
 				}
 				else if (ptr > 0)
 				{
@@ -303,7 +385,13 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			}
                         catch (final Exception err)
 			{
-			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
+			    synchronized (cplayer)
+			    {
+				if (cplayer[0] == null)
+				    return;
+				Blackboard.broadcastMessage(new PlayerDropped(cplayer[0]));
+				cplayer[0] = null;
+			    }
 			}
 		    }
 	        };
@@ -335,7 +423,13 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			}
                         catch (final Throwable err)
 		        {
-			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
+			    synchronized (cplayer)
+			    {
+				if (cplayer[0] == null)
+				    return;
+				Blackboard.broadcastMessage(new PlayerDropped(cplayer[0]));
+				cplayer[0] = null;
+			    }
 			}
 		    }
 	        };
@@ -353,15 +447,15 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			{
 			    for (;;)
 			    {
-				int p = privateIn.read();
+				int p = cin.read();
 				synchronized (mutex)
 				{
 				    out.write(p);
-				    while ((p = privateIn.read()) != -1)
+				    while ((p = cin.read()) != -1)
 				    {
 					out.write(p);
 					if (p == 27)
-					    out.write(privateIn.read());
+					    out.write(cin.read());
 					else if (p == 0)
 					{
 					    out.flush();
@@ -373,7 +467,13 @@ public class ConnectionNetworking import Blackboard.BlackboardOberserver
 			}
                         catch (final Throwable err)
 			{
-			    Blackboard.broadcastMessage(new PlayerDropped(ConnectionNetworking.this.localPlayer));
+			    synchronized (cplayer)
+			    {
+				if (cplayer[0] == null)
+				    return;
+				Blackboard.broadcastMessage(new PlayerDropped(cplayer[0]));
+				cplayer[0] = null;
+			    }
 			}
 		    }
 	        };
