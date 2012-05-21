@@ -13,11 +13,11 @@ pdf270 Documentation/CNT_join_diagram.pdf  -o Documentation/CNT_join_diagram.pdf
 mkdir bin 2>/dev/null
 
 ## copy resources files from source to classpath and working directory
-cp src/*.png bin/
-cp src/*.png ./
+cp src/*.{png,jmml} bin/
+cp src/*.{png,jmml} ./
 
 ## the Jars used by cnt
-jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar:lib/libandree.jar"
+jars=":lib/cling-core-1.0.5.jar:lib/cling-support-1.0.5.jar:lib/teleal-common-1.0.13.jar:lib/libandree.jar:lib/jmenumaker.jar"
 
 
 ## java compilor if default is for Java 7

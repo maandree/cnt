@@ -7,8 +7,12 @@
  */
 package cnt.interaction.desktop;
 
+import se.kth.maandree.jmenumaker.*;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.io.IOError;
 
 
 /**
@@ -17,7 +21,7 @@ import java.awt.*;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame
+public class MainFrame extends JFrame implements UpdateListener
 {
     /**
      * The default total frame width
@@ -53,9 +57,24 @@ public class MainFrame extends JFrame
 	this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)); //TODO temporary, should depend on screen
 	this.setLocationByPlatform(true);
 	
+	buildMenus();
 	buildInterior();
     }
     
+    
+    
+    /**
+     * Builds and lays out all menu items for the frame
+     */
+    private void buildMenus()
+    {
+	try
+	{   JMenuMaker.makeMenu(this, "MainFrame.jmml", this, null);
+	}
+	catch (final IOException err)
+	{   throw new IOError(err);
+	}
+    }
     
     
     /**
@@ -83,6 +102,30 @@ public class MainFrame extends JFrame
 	
 	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void itemClicked(final String id)
+    {
+	switch (id)
+	{
+	    case "netdiag":
+		(new NetworkDialogue(this)).setVisible(true);
+	        break;
+		
+	    default:
+		System.err.println("Unrecognised menu ID for MainFrame: " + id);
+		break;
+	}
+    }
+    
+    public void valueUpdated(final String id, final String value)  { /*Not used*/ }
+    public void valueUpdated(final String id, final double value)  { /*Not used*/ }
+    public void valueUpdated(final String id, final long value)    { /*Not used*/ }
+    public void valueUpdated(final String id, final int value)     { /*Not used*/ }
+    public void valueUpdated(final String id, final boolean value) { /*Not used*/ }
     
 }
 
