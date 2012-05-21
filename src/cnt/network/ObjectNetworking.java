@@ -30,7 +30,14 @@ public class ObjectNetworking
     {
 	this.output = new ObjectOutputStream(new BufferedOutputStream(output));
 	this.output.flush(); //Program freezes otherwise
-	this.input  = new ObjectInputStream(new BufferedInputStream(input));
+	this.input = input;
+	
+	synchronized (alternatives)
+	{
+	    alternatives.put(input, new ArrayDeque<Serializable>());
+	}
+	
+	addAlternative(input, input);
     }
     
     
@@ -38,12 +45,14 @@ public class ObjectNetworking
     /**
      * Stream for reading from the network
      */
-    private final ObjectInputStream input;
+    private final InputStream input;
     
     /**
      * Stream for writing to the network
      */
     private final ObjectOutputStream output;
+    
+    private static final HashMap<InputStream, ArrayDeque<Serializable>> alternatives = new HashMap<InputStream, ArrayDeque<Serializable>>();
     
     
     
@@ -70,14 +79,67 @@ public class ObjectNetworking
     }
     
     /**
-     * Sends an object, but does to perform back-referencing
+     * Receive an object
      *
-     * @throws  IOException             Thrown if the program fails to receive data
      * @throws  ClassNotFoundException  Thrown if the received object is not a part of the program
      */
-    public Serializable receive() throws IOException, ClassNotFoundException
+    public Serializable receive() throws ClassNotFoundException
     {
-	return (Serializable)(this.input.readObject());
+	final ArrayDeque<Serializable> queue;
+	synchronized (alternatives)
+        {
+	    queue = alternatives.get(this.input);
+	}
+	final Serializable object;
+	synchronized (queue)
+	{
+	    if (queue.isEmpty())
+		try
+		{
+		    queue.wait();
+		}
+		catch (final InterruptedException err)
+		{
+		    return null;
+		}
+	     object = queue.pollLast();
+	}
+	if (object instanceof ClassNotFoundException)
+	    throw (ClassNotFoundException)object;
+	if (object instanceof Throwable)
+	    throw new Error((Throwable)object);
+	return object;
+    }
+    
+    public static void addAlternative(final InputStream in, final InputStream alt) throws IOException
+    {
+	final ArrayDeque<Serializable> queue;
+	synchronized (alternatives)
+	{
+	    queue = alternatives.get(in);
+	}
+	
+	final ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(alt));
+	
+	for (;;)
+	{
+	    Serializable object;
+	    try
+	    {
+		object = (Serializable)(input.readObject());
+		if (object instanceof Throwable) //TODO: kick him
+		    continue;
+	    }
+	    catch (final ClassNotFoundException err)
+	    {
+		object = err;
+	    }
+	    synchronized (queue)
+	    {
+		queue.offerLast(object);
+		queue.notifyAll();
+	    }
+	}
     }
     
 }
