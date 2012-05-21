@@ -130,7 +130,10 @@ public class IGDListener extends DefaultRegistryListener
 				@Override
 				public void success(final ActionInvocation invocation)
 				{
-					IGDListener.this.monitor.notifyAll();
+				        synchronized (IGDListener.this.monitor)
+					{
+					    IGDListener.this.monitor.notifyAll();
+					}
 				}
 				
 				/**
@@ -169,7 +172,10 @@ public class IGDListener extends DefaultRegistryListener
 				@Override
 				public void success(final ActionInvocation invocation)
 				{
+				    synchronized (IGDListener.this.monitor)
+				    {
 					IGDListener.this.monitor.notifyAll();
+				    }
 				}
 				/**
 				* {@inheritDoc}

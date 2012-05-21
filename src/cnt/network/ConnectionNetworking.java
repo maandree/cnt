@@ -337,7 +337,10 @@ public class ConnectionNetworking
 		try
 		{
 			// Devices are discovered asynchronously, but should be faster then 5 sec.
-			monitor.wait(5000);
+		        synchronized (monitor)
+			{
+			    monitor.wait(5000);
+			}
 		} catch (InterruptedException ie)
 		{
 			// {ignore and continue}
