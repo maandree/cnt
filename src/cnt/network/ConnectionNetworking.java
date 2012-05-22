@@ -65,11 +65,14 @@ public class ConnectionNetworking
 	{
 	
 		this.objectNetworking = objectNetworking;
+	
+		Blackboard.broadcastMessage(new SystemMessage(null, "Starting upp connections..."));
 
 		// Check if public ip is same as internal ip
 		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
 		if (!getExternalIP().equals(getInternalIP()))
 		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
 			if(createPortForward(ConnectionNetworking.PORT))
 			{
 				startTCP(ConnectionNetworking.PORT);
@@ -77,7 +80,8 @@ public class ConnectionNetworking
 			{
 				startLokalTCP();
 			}
-		}
+		} else
+			startTCP(ConnectionNetworking.PORT);
 	}
 	
 	/**
@@ -105,7 +109,9 @@ public class ConnectionNetworking
 			{
 				startLokalTCP();
 			}
-		}
+		} else
+			startTCP(port);
+		
 	}
 
 	/**
@@ -189,17 +195,23 @@ public class ConnectionNetworking
 	*/
 	public final Socket connect(Inet4Address host, int port, int peer)
 	{
+		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating connection to ["+ host + ":" + port + "]"));
 		Socket connection = null;
 		try {
 			connection = new Socket(host, port);
 		} catch (IOException err) 
 		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "Connection Failed"));
 			return null;
 		}
 		
 		// Always save live connections. TODO: lookup possible security issues with this.
 		this.connections.put(peer, connection);
 		
+		Blackboard.broadcastMessage(new SystemMessage(null, "Connected to ID: " + peer));
+
+		Blackboard.broadcastMessage(new SystemMessage(null, "Number of open connections: " + this.connections.size()));
+
 		return connection;
 	}
 	
@@ -209,8 +221,9 @@ public class ConnectionNetworking
 	* @param message Serialized object to send as message
 	*/
 	public void send(Serializable message)
-	{
-
+	{ 
+		
+		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating send"));
 		if (this.connections != null && this.connections.isEmpty() == false)
 		{
 			/**
@@ -231,6 +244,7 @@ public class ConnectionNetworking
 					Thread _tmpThread = new Thread(_sender);
 					_tmpThread.start();
 					_threads.add(_tmpThread);
+					Blackboard.broadcastMessage(new SystemMessage(null, "Sending " + message + " to ID " + peer));
 				
 				} catch (IOException ioe)
 				{
@@ -339,7 +353,9 @@ public class ConnectionNetworking
 		ServiceType _type = new UDAServiceType("WANIPConnection");
 
 		//Initiate a standard search
-		this.upnpService.getControlPoint().search(new ServiceTypeHeader(_type));
+		//this.upnpService.getControlPoint().search(new ServiceTypeHeader(_type));
+		// Testing default serach
+		this.upnpService.getControlPoint().search(new STAllHeader());
 		try
 		{
 			// Devices are discovered asynchronously, but should be faster then 5 sec.
@@ -353,10 +369,14 @@ public class ConnectionNetworking
 		// If no PortForward could be done, device is removed before this check. 
 		// Probably... depending on timeout and asymchronous behaviour.
 		if (this.upnpService.getRegistry().getDevices(_type).size() > 0)
+		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "We have " + this.upnpService.getRegistry().getDevices(_type).size() + " IGD(s) "));
 			return true;
-		else
+		} else
+		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "We have 0 IGDs"));
 			return false;
-		
+		}
 	}
 	
 	/**

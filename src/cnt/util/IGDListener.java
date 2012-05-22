@@ -26,6 +26,10 @@ import cnt.messages.*;
 //Network stuff
 import java.net.*;
 
+// Other dependencies
+import java.util.HashSet;
+import java.util.Enumeration;
+import cnt.network.Toolkit;
 /**
 * Listener class used to find Internet Gateway Devices on the network.
 *
@@ -81,7 +85,7 @@ public class IGDListener extends DefaultRegistryListener
 
 		if (portMap != null)
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "UPnP Device discovered"));
+			Blackboard.broadcastMessage(new SystemMessage(null, "UPnP Device discovered: " + device.getDetails().getFriendlyName()));
 			
 			// Make the portmap
 			this.mapPort(portMap, registry, device);
@@ -101,7 +105,9 @@ public class IGDListener extends DefaultRegistryListener
 	{
 		RemoteService portMap;
 		if ((portMap = device.findService(serviceType)) != null)
-			Blackboard.broadcastMessage(new SystemMessage(null, "Internet Gateway is leaving network. This might bring connection errors."));
+			Blackboard.broadcastMessage(new SystemMessage(null, "Internet Gateway [ " + device.getDetails().getFriendlyName() + " ] is leaving network. This might bring connection errors."));
+		
+		registry.removeDevice(device);
 	}
 
 	/**
@@ -112,25 +118,26 @@ public class IGDListener extends DefaultRegistryListener
 	*/
 	synchronized public void mapPort(final RemoteService portMapService, final Registry registry, final RemoteDevice device)
 	{
-		// Set up the portmappin
-		PortMapping cntPort = null;
-		try {
-			cntPort = new PortMapping(this.port, InetAddress.getLocalHost().getHostAddress(), PortMapping.Protocol.TCP, "CNT");
-		} catch (UnknownHostException err) 
-		{
-			// Very unlikely that we can't find the localhost. Ignore for now. TODO: fix proper error handeling
-		}
-
+		String ip = Toolkit.getLocalIP();
+						
+		PortMapping cntPort = new PortMapping(this.port, ip, PortMapping.Protocol.TCP, "CNT");
+		
+		
 		// Execute the mapping on the IGD
 		this.upnpService.getControlPoint().execute(new PortMappingAdd(portMapService, cntPort)
 			{
+				
 				/**
 				* {@inheritDoc}
 				*/
 				@Override
 				public void success(final ActionInvocation invocation)
 				{
-					IGDListener.this.monitor.notifyAll();
+				        synchronized (IGDListener.this.monitor)
+					{
+					    IGDListener.this.monitor.notifyAll();
+					}
+					Blackboard.broadcastMessage(new SystemMessage(null, "Portmapping complete"));
 				}
 				
 				/**
@@ -139,10 +146,16 @@ public class IGDListener extends DefaultRegistryListener
 				@Override
 				public void failure(final ActionInvocation invocation, final UpnpResponse operation, final String defaultMsg)
 				{
+					System.err.println("\n\nFailure[default message]: " + defaultMsg);
+					System.err.println("\nFailure[responseDetails]: " + operation.getResponseDetails());
+					System.err.println("\nFailure[StatusMessge]: " + operation.getStatusMessage() + "\n");
 					registry.removeDevice(device);
+					Blackboard.broadcastMessage(new SystemMessage(null, "Portmapping failed, removing device [ " + device.getDetails().getFriendlyName() + " ]"));
 				}
+
 			}
 		);
+
 	}
 	/**
 	* Removes the portmapping on a IGD
@@ -169,7 +182,10 @@ public class IGDListener extends DefaultRegistryListener
 				@Override
 				public void success(final ActionInvocation invocation)
 				{
+				    synchronized (IGDListener.this.monitor)
+				    {
 					IGDListener.this.monitor.notifyAll();
+				    }
 				}
 				/**
 				* {@inheritDoc}

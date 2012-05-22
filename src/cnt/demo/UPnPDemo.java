@@ -100,7 +100,7 @@ public class UPnPDemo implements Runnable
 	    upnpService.getControlPoint().search(new STAllHeader());
 			
 	    try {
-		Thread.sleep(5000);
+		Thread.sleep(15000);
 	    }
 	    catch (final InterruptedException err) {
 		//Ignore
@@ -190,7 +190,6 @@ public class UPnPDemo implements Runnable
 				    public void success(final ActionInvocation invocation)
 				    {
 					System.out.println("Successfully made a portforward: " + portMapping);
-					try {  Thread.sleep(1200);  }  catch (final InterruptedException err) { /* Ignore */ }
 				    }
 			    
 				    /**
@@ -205,12 +204,6 @@ public class UPnPDemo implements Runnable
 			        });
 			
 			updatePortMappings(portMapService);
-			try {
-			    Thread.sleep(2200);
-			}
-			catch (final InterruptedException err) {
-			    //Ignore
-			}
 			
 			// Execute de-mapping on router
 			upnpService.getControlPoint().execute(new PortMappingDelete(portMapService, cntPort)
@@ -222,7 +215,6 @@ public class UPnPDemo implements Runnable
 				    public void success(ActionInvocation invocation)
 				    {
 					System.out.println("Successfully removed forwarded port: " + portMapping);
-					try {  Thread.sleep(1200);  }  catch (final InterruptedException err) { /* Ignore */ }
 				    }
 				    
 				    /**

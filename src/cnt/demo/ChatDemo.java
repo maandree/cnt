@@ -54,14 +54,20 @@ public class ChatDemo
 	final String remote = args[4];
 	
 	final BlackboardNetworking blackboardNetworking = new BlackboardNetworking();
-	System.out.println("BlackboardNetworking and all other *Networking instances created from chain.");
+	Blackboard.broadcastMessage(new SystemMessage(null, "BlackboardNetworking and all other *Networking instances created from chain."));
 	
 	
 	Blackboard.broadcastMessage(new LocalPlayer(new Player(args[0], args[0].hashCode() | (255 << 24))));
 	
 	Blackboard.registerObserver(new Listener());
 	
+<<<<<<< Updated upstream
 	synchronized(ChatDemo.class)
+=======
+	Blackboard.broadcastMessage(new SystemMessage(null, "Done setting up. Trying to connect to [" + remote + "]"));
+	
+	if (remote != null)
+>>>>>>> Stashed changes
 	{
 		ChatDemo.class.wait();
 	}
