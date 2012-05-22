@@ -120,8 +120,12 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    PlayerJoined message = (PlayerJoined)object;
 	    Player _player = message.player;
 	    return new Integer(_player.getColor());
-	}
-	else
+	} else if (object instanceof ChatMessage)
+	{
+	    ChatMessage message = (ChatMessage)object;
+	    Player _player = message.player;
+	    return new Integer(_player.getColor());
+	}else
 	    return null;	
     }
     

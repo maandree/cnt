@@ -61,12 +61,18 @@ public class TCPReceiver implements Runnable
 		ObjectInputStream input = null;
 		try
 		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
 			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 			// Send message to ObjectNetworking layer, and wait for a ID number to be returned
 			Integer peer = this.objectNetworking.receive((Serializable)input.readObject());
 			// Take ID and map the connection and peer in ConnectionNetworking
-			this.connectionNetworking.connections.put(peer, this.connection);
+			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
+			if (peer != null) {
+				this.connectionNetworking.connections.put(peer, this.connection);
+			}
 			
+			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.connections.size() + " connections"));
+
 		} catch (IOException ioe) 
 		{
 			// TODO: make some error handling happen
@@ -79,6 +85,7 @@ public class TCPReceiver implements Runnable
 		{
 			while((message = (Serializable)input.readObject()) != null)
 			{
+				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
 				this.objectNetworking.receive(message);
 			}
 		} catch (IOException ioe)
