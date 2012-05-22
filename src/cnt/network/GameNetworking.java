@@ -38,12 +38,12 @@ public class GameNetworking
     /**
      * The next layer in the protocol stack
      */
-    private final ObjectNetworking objectNetworking;
+    public final ObjectNetworking objectNetworking;
 
     /**
      * The previous layer in the protocol stack
      */
-    private final BlackboardNetworking blackboardNetworking;
+    public final BlackboardNetworking blackboardNetworking;
     
     /**
      * The local player
