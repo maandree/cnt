@@ -37,7 +37,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     /**
      * The next layer the networking stack
      */
-    private final GameNetworking gameNetworking;
+    public final GameNetworking gameNetworking;
     
     /**
      * Blackboard message to ignore (with how many times) to prevent an infinite resonance loop

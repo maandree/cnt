@@ -28,14 +28,10 @@ class Listener implements Blackboard.BlackboardObserver
 		try
         	{
 	    		if (message instanceof UserMessage)
-	    		{
 				System.out.println((UserMessage)message);
-	    		}
             		else if (message instanceof ChatMessage)
 				System.out.println((ChatMessage)message);
-	    		else
-				assert false : "Update message types in BlackboardNetworking";
-			}
+		}
 		catch (final Exception err)
 		{
 	   		//FIXME error!

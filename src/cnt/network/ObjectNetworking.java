@@ -35,12 +35,12 @@ public class ObjectNetworking
     /**
      * The previous layer in the network stack
      */
-    private final GameNetworking gameNetworking;
+    public final GameNetworking gameNetworking;
 
     /**
      * The next layer in the network stack
      */
-    private final ConnectionNetworking connectionNetworking;
+    public final ConnectionNetworking connectionNetworking;
     
     
     
