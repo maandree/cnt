@@ -68,10 +68,14 @@ public class TCPReceiver implements Runnable
 			// Take ID and map the connection and peer in ConnectionNetworking
 			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
 			if (peer != null) {
-				this.connectionNetworking.connections.put(peer, this.connection);
+				this.connectionNetworking.sockets.put(peer, this.connection);
+				this.connectionNetworking.objectInputs.put(peer, input);
+				ObjectOutputStream out =  new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
+				out.flush();
+				this.connectionNetworking.objectOutputs.put(peer, out);
 			}
 			
-			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.connections.size() + " connections"));
+			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.sockets.size() + " connections"));
 
 		} catch (IOException ioe) 
 		{

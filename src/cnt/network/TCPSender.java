@@ -32,19 +32,17 @@ public class TCPSender implements Runnable
 	* @param socket the socket to send to
 	* @param message the serialized object to send
 	*/
-	public TCPSender(Socket socket, Serializable message) throws IOException
+	public TCPSender(ObjectOutputStream out, Serializable message) throws IOException
 	{
-		this.socket = socket;
+		this.out = out;
 		this.message = message;
 		
-		// test if we can get the input stream.	
-		InputStream in = socket.getInputStream();
 	}
 	
 	/**
-	* Socket to use for sending
+	* ObjectOutputStream to use for sending
 	*/
-	Socket socket;
+	ObjectOutputStream out;
 	
 	/**
 	* Message to be sent
@@ -55,15 +53,12 @@ public class TCPSender implements Runnable
 	{
 		try {
 			Blackboard.broadcastMessage(new SystemMessage(null, "Starting output stream"));
-			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
-			out.flush(); // Program freezes otherwise
-			out.reset();
+			ObjectOutputStream out = this.out;
 
 			Blackboard.broadcastMessage(new SystemMessage(null, "Starting wirte"));
 	
 			out.writeObject(message);
 			out.flush();
-			out.reset();	
 			Blackboard.broadcastMessage(new SystemMessage(null, "Finnished sending"));
 		} catch (Exception err)
 		{

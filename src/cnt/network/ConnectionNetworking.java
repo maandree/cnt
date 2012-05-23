@@ -36,8 +36,8 @@ import java.net.*;
 /**
 * Connection Networking layer
 *<p>
-* This class sets up the connections to be used by the client. 
-* Provides socket connections for higher levels of networking.
+* This class sets up the sockets to be used by the client. 
+* Provides socket sockets for higher levels of networking.
 *
 * @author Calle Lejdbrandt, <a href="callel@kth.se">callel@kth.se</a>
 */
@@ -66,7 +66,7 @@ public class ConnectionNetworking
 	
 		this.objectNetworking = objectNetworking;
 	
-		Blackboard.broadcastMessage(new SystemMessage(null, "Starting upp connections..."));
+		Blackboard.broadcastMessage(new SystemMessage(null, "Starting upp sockets..."));
 
 		// Check if public ip is same as internal ip
 		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
@@ -135,9 +135,19 @@ public class ConnectionNetworking
 	public boolean isServer;
 
 	/**
-	* Map of current threaded connections to use to store connections
+	* Map of current threaded connections to use to store sockets
 	*/
-	final HashMap<Integer, Socket> connections = new HashMap<Integer, Socket>();
+	final HashMap<Integer, Socket> sockets = new HashMap<Integer, Socket>();
+
+	/**
+	* Map of current threaded connections to use to store ObjectOutputStreams
+	*/
+	final HashMap<Integer, ObjectOutputStream> objectOutputs = new HashMap<Integer, ObjectOutputStream>();
+
+	/**
+	* Map of current threaded connections to use to store ObjectInputStremas
+	*/
+	final HashMap<Integer, ObjectInputStream> objectInputs = new HashMap<Integer, ObjectInputStream>();
 
 	/**
 	* The time when we last updated our external ip. Provider ask us not to do so more then every 5min/host.
@@ -150,7 +160,7 @@ public class ConnectionNetworking
 	private UpnpService upnpService;
 
 	/**
-	* Make a TCP serversocket to listen on incoming connections
+	* Make a TCP serversocket to listen on incoming sockets
 	*
 	* @param port Port to listen on
 	*/
@@ -181,7 +191,7 @@ public class ConnectionNetworking
 		
 		Blackboard.broadcastMessage(new SystemMessage(null, "Running in local mode. Needs access to at least one server in cloud."));
 		
-		// Do nothing else, we can only use outgoing connections
+		// Do nothing else, we can only use outgoing sockets
 	}
 	
 	/**
@@ -205,12 +215,23 @@ public class ConnectionNetworking
 			return null;
 		}
 		
-		// Always save live connections. TODO: lookup possible security issues with this.
-		this.connections.put(peer, connection);
+		// Always save live sockets. TODO: lookup possible security issues with this.
+		this.sockets.put(peer, connection);
+		ObjectOutputStream out; 
+		try
+		{
+			out = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+			out.flush();
+			this.objectOutputs.put(peer, out);
+			this.objectInputs.put(peer, new ObjectInputStream(new BufferedInputStream(connection.getInputStream())));
+		} catch (IOException ioe)
+		{
+			// TODO: fix this
+		}
 		
 		Blackboard.broadcastMessage(new SystemMessage(null, "Connected to ID: " + peer));
 
-		Blackboard.broadcastMessage(new SystemMessage(null, "Number of open connections: " + this.connections.size()));
+		Blackboard.broadcastMessage(new SystemMessage(null, "Number of open sockets: " + this.sockets.size()));
 
 		return connection;
 	}
@@ -224,28 +245,39 @@ public class ConnectionNetworking
 	{ 
 		
 		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating send"));
-		if (this.connections != null && this.connections.isEmpty() == false)
+		if (this.sockets != null && this.sockets.isEmpty() == false)
 		{
 	
-			for (int peer : this.connections.keySet())
+			for (int peer : this.sockets.keySet())
 			{
 						
 				try
 				{
-					TCPSender _sender = new TCPSender(this.connections.get(peer), message);
+					TCPSender _sender = new TCPSender(this.objectOutputs.get(peer), message);
 					Thread _tmpThread = new Thread(_sender);
 					_tmpThread.start();
 				
 				} catch (IOException ioe)
 				{
-					Socket dead_socket = this.connections.get(peer);
-					this.connections.remove(peer);	
+					Socket dead_socket = this.sockets.get(peer);
+					this.sockets.remove(peer);	
 					Socket _socket = this.connect((Inet4Address)dead_socket.getInetAddress(), dead_socket.getPort(), peer);
+					this.sockets.put(peer, _socket);
+					ObjectOutputStream out = null;
+					try {
+						this.objectInputs.put(peer, new ObjectInputStream(new BufferedInputStream(_socket.getInputStream())));
+						out = new ObjectOutputStream(new BufferedOutputStream(_socket.getOutputStream()));
+						out.flush();
+						this.objectOutputs.put(peer, out);
+					} catch(IOException iioe)
+					{
+						// TODO: fix this
+					}
 					if (_socket != null)
 					{
 						try
 						{
-							TCPSender _sender = new TCPSender(_socket, message);
+							TCPSender _sender = new TCPSender(out, message);
 							Thread _tmpThread = new Thread(_sender);
                                         	        _tmpThread.start();
 						} catch (IOException sec_ioe) 
