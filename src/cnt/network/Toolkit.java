@@ -65,9 +65,12 @@ public class Toolkit
 			// Get ALL address listed on the interface
 			for (InterfaceAddress eth : iface.getInterfaceAddresses())
 			{
-					// We don't want loopback or IPv6. TODO: better way of sorting out IPv6
+				
+				System.out.println("\n\nPossible Address: [" + eth.getAddress().toString().substring(1) + "]\n");
+				// We don't want loopback or IPv6. TODO: better way of sorting out IPv6
 				if ( !eth.getAddress().isLoopbackAddress() && !eth.getAddress().toString().contains(":") )
 				{
+					System.out.println("\nChoosen Address: [" + eth.getAddress().toString().substring(1) + "]\n");
 					// Remove \ from begining of string and return it
 					return eth.getAddress().toString().substring(1);
 				}
