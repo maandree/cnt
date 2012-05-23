@@ -70,6 +70,7 @@ public class ConnectionNetworking
 
 		// Check if public ip is same as internal ip
 		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
+		System.out.println("\n\nExternal IP: [" + getExternalIP() + "]\nInternal IP: [" + getInternalIP() + "]\n");
 		if (!getExternalIP().equals(getInternalIP()))
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
@@ -309,7 +310,7 @@ public class ConnectionNetworking
 	{
 		try
 		{
-			this.internalIP = (Inet4Address)Inet4Address.getLocalHost();
+			this.internalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getLocalIP());
 		} catch (UnknownHostException uhe)
 		{
 			this.internalIP = null;
