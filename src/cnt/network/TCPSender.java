@@ -63,7 +63,7 @@ public class TCPSender implements Runnable
 	
 			out.writeObject(message);
 			out.flush();
-			
+			out.reset();	
 			Blackboard.broadcastMessage(new SystemMessage(null, "Finnished sending"));
 		} catch (Exception err)
 		{
