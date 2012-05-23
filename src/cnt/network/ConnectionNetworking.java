@@ -226,14 +226,6 @@ public class ConnectionNetworking
 		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating send"));
 		if (this.connections != null && this.connections.isEmpty() == false)
 		{
-			/**
-			* Create a arraylist of threads so we can start sending messages
-			* to all remote clients as fast as possible.
-			* Then we wait for all threads to finish.
-			* This should speed up chatter in the cloud while keeping the cloud
-			* synzronized.
-			*/
-			ArrayList<Thread> _threads = new ArrayList<Thread>();
 	
 			for (int peer : this.connections.keySet())
 			{
@@ -243,7 +235,6 @@ public class ConnectionNetworking
 					TCPSender _sender = new TCPSender(this.connections.get(peer), message);
 					Thread _tmpThread = new Thread(_sender);
 					_tmpThread.start();
-					_threads.add(_tmpThread);
 					Blackboard.broadcastMessage(new SystemMessage(null, "Sending " + message + " to ID " + peer));
 				
 				} catch (IOException ioe)
@@ -258,7 +249,6 @@ public class ConnectionNetworking
 							TCPSender _sender = new TCPSender(_socket, message);
 							Thread _tmpThread = new Thread(_sender);
                                         	        _tmpThread.start();
-                                        	        _threads.add(_tmpThread);
 						} catch (IOException sec_ioe) 
 						{
 							//TODO: Change to correct BlackboardMessage to send a PlayerDroped message

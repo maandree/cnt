@@ -107,7 +107,6 @@ public class IGDListener extends DefaultRegistryListener
 		if ((portMap = device.findService(serviceType)) != null)
 			Blackboard.broadcastMessage(new SystemMessage(null, "Internet Gateway [ " + device.getDetails().getFriendlyName() + " ] is leaving network. This might bring connection errors."));
 		
-		registry.removeDevice(device);
 	}
 
 	/**

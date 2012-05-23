@@ -83,8 +83,10 @@ public class TCPReceiver implements Runnable
 		Serializable message;
 		try 
 		{
-			while((message = (Serializable)input.readObject()) != null)
+			while(true)
 			{
+				Blackboard.broadcastMessage(new SystemMessage(null, "Waiting for next message"));
+				message = (Serializable)input.readObject();
 				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
 				this.objectNetworking.receive(message);
 			}

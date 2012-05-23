@@ -54,14 +54,19 @@ public class TCPSender implements Runnable
 	public void run()
 	{
 		try {
+			Blackboard.broadcastMessage(new SystemMessage(null, "Starting output stream"));
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
 			out.flush(); // Program freezes otherwise
+
+			Blackboard.broadcastMessage(new SystemMessage(null, "Starting wirte"));
 	
 			out.writeObject(message);
 			out.flush();
+			
+			Blackboard.broadcastMessage(new SystemMessage(null, "Finnished sending"));
 		} catch (Exception err)
 		{
-			// TODO: get som error handling happen
+			Blackboard.broadcastMessage(new SystemMessage(null, "Error Sending"));
 		}
 	}
 }	
