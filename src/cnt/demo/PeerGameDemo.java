@@ -7,11 +7,11 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
-import cnt.network.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
-import cnt.mock.ConnectionNetworking;
+import cnt.mock.*;
+import cnt.network.PlayerRing;
 
 
 /**
