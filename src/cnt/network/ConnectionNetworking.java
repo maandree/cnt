@@ -223,7 +223,6 @@ public class ConnectionNetworking
 			out = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 			out.flush();
 			this.objectOutputs.put(peer, out);
-			this.objectInputs.put(peer, new ObjectInputStream(new BufferedInputStream(connection.getInputStream())));
 		} catch (IOException ioe)
 		{
 			// TODO: fix this
