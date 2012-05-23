@@ -22,33 +22,33 @@ elif [[ $1 = "main" ]]; then
 elif [[ $1 = "main-da" ]]; then
     javaSeven -da -cp bin$jars cnt.Program
 
-elif [[ $1 = "engine" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo $2
+#elif [[ $1 = "engine" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo $2
 
-elif [[ $1 = "frame" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.MainFrameDemo
+#elif [[ $1 = "frame" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.MainFrameDemo
 
-elif [[ $1 = "network" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo
+#elif [[ $1 = "network" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo
 
-elif [[ $1 = "peernetwork" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.PeerNetworkingDemo $2 $3 $4 $5 $6
+#elif [[ $1 = "peernetwork" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.PeerNetworkingDemo $2 $3 $4 $5 $6
 
 elif [[ $1 = "chat" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.ChatDemo $2 $3 $4 $5 $6
 
-elif [[ $1 = "upnp" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.UPnPDemo
+#elif [[ $1 = "upnp" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.UPnPDemo
 
-elif [[ $1 = "shape" ]]; then
-    javaSeven -ea -cp bin$jars cnt.test.ShapeTest
+#elif [[ $1 = "shape" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.test.ShapeTest
 
-elif [[ $1 = "pipe" ]]; then
-    javaSeven -ea -cp bin$jars cnt.test.PipeTest
+#elif [[ $1 = "pipe" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.test.PipeTest
 
-elif [[ $1 = "linkedlist" ]]; then
-    javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
-    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
+#elif [[ $1 = "linkedlist" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
+#    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
 
 elif [[ $1 = "game" ]]; then
     stty -icanon
@@ -63,8 +63,8 @@ elif [[ $1 = "peergame" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.PeerGameDemo $2 $3 $4 $5 $6
     stty icanon
 
-elif [[ $1 = "connection" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.ConnectionDemo $2 $3 $4 $5 $6
+#elif [[ $1 = "connection" ]]; then
+#    javaSeven -ea -cp bin$jars cnt.demo.ConnectionDemo $2 $3 $4 $5 $6
 
 elif [[ $1 = "--completion--" ]]; then
     _run()
@@ -78,7 +78,7 @@ elif [[ $1 = "--completion--" ]]; then
 	    #COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat' -- "$cur" ) \
 	    #            $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
 	    
-	    COMPREPLY=( $( compgen -W 'main main-da engine frame chat upnp shape pipe linkedlist game repaly peergame' -- "$cur" ) )
+	    COMPREPLY=( $( compgen -W 'main main-da chat game replay peergame' -- "$cur" ) )
 	fi
     }
     
