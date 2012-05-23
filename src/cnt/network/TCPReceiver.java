@@ -80,22 +80,25 @@ public class TCPReceiver implements Runnable
 		{
 			// TODO: make some error handling happen
 		}
-		Serializable message;
+	
 		try 
 		{
 			while(true)
 			{
 				Blackboard.broadcastMessage(new SystemMessage(null, "Waiting for next message"));
-				message = (Serializable)input.readObject();
+				if (!this.connection.isInputShutdown())
+					Blackboard.broadcastMessage(new SystemMessage(null, "Connection has alive instream"));
+				Serializable message = (Serializable)input.readObject();
 				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
 				this.objectNetworking.receive(message);
 			}
 		} catch (IOException ioe)
 		{
-			//TODO: make some error handling happen
+			Blackboard.broadcastMessage(new SystemMessage(null, "IOException receving messages"));
+			Blackboard.broadcastMessage(new SystemMessage(null, "IOExceotion: " + ioe.getMessage()));
 		} catch (ClassNotFoundException cnfe)
 		{
-			//TODO: make som error handling happen
+			Blackboard.broadcastMessage(new SystemMessage(null, "ClassNotFoundException reading messages"));
 		}
 	}
 }

@@ -57,6 +57,7 @@ public class TCPSender implements Runnable
 			Blackboard.broadcastMessage(new SystemMessage(null, "Starting output stream"));
 			ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
 			out.flush(); // Program freezes otherwise
+			out.reset();
 
 			Blackboard.broadcastMessage(new SystemMessage(null, "Starting wirte"));
 	

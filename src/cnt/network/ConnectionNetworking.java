@@ -235,7 +235,6 @@ public class ConnectionNetworking
 					TCPSender _sender = new TCPSender(this.connections.get(peer), message);
 					Thread _tmpThread = new Thread(_sender);
 					_tmpThread.start();
-					Blackboard.broadcastMessage(new SystemMessage(null, "Sending " + message + " to ID " + peer));
 				
 				} catch (IOException ioe)
 				{
