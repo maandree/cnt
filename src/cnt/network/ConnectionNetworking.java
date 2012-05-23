@@ -229,6 +229,10 @@ public class ConnectionNetworking
 			// TODO: fix this
 		}
 		
+		TCPReceiver receiver = new TCPReceiver(connection, this.objectNetworking, this);
+		Thread t = new Thread(receiver);
+		t.start();
+		
 		Blackboard.broadcastMessage(new SystemMessage(null, "Connected to ID: " + peer));
 
 		Blackboard.broadcastMessage(new SystemMessage(null, "Number of open sockets: " + this.sockets.size()));
