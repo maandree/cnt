@@ -98,18 +98,70 @@ public class MainScreen extends Thread
 	    
 	    initalise();
 	    
-	    final int blockSize_w = (screenWidth - 4) / 3;
-	    final int blockSize_h = 2 * (screenHeight - 5) / 3;
+	    final int blockSize_w = (screenWidth - 4) / 30;
+	    final int blockSize_h = 2 * (screenHeight - 5) / 30;
 	    int blocksize = blockSize_w < blockSize_h ? blockSize_w : blockSize_h;
 	    if (blocksize < 1)
 		blocksize = 1;
 	    
-	    System.out.print("\033c\033[47m");
+	    System.out.print("\033c\033[0;47m");
 	    for (int i = 0; i < screenWidth; i++)
 		System.out.write(' ');
 	    System.out.print("\033[" + screenHeight + ";1H");
 	    for (int i = 0; i < screenWidth; i++)
 		System.out.write(' ');
+	    
+	    //  ┌─────┬─────┬─────┐
+	    //  │ 0   │ 2   │ 3   │
+	    //  │     │     │     │
+	    //  │     │     │     │
+	    //  │     │     │     │
+	    //  ├─────┴─────┤     │
+	    //  │ 1         │     │
+	    //  └───────────┴─────┘
+	    
+	    int split1, split2, splitH;
+	    split1 = 1 + 10 * blocksize;
+	    split2 = (screenW - split1 - 1) / 2;
+	    splitH = 2 + 10 * blocksize;
+	    
+	    System.out.print("\033[49m;\033[2;1H┌");
+	    for (int i = 0; i < screenWidth - 1; i++)
+		if ((i == split1) || (i == split2))
+		    System.out.print("┬");
+		else
+		    System.out.print("─");
+	    System.out.print("┐\033[3;1H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		if (i == splitH)
+		    System.out.print("├\033[D\033[B");
+		else
+		    System.out.print("│\033[D\033[B");
+	    System.out.print("└\033[3;" + (split1 + 1) + "H");
+	    for (int i = 2; i < splitH - 1; i++)
+		System.out.print("│\033[D\033[B");
+	    System.out.print("┴\033[3;" + (split2 + 1) + "H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		if (i == splitH)
+		    System.out.print("┤\033[D\033[B");
+		else
+		    System.out.print("│\033[D\033[B");
+	    System.out.print("┴\033[3;" + screenWidth + "H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		System.out.print("│\033[D\033[B");
+	    System.out.print("┘\033[" + screenHeight + ";2H");
+	    for (int i = 1; i < screenWidth - 1; i++)
+		if (i == split2)
+		    System.out.print("\033[C");
+		else
+		    System.out.print("─");
+	    System.out.print("\033[" + (splitH + 1) + ";2H");
+	    for (int i = 1; i < split2 - 1; i++)
+		if (i == split1)
+		    System.out.print("\033[C");
+		else
+		    System.out.print("─");
+	    
 	    System.out.flush("");
 	    
 	    for (int d; (d = System.in.read()) != 'C' - '@';)
