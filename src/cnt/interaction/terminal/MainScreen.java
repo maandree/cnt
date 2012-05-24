@@ -20,6 +20,68 @@ public class MainScreen extends Thread
     //││ │║║ ║░▒▓
     //└┴─┘╚╩═╝
     
+    
+    //   Menu bar up here
+    //  ┌─────┬─────┬─────┐
+    //  │ 0   │ 2   │ 3   │   (numbers are in tab index order)
+    //  │     │     │     │
+    //  │     │     │     │
+    //  │     │     │     │
+    //  ├─────┴─────┤     │
+    //  │ 1         │     │
+    //  └───────────┴─────┘
+    //   Status bar down here  
+    //
+    //  0: Game area (The Tetris game session)
+    //  1: Chat area (Shat here)
+    //  2: User area (List of playing users)
+    //  3: Misc area (Contains another opened screen)
+    //
+    //  Global keys:
+    // 
+    //  ^+       scale up game area
+    //  ^-       scale down game area
+    //  ^L       redraw everything, and update terminal size
+    //  tab      next frame
+    //  backtab  previous frame
+    //  ^Q       rotate falling block anti-clockwise
+    //  ^W       rotate falling block anti-clockwise
+    //  ^E       rotate falling block clockwise
+    //  ^A       move falling block one step left
+    //  ^S       move falling block one step down
+    //  ^D       move falling block one step right
+    //  ^T       drop falling shape to bottom
+    //  ^P       pause/unpause
+    //  pause    pause/unpause
+    //  sysrq    exit program (twise for uncleanly)
+    //  ^C       exit program (three times, five times for uncleanly)
+    //  ^\ = ^4  system information dump from JVM
+    //  ^M       hide/show menu bar and status bar
+    //  page up    scroll message board one page up
+    //  page down  scroll message board one page down
+    //  
+    //  Game area keys:
+    //  
+    //  s        rotate falling block anti-clockwise
+    //  d        rotate falling block clockwise
+    //  spc      drop falling shape to bottom
+    //  up       rotate falling block anti-clockwise
+    //  down     move falling block one step down
+    //  left     move falling block one step left
+    //  right    move falling block one step right
+    //  S-up     rotate falling block clockwise
+    //  
+    //  Chat area keys:
+    //  
+    //  up       one line up
+    //  down     one line down
+    //  
+    //  User area keys:
+    //  
+    //  +        add as friend
+    //  up       one player up
+    //  down     one player down
+    
     /**
      * {@inheritDoc}
      */
@@ -36,66 +98,74 @@ public class MainScreen extends Thread
 	    
 	    initalise();
 	    
-	    //   Menu bar up here
+	    final int blockSize_w = (screenWidth - 4) / 30;
+	    final int blockSize_h = 2 * (screenHeight - 5) / 30;
+	    int blocksize = blockSize_w < blockSize_h ? blockSize_w : blockSize_h;
+	    if (blocksize < 1)
+		blocksize = 1;
+	    
+	    System.out.print("\033c\033[0;47m");
+	    for (int i = 0; i < screenWidth; i++)
+		System.out.write(' ');
+	    System.out.print("\033[" + screenHeight + ";1H");
+	    for (int i = 0; i < screenWidth; i++)
+		System.out.write(' ');
+	    
 	    //  ┌─────┬─────┬─────┐
-	    //  │ 0   │ 2   │ 3   │   (numbers are in tab index order)
+	    //  │ 0   │ 2   │ 3   │
 	    //  │     │     │     │
 	    //  │     │     │     │
 	    //  │     │     │     │
 	    //  ├─────┴─────┤     │
 	    //  │ 1         │     │
 	    //  └───────────┴─────┘
-	    //   Status bar down here  
-	    //
-	    //  0: Game area (The Tetris game session)
-	    //  1: Chat area (Shat here)
-	    //  2: User area (List of playing users)
-	    //  3: Misc area (Contains another opened screen)
-	    //
-	    //  Global keys:
-	    // 
-	    //  ^+       scale up game area
-	    //  ^-       scale down game area
-	    //  ^L       redraw everything, and update terminal size
-	    //  tab      next frame
-	    //  backtab  previous frame
-	    //  ^Q       rotate falling block anti-clockwise
-	    //  ^W       rotate falling block anti-clockwise
-	    //  ^E       rotate falling block clockwise
-	    //  ^A       move falling block one step left
-	    //  ^S       move falling block one step down
-	    //  ^D       move falling block one step right
-	    //  ^T       drop falling shape to bottom
-	    //  ^P       pause/unpause
-	    //  pause    pause/unpause
-	    //  sysrq    exit program (twise for uncleanly)
-	    //  ^C       exit program (three times, five times for uncleanly)
-	    //  ^\ = ^4  system information dump from JVM
-	    //  ^M       hide/show menu bar and status bar
-	    //  page up    scroll message board one page up
-	    //  page down  scroll message board one page down
-	    //  
-	    //  Game area keys:
-	    //  
-	    //  s        rotate falling block anti-clockwise
-	    //  d        rotate falling block clockwise
-	    //  spc      drop falling shape to bottom
-	    //  up       rotate falling block anti-clockwise
-	    //  down     move falling block one step down
-	    //  left     move falling block one step left
-	    //  right    move falling block one step right
-	    //  S-up     rotate falling block clockwise
-	    //  
-	    //  Chat area keys:
-	    //  
-	    //  up       one line up
-	    //  down     one line down
-	    //  
-	    //  User area keys:
-	    //  
-	    //  +        add as friend
-	    //  up       one player up
-	    //  down     one player down
+	    
+	    int split1, split2, splitH;
+	    split1 = 1 + 10 * blocksize;
+	    split2 = (screenW - split1 - 1) / 2;
+	    splitH = 2 + 10 * blocksize;
+	    
+	    System.out.print("\033[49m;\033[2;1H┌");
+	    for (int i = 0; i < screenWidth - 1; i++)
+		if ((i == split1) || (i == split2))
+		    System.out.print("┬");
+		else
+		    System.out.print("─");
+	    System.out.print("┐\033[3;1H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		if (i == splitH)
+		    System.out.print("├\033[D\033[B");
+		else
+		    System.out.print("│\033[D\033[B");
+	    System.out.print("└\033[3;" + (split1 + 1) + "H");
+	    for (int i = 2; i < splitH - 1; i++)
+		System.out.print("│\033[D\033[B");
+	    System.out.print("┴\033[3;" + (split2 + 1) + "H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		if (i == splitH)
+		    System.out.print("┤\033[D\033[B");
+		else
+		    System.out.print("│\033[D\033[B");
+	    System.out.print("┴\033[3;" + screenWidth + "H");
+	    for (int i = 2; i < screenHeight - 2; i++)
+		System.out.print("│\033[D\033[B");
+	    System.out.print("┘\033[" + screenHeight + ";2H");
+	    for (int i = 1; i < screenWidth - 1; i++)
+		if (i == split2)
+		    System.out.print("\033[C");
+		else
+		    System.out.print("─");
+	    System.out.print("\033[" + (splitH + 1) + ";2H");
+	    for (int i = 1; i < split2 - 1; i++)
+		if (i == split1)
+		    System.out.print("\033[C");
+		else
+		    System.out.print("─");
+	    
+	    System.out.flush("");
+	    
+	    for (int d; (d = System.in.read()) != 'C' - '@';)
+		continue;
 	}
 	finally
 	{
@@ -140,7 +210,7 @@ public class MainScreen extends Thread
     /**
      * Rules on how to parse line breaks
      */
-    public static enum LineRule
+    static enum LineRule
     {
         /**
          * Ignore all line breaks
@@ -167,7 +237,7 @@ public class MainScreen extends Thread
     /**
      * Properties fetchable by {@link Properties#getProperty(Property)}
      */
-    public static enum Property
+    static enum Property
     {
 	/**
 	 * The number of columns in the terminal
@@ -197,7 +267,7 @@ public class MainScreen extends Thread
      * @param   property  The property
      * @return            The property value
      */
-    public static String getProperty(final Property property)
+    static String getProperty(final Property property)
     {
         switch (property)
 	{
@@ -242,7 +312,7 @@ public class MainScreen extends Thread
      * @param  lineRule  What to do with line breaks
      * @param  cmd       The command to run
      */
-    public static String execSystemProperty(final LineRule lineRule, final String... cmd)
+    static String execSystemProperty(final LineRule lineRule, final String... cmd)
     {
         try
 	{
