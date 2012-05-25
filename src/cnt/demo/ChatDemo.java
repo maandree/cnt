@@ -45,7 +45,7 @@ public class ChatDemo
      */
     public static void main(final String... args) throws Exception
     {
-	(new MainFrame()).setVisible(true);
+	(new GameFrame()).setVisible(true);
 	
 	final String name = args[0];
 	final String remote = args.length > 1 ? args[1] : null;

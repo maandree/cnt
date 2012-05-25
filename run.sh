@@ -26,7 +26,7 @@ elif [[ $1 = "main-da" ]]; then
 #    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo $2
 
 #elif [[ $1 = "frame" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.MainFrameDemo
+#    javaSeven -ea -cp bin$jars cnt.demo.GameFrameDemo
 
 #elif [[ $1 = "network" ]]; then
 #    javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo

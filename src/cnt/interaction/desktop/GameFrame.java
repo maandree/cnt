@@ -21,7 +21,7 @@ import java.io.IOError;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame implements UpdateListener
+public class GameFrame extends JFrame implements UpdateListener
 {
     /**
      * The default total frame width
@@ -49,7 +49,7 @@ public class MainFrame extends JFrame implements UpdateListener
     /**
      * Constructor
      */
-    public MainFrame()
+    public GameFrame()
     {
 	super("cnt: Coop Network Tetris");
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO only on demo
@@ -69,7 +69,7 @@ public class MainFrame extends JFrame implements UpdateListener
     private void buildMenus()
     {
 	try
-	{   JMenuMaker.makeMenu(this, "MainFrame.jmml", this, null);
+	{   JMenuMaker.makeMenu(this, "GameFrame.jmml", this, null);
 	}
 	catch (final IOException err)
 	{   throw new IOError(err);

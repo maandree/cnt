@@ -43,7 +43,7 @@ public class Replayer //TODO: this class has only a rudamentary implementation
 					     new File(args[0])
 				       ) ) );
 	
-	(new MainFrame()).setVisible(true);
+	(new GameFrame()).setVisible(true);
 	
 	while (tape.available() > 0)
 	{

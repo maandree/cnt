@@ -44,7 +44,7 @@ public class GameDemo
     {
 	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
 	
-	(new MainFrame()).setVisible(true);
+	(new GameFrame()).setVisible(true);
 	final PlayerRing ring = new PlayerRing();
 	
 	rec.start();
