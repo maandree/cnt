@@ -7,6 +7,8 @@
  */
 package cnt.interaction.terminal;
 
+import java.io.*;
+
 
 /**
  * This is the main screen of the program
@@ -122,7 +124,7 @@ public class MainScreen extends Thread
 	    
 	    int split1, split2, splitH;
 	    split1 = 1 + 10 * blocksize;
-	    split2 = (screenW - split1 - 1) / 2;
+	    split2 = (screenWidth - split1 - 1) / 2;
 	    splitH = 2 + 10 * blocksize;
 	    
 	    System.out.print("\033[49m;\033[2;1H┌");
@@ -162,10 +164,17 @@ public class MainScreen extends Thread
 		else
 		    System.out.print("─");
 	    
-	    System.out.flush("");
-	    
-	    for (int d; (d = System.in.read()) != 'C' - '@';)
-		continue;
+	    System.out.flush();
+	 
+	    try
+	    {
+		for (int d; (d = System.in.read()) != 'C' - '@';)
+		    continue;
+	    }
+	    catch (final IOException err)
+	    {
+		//Stop reading
+	    }
 	}
 	finally
 	{
@@ -178,7 +187,7 @@ public class MainScreen extends Thread
     /**
      * Status quo ante TTY settings
      */
-    private final String stty;
+    private static String stty;
     
     
     
@@ -190,7 +199,7 @@ public class MainScreen extends Thread
 	System.out.print("\033[?1049h");
 	System.out.print("\033%G");
 	System.out.flush();
-	stty = Properties.getProperty(Property.STTY);
+	stty = getProperty(Property.STTY);
 	execSystemProperty(LineRule.BREAK, "stty -icanon -echo -isig -ixon -ixoff".split(" "));
     }
     
@@ -201,7 +210,7 @@ public class MainScreen extends Thread
     private static void terminate()
     {
 	if (stty != null)
-	    Properties.execSystemProperty(LineRule.BREAK, ("stty " + stty).split(" "));
+	    execSystemProperty(LineRule.BREAK, ("stty " + stty).split(" "));
 	System.out.print("\033[?1049l");
 	System.out.flush();
     }
@@ -320,7 +329,7 @@ public class MainScreen extends Thread
 	    int ptr = 0;
             
 	    final ProcessBuilder procBuilder = new ProcessBuilder(cmd);
-	    procBuilder.redirectInput(ProcessBuilder.Redirect.from(new File(stdout)));
+	    procBuilder.redirectInput(ProcessBuilder.Redirect.from((new File("/dev/stdout")).getCanonicalFile()));
 	    final Process process = procBuilder.start();
 	    final InputStream stream = process.getInputStream();
             
