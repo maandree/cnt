@@ -5,7 +5,7 @@
  * 
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.interaction.desktop;
+package cnt.game;
 import cnt.messages.*;
 import cnt.*;
 
@@ -27,18 +27,6 @@ public class Launcher implements Blackboard.BlackboardObserver
     
     
     
-    ///**
-    // * The started {@link LoginFrame}
-    // */
-    //private static LoginFrame loginFrame = null;
-    
-    /**
-     * The started {@link GameFrame}
-     */
-    private static GameFrame gameFrame = null;
-    
-    
-    
     /**
      * Main launcher method for this package
      * 
@@ -46,9 +34,7 @@ public class Launcher implements Blackboard.BlackboardObserver
      */
     public static void launch(final String... args)
     {
-	//(loginFrame = new LoginFrame()).setVisible(true);
-	//Blackboard.registerObserver(new Launcher());
-	(new GameFrame()).setVisible(true);
+	Blackboard.registerObserver(new Launcher());
     }
     
     
@@ -58,11 +44,11 @@ public class Launcher implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	//if (message instanceof JoinGame)
-	//{
-	//    loginFrame.setVisible(false);
-	//    (gameFrame = new GameFrame()).setVisible(true);
-	//}
+	if (message instanceof JoinGame)
+	{
+	    if (((JoinGame)message).remote == null)
+		Engine.start();
+	}
     }
     
 }
