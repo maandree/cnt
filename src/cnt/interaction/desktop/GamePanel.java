@@ -155,6 +155,11 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      */
     private boolean paused = false;
     
+    /**
+     * The local player
+     */
+    private Player player = null;
+    
     
     
     /**
@@ -170,13 +175,13 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	
 	final Graphics2D gg = offimg.createGraphics();
 	gg.setRenderingHint(KEY_ALPHA_INTERPOLATION, VALUE_ALPHA_INTERPOLATION_QUALITY);
-	gg.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-	gg.setRenderingHint(KEY_COLOR_RENDERING, VALUE_COLOR_RENDER_QUALITY);
-	gg.setRenderingHint(KEY_DITHERING, VALUE_DITHER_ENABLE); //if needed
-	gg.setRenderingHint(KEY_FRACTIONALMETRICS, VALUE_FRACTIONALMETRICS_OFF);
-	gg.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BICUBIC); //no implemention for sinc available
-	gg.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY);
-	gg.setRenderingHint(KEY_STROKE_CONTROL, VALUE_STROKE_PURE);
+	gg.setRenderingHint(KEY_ANTIALIASING,        VALUE_ANTIALIAS_ON);
+	gg.setRenderingHint(KEY_COLOR_RENDERING,     VALUE_COLOR_RENDER_QUALITY);
+	gg.setRenderingHint(KEY_DITHERING,           VALUE_DITHER_ENABLE); //if needed
+	gg.setRenderingHint(KEY_FRACTIONALMETRICS,   VALUE_FRACTIONALMETRICS_OFF);
+	gg.setRenderingHint(KEY_INTERPOLATION,       VALUE_INTERPOLATION_BICUBIC); //no implemention for sinc available
+	gg.setRenderingHint(KEY_RENDERING,           VALUE_RENDER_QUALITY);
+	gg.setRenderingHint(KEY_STROKE_CONTROL,      VALUE_STROKE_PURE);
 	super.paint(gg);
 	
 	int pieceW = screenW / this.width;
@@ -224,6 +229,18 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	{
 	    final MatrixPatch patch = (MatrixPatch)message;
 	    update(patch.erase, patch.blocks, patch.offY, patch.offX);
+	}
+	else if (message instanceof LocalPlayer)
+        {
+	    this.player = ((LocalPlayer)message).player;
+	}
+	else if (message instanceof PlayerPause)
+        {
+	    if (((PlayerPause)message).player == this.player)
+	    {
+		this.paused = ((PlayerPause)message).paused;
+		this.repaint();
+	    }
 	}
     }
     
