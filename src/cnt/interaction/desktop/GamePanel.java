@@ -38,28 +38,55 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	this.matrix = new Color[this.height][this.width];
 	
 	
-	BufferedImage pimg = null;
-	try
 	{
-	    pimg = ImageIO.read(new File("piece.png"));
+	    BufferedImage img = null;
+	    try
+	    {
+		img = ImageIO.read(new File("piece.png"));
+	    }
+	    catch (final IOException err)
+	    {
+		//WARNING: Can't load piece image!
+		//will be printed soon
+	    }
+	    this.pieceImage = img;
+	    
+	    if (this.pieceImage == null)
+	    {
+		System.err.println("WARNING: Can't load piece image!");
+		Blackboard.broadcastMessage(new SystemMessage(null, "Can't load piece image, your blocks will lose graphical quality!"));
+		this.pieceImageW = this.pieceImageH = 1; //initialising
+	    }
+	    else
+	    {
+		this.pieceImageW = this.pieceImage.getWidth();
+		this.pieceImageH = this.pieceImage.getHeight();
+	    }
 	}
-	catch (final IOException err)
 	{
-	    //WARNING: Can't load piece image!
-	    //will be printed soon
-	}
-	this.pieceImage = pimg;
-	
-	if (this.pieceImage == null)
-	{
-	    System.err.println("WARNING: Can't load piece image!");
-	    Blackboard.broadcastMessage(new SystemMessage(null, "Can't load piece image, your blocks will lose graphical quality!"));
-	    this.pieceImageW = this.pieceImageH = 1; //initialising
-	}
-	else
-	{
-	    this.pieceImageW = this.pieceImage.getWidth();
-	    this.pieceImageH = this.pieceImage.getHeight();
+	    BufferedImage img = null;
+	    try
+	    {
+		img = ImageIO.read(new File("paused.png"));
+	    }
+	    catch (final IOException err)
+	    {
+		//WARNING: Can't load paused image!
+		//will be printed soon
+	    }
+	    this.pausedImage = img;
+	    
+	    if (this.pausedImage == null)
+	    {
+		System.err.println("WARNING: Can't load pause image!");
+		Blackboard.broadcastMessage(new SystemMessage(null, "Can't load pause image!"));
+		this.pausedImageW = this.pausedImageH = 1; //initialising
+	    }
+	    else
+	    {
+		this.pausedImageW = this.pausedImage.getWidth();
+		this.pausedImageH = this.pausedImage.getHeight();
+	    }
 	}
 	
 	
@@ -84,9 +111,29 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
     private final Color gameBackground = new Color(16, 16, 100);
     
     /**
+     * The background of the game area when paused and pause image is missing
+     */
+    private final Color pausedBackground = new Color(100, 16, 16);
+    
+    /**
      * Piece matrix
      */
     private final Color[][] matrix;
+    
+    /**
+     * The image printed on top of the board with paused
+     */
+    private final BufferedImage pausedImage;
+    
+    /**
+     * The width of {@link #pausedImage}
+     */
+    private final int pausedImageW;
+    
+    /**
+     * The height of {@link #pausedImage}
+     */
+    private final int pausedImageH;
     
     /**
      * The image printed on top of piece to make them look better
@@ -102,6 +149,11 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      * The height of {@link #pieceImage}
      */
     private final int pieceImageH;
+    
+    /**
+     * Whether the local client is paused
+     */
+    private boolean paused = false;
     
     
     
@@ -136,6 +188,8 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	final int offY = screenH - this.height * pieceH;
 	
 	gg.setColor(this.gameBackground);
+	if (this.paused && (this.pausedImage == null))
+	    gg.setColor(this.pausedBackground);
 	gg.fillRect(offX, offY, this.width * pieceW, this.height * pieceH);
 	
 	Color colour;
@@ -152,6 +206,10 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 			gg.drawImage(this.pieceImage, px, py, px + pieceW, py + pieceH,
 				     0, 0, this.pieceImageW, this.pieceImageH, null);
 		}
+	
+	if (this.paused && (this.pausedImage != null))
+	    gg.drawImage(this.pausedImage, offX, offY, offX + this.width * pieceW, offY + this.height * pieceH,
+			 0, 0, this.pausedImageW, this.pausedImageH, null);
 	
 	g.drawImage(offimg, 0, 0, null);
     }
