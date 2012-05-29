@@ -61,6 +61,27 @@ public class Player implements Serializable
     }
     
     
+    /**
+     * Initialiser
+     */
+    {
+	try
+	{   readResolve();
+	}
+	catch (final ObjectStreamException err)
+	{   //This will never happen
+	    throw new Error("Impossible error");
+	}
+    }
+    
+    
+    
+    /**
+     * All instances of this class
+     */
+    private static HashMap<Integer, Player> instances = new HashMap<Integer, Player>();
+    
+    
     
     /**
      * The name of the player
@@ -82,6 +103,38 @@ public class Player implements Serializable
      */
     protected ArrayList<String> dnses;
     
+    
+    
+    /**
+     * Gets an instance of this class
+     * 
+     * @param   id  The ID of the {@lnk Player} instance
+     * @return      The instance with the ID
+     */
+    public static Player getInstance(final int id)
+    {
+	final Player rc;
+	synchronized (instances)
+	{   rc = instances.get(Integer.valueOf(id));
+	}
+	if (rc == null)
+	    throw new Error("Trying to get none existing Player instance");
+	return rc;
+    }
+    
+    
+    /**
+     * Used to store deserialised instances
+     * 
+     * @see Serializable
+     */
+    public Object readResolve() throws ObjectStreamException
+    {
+	synchronized (instances)
+	{   instances.put(Integer.valueOf(this.id), this);
+	}
+	return this;
+    }
     
     
     /**
