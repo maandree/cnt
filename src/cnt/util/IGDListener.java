@@ -164,10 +164,13 @@ public class IGDListener extends DefaultRegistryListener
 	*/
 	synchronized public void demapPort(final RemoteService portMapService, final Registry registry, final RemoteDevice device)
 	{
+		
+		String ip = Toolkit.getLocalIP();
+
 		// Set up the portmappin
 		PortMapping cntPort = null;
 		try {
-			cntPort = new PortMapping(this.port, InetAddress.getLocalHost().getHostAddress(), PortMapping.Protocol.TCP, "CNT");
+			cntPort = new PortMapping(this.port, ip, PortMapping.Protocol.TCP, "CNT");
 		} catch (UnknownHostException err)
 		{
 			// Very unlikely. TODO: setup proper error handling

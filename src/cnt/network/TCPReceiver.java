@@ -61,10 +61,38 @@ public class TCPReceiver implements Runnable
 		ObjectInputStream input = null;
 		try
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
+			// flag for setting if message is priority or not
+			boolean prio = false;			
+
 			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
-			// Send message to ObjectNetworking layer, and wait for a ID number to be returned
-			Integer peer = this.objectNetworking.receive((Serializable)input.readObject());
+			// Check to see what the message is all about
+			String msgType = input.readByte();
+			
+			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
+			
+			// Check what the message is and handle it accordingly
+			if (msgType == ConnectionNetworking.PRIORITY)
+			{
+				prio = true;
+				msgType = input.readByte();
+			}
+
+			int fromID = input.readInt();
+			switch (msgType)
+			{
+				case ConnectionNetworking.QUESTION:
+					break;
+				
+				case ConnectionNetwokring.MESSAGE:
+					break;
+
+				case ConnectionNetworking.OBJECT:
+					break;
+				
+				default:
+					break; // Drop player who sends fulty data?
+			}
+			
 			// Take ID and map the connection and peer in ConnectionNetworking
 			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
 			if (peer != null) {
