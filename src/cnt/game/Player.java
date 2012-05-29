@@ -33,7 +33,7 @@ public class Player implements Serializable
      * @param  id    The ID of the player
      * @param  ip    The IP address of the player
      */
-    public Player(final String name, final int id)
+    public Player(final String name, final int id, final String ip)
     {
 	this.name = name;
 	this.id = id;
@@ -108,7 +108,7 @@ public class Player implements Serializable
      * 
      * @return  The IP address of the player
      */
-    public int getIP() {
+    public String getIP() {
 	return this.ip;
     }
     
