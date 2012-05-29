@@ -29,13 +29,15 @@ public class Player implements Serializable
     /**
      * Constructor
      * 
-     * @param  name   The name of the player
-     * @param  color  The ID of the player
+     * @param  name  The name of the player
+     * @param  id    The ID of the player
+     * @param  ip    The IP address of the player
      */
     public Player(final String name, final int id)
     {
 	this.name = name;
 	this.id = id;
+	this.ip = ip;
     }
     
     
@@ -49,6 +51,11 @@ public class Player implements Serializable
      * The ID of the player
      */
     protected int id;
+    
+    /**
+     * The IP address of the player
+     */
+    protected String ip;
     
     
     
@@ -64,7 +71,7 @@ public class Player implements Serializable
 	
 	final Player p = (Player)object;
 	
-	return this.name.equals(p.name) && (this.id == p.id);
+	return this.id == p.id;
     }
     
     
@@ -72,7 +79,7 @@ public class Player implements Serializable
      * {@inheritDoc}
      */
     public int hashCode() {
-	return this.name.hashCode() ^ this.id;
+	return this.id;
     }
     
     
@@ -97,19 +104,19 @@ public class Player implements Serializable
     
     
     /**
-     * Sets the ID of the player
+     * Gets the IP address of the player
      * 
-     * @param  value  The new ID of the player
+     * @return  The IP address of the player
      */
-    public void setID(final int value) {
-	this.id = value;
+    public int getIP() {
+	return this.ip;
     }
     
     /**
      * {@inheritDoc}
      */
     public String toString() {
-	return this.name + " (" + this.id + ")";
+	return this.name + " (" + this.id + ", " + this.ip + ")";
     }
     
 }
