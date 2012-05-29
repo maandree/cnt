@@ -139,7 +139,7 @@ public class ColourRing extends JFrame
 	    g.fillRect(x1, y, x - x1, 100);
 	    int arc1 = arc;
 	    arc += 360 * (z / 1.5) / rgb.length;
-	    g.fillArc(300, 500, 400, 400, -arc1 * 2 + 90, (arc - arc1) * -3);
+	    g.fillArc(400, 500, 200, 200, -arc1 * 2 + 90, (arc - arc1) * -3);
 	}
 	
 	y += 100;
@@ -165,9 +165,13 @@ public class ColourRing extends JFrame
 	if (diffs[diffs.length - 1] == 0.)
 	    g.fillRect(x, 40, step << 1, 100);
 	
+	int xx = 0;
 	int pow = 1, j = 0, pln = -1;
-	for (int i = 0, n = 36; i < n; i++, j++)
+	for (int i = 0, n = 64; i < n; i++, j++)
 	{
+	    if ((i & 15) == 0)
+		xx += 20;
+	    
 	    int c = j;
 	    if (i > 0)
 	    {
@@ -176,11 +180,11 @@ public class ColourRing extends JFrame
 		    pln++;
 		    pow = i;
 		    j = 0;
-		    System.out.println("--" + pow);
+		    System.out.println("-- " + pow);
 		}
 		
 		int jj = 0;
-		for (int p = 0; p < pow; p++)
+		for (int p = 0; p < pln; p++)
 		{
 		    int jl = ((j & (1 << p)) >>> p) << (pln - p - 1);
 		    int jh = ((j & (1 << (pln - p - 1))) >>> (pln - p - 1)) << p;
@@ -192,8 +196,44 @@ public class ColourRing extends JFrame
 		System.out.println(i + ": " + j + "." + jj + ": " + c);
 	    }
 	    
-	    g.setColor(colours[c]);
-	    g.fillRect(40 + 900 * i / n, 940, 900 / n + 1, 60);
+	    double llum = 0.7;
+	    double hlum = 1.05;
+	    
+	    int cr = colours[c].getRed();
+	    int cg = colours[c].getGreen();
+	    int cb = colours[c].getBlue();
+	    double[] lrgb = toLinear(cr, cg, cb);
+	    
+	    int yy = 690;
+	    for (int ł = 0, łn = 16; ł < łn; ł++)
+	    {
+		if ((ł & 7) == 0)
+		    yy += 20;
+		int łł = 0;
+		for (int p = 0; p < 5; p++)
+		{
+		    int łl = ((ł & (1 << p)) >>> p) << (3 - p);
+		    int łh = ((ł & (1 << (3 - p))) >>> (3 - p)) << p;
+		    
+		    łł |= łl | łh;
+		}
+		double lum = (double)łł / łn;
+		lum = hlum + lum * (llum - hlum);
+		
+		double lr = lrgb[0] * lum, lg = lrgb[1] * lum, lb = lrgb[2] * lum;
+		double avg = (lr + lg + lb) / 3;
+		
+		
+		for (int si = 0; si < 2; si++)
+		{
+		    final int S = 3;
+		    int[] srgb = toStandard(lr * (S - si) / S + avg * si / S,
+					    lg * (S - si) / S + avg * si / S,
+					    lb * (S - si) / S + avg * si / S);
+		    g.setColor(new Color(srgb[0], srgb[1], srgb[2]));
+		    g.fillRect(xx + 900 * i / n, yy + ł * 240 / łn + 120 * si / łn, 900 / n + 1, 120 / łn + 1);
+		}
+	    }
 	}
     }
     
