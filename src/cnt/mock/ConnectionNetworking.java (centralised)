@@ -6,8 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.mock;
-import cnt.mock.PipedInputStream;
-import cnt.mock.PipedOutputStream;
+import cnt.util.PipedInputStream;
+import cnt.util.PipedOutputStream;
 import cnt.game.*;
 import cnt.messages.*;
 import cnt.*;
