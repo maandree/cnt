@@ -51,7 +51,7 @@ public class PeerGameDemo
 	final int serverport = Integer.parseInt(args[3]);
 	final String remote = args[4];
 	
-	final Player me = new Player(args[0], args[0].hashCode() | (255 << 24), null);
+	final Player me = new Player(args[0], args[0].hashCode() | (255 << 24), 0, null);
 	final Object monitor = new Object();
 	
 	final Player[] lowest = {null};

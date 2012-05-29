@@ -31,13 +31,15 @@ public class Player implements Serializable
      * 
      * @param  name   The name of the player
      * @param  id     The ID of the player
+     * @param  uuid   Universally unique ID for the player
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final String ip, final String... dnses)
+    public Player(final String name, final int id, final long uuid, final String ip, final String... dnses)
     {
 	this.name = name;
 	this.id = id;
+	this.uuid = uuid;
 	this.ip = ip;
 	this.dnses = new ArrayList<String>();
 	for (final String dns : dnses)
@@ -49,13 +51,15 @@ public class Player implements Serializable
      * 
      * @param  name   The name of the player
      * @param  id     The ID of the player
+     * @param  uuid   Universally unique ID for the player
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final String ip, final ArrayList<String> dnses)
+    public Player(final String name, final int id, final long uuid, final String ip, final ArrayList<String> dnses)
     {
 	this.name = name;
 	this.id = id;
+	this.uuid = uuid;
 	this.ip = ip;
 	this.dnses = dnses;
     }
@@ -81,6 +85,11 @@ public class Player implements Serializable
      */
     private static HashMap<Integer, Player> instances = new HashMap<Integer, Player>();
     
+    /**
+     * All instances of this class, by UUID
+     */
+    private static HashMap<Long, Player> instancesUUID = new HashMap<Long, Player>();
+    
     
     
     /**
@@ -92,6 +101,11 @@ public class Player implements Serializable
      * The ID of the player
      */
     protected int id;
+    
+    /**
+     * Universally unique ID for the player
+     */
+    protected long uuid;
     
     /**
      * The IP address of the player
@@ -108,18 +122,28 @@ public class Player implements Serializable
     /**
      * Gets an instance of this class
      * 
-     * @param   id  The ID of the {@lnk Player} instance
+     * @param   id  The ID of the {@link Player} instance
      * @return      The instance with the ID
      */
     public static Player getInstance(final int id)
     {
-	final Player rc;
 	synchronized (instances)
-	{   rc = instances.get(Integer.valueOf(id));
+	{   return instances.get(Integer.valueOf(id));
 	}
-	if (rc == null)
-	    throw new Error("Trying to get none existing Player instance");
-	return rc;
+    }
+    
+    
+    /**
+     * Gets an instance of this class by UUID
+     * 
+     * @param   uuid  The UUID of the {@link Player} instance
+     * @return        The instance with the UUID
+     */
+    public static Player getInstanceByUUID(final long uuid)
+    {
+	synchronized (instances)
+	{   return instances.get(Long.valueOf(uuid));
+	}
     }
     
     
@@ -132,6 +156,7 @@ public class Player implements Serializable
     {
 	synchronized (instances)
 	{   instances.put(Integer.valueOf(this.id), this);
+	    instancesUUID.put(Long.valueOf(this.uuid), this);
 	}
 	return this;
     }
@@ -178,6 +203,16 @@ public class Player implements Serializable
      */
     public int getID() {
 	return this.id;
+    }
+    
+    
+    /**
+     * Gets the yniversally unique ID for the player
+     * 
+     * @return  Universally unique ID for the player
+     */
+    public long getUUID() {
+	return this.uuid;
     }
     
     
