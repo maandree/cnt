@@ -125,13 +125,13 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
 	synchronized (this)
-	{
+	{   
 	    if (message instanceof PlayerJoined)
 	    {
 		final Player player = ((PlayerJoined)message).player;
 		if (this.playerMap.containsKey(player))
 		    return;
-		int _colour = player.getColor();
+		int _colour = player.getID();
 		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  0) & 255);

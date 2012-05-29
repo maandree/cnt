@@ -29,13 +29,13 @@ public class Player implements Serializable
     /**
      * Constructor
      * 
-     * @param  name    The name of the player
-     * @param  color  The color and ID of the player
+     * @param  name   The name of the player
+     * @param  color  The ID of the player
      */
-    public Player(final String name, final int color)
+    public Player(final String name, final int id)
     {
 	this.name = name;
-	this.color = color;
+	this.id = id;
     }
     
     
@@ -46,9 +46,9 @@ public class Player implements Serializable
     protected String name;
     
     /**
-     * The color and ID of the player
+     * The ID of the player
      */
-    protected int color;
+    protected int id;
     
     
     
@@ -64,14 +64,15 @@ public class Player implements Serializable
 	
 	final Player p = (Player)object;
 	
-	return this.name.equals(p.name) && (this.color == p.color);
+	return this.name.equals(p.name) && (this.id == p.id);
     }
+    
     
     /**
      * {@inheritDoc}
      */
     public int hashCode() {
-	return this.name.hashCode() ^ this.color;
+	return this.name.hashCode() ^ this.id;
     }
     
     
@@ -86,29 +87,29 @@ public class Player implements Serializable
     
     
     /**
-     * Gets the color and ID of the player
+     * Gets the ID of the player
      * 
-     * @return  The color and ID of the player
+     * @return  The ID of the player
      */
-    public int getColor() {
-	return this.color;
+    public int getID() {
+	return this.id;
     }
     
     
     /**
-     * Sets the color and ID of the player
+     * Sets the ID of the player
      * 
-     * @param  value  The new color and ID of the player
+     * @param  value  The new ID of the player
      */
-    public void setColor(final int value) {
-	this.color = value;
+    public void setID(final int value) {
+	this.id = value;
     }
     
     /**
      * {@inheritDoc}
      */
     public String toString() {
-	return this.getName() + " (" + this.getColor() + ")";
+	return this.name + " (" + this.id + ")";
     }
     
 }

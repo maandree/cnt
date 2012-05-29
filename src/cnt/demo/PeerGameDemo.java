@@ -79,7 +79,7 @@ public class PeerGameDemo
 			else if (message instanceof PlayerJoined)
 			{
 			    final Player player = ((PlayerJoined)message).player;
-			    if ((lowest[0] == null) || (lowest[0].getColor() > player.getColor()))
+			    if ((lowest[0] == null) || (lowest[0].getID() > player.getID()))
 				lowest[0] = player;
 			    players++;
 			    if (players == 2)
