@@ -35,7 +35,7 @@ public class Player implements Serializable
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final long uuid, final String ip, final String... dnses)
+    public Player(final String name, final int id, final UUID uuid, final String ip, final String... dnses)
     {
 	this.name = name;
 	this.id = id;
@@ -46,6 +46,7 @@ public class Player implements Serializable
 	    this.dnses.add(dns);
     }
     
+    
     /**
      * Constructor
      * 
@@ -55,7 +56,7 @@ public class Player implements Serializable
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final long uuid, final String ip, final ArrayList<String> dnses)
+    public Player(final String name, final int id, final UUID uuid, final String ip, final ArrayList<String> dnses)
     {
 	this.name = name;
 	this.id = id;
@@ -88,7 +89,7 @@ public class Player implements Serializable
     /**
      * All instances of this class, by UUID
      */
-    private static HashMap<Long, Player> instancesUUID = new HashMap<Long, Player>();
+    private static HashMap<UUID, Player> instancesUUID = new HashMap<UUID, Player>();
     
     
     
@@ -105,7 +106,7 @@ public class Player implements Serializable
     /**
      * Universally unique ID for the player
      */
-    protected long uuid;
+    protected UUID uuid;
     
     /**
      * The IP address of the player
@@ -139,10 +140,10 @@ public class Player implements Serializable
      * @param   uuid  The UUID of the {@link Player} instance
      * @return        The instance with the UUID
      */
-    public static Player getInstanceByUUID(final long uuid)
+    public static Player getInstanceByUUID(final UUID uuid)
     {
 	synchronized (instances)
-	{   return instances.get(Long.valueOf(uuid));
+	{   return instances.get(uuid);
 	}
     }
     
@@ -156,7 +157,7 @@ public class Player implements Serializable
     {
 	synchronized (instances)
 	{   instances.put(Integer.valueOf(this.id), this);
-	    instancesUUID.put(Long.valueOf(this.uuid), this);
+	    instancesUUID.put(this.uuid, this);
 	}
 	return this;
     }
@@ -211,7 +212,7 @@ public class Player implements Serializable
      * 
      * @return  Universally unique ID for the player
      */
-    public long getUUID() {
+    public UUID getUUID() {
 	return this.uuid;
     }
     

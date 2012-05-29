@@ -54,7 +54,7 @@ public class ChatDemo
 	Blackboard.broadcastMessage(new SystemMessage(null, "BlackboardNetworking and all other *Networking instances created from chain."));
 	
 	
-	Blackboard.broadcastMessage(new LocalPlayer(new Player(name, name.hashCode() | (255 << 24), 0, null)));
+	Blackboard.broadcastMessage(new LocalPlayer(new Player(name, name.hashCode() | (255 << 24), null, null)));
 	
 	Blackboard.registerObserver(new Listener());
 	
