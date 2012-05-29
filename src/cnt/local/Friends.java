@@ -6,6 +6,9 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.local;
+import cnt.game.*;
+
+import java.util.*;
 
 
 /**
@@ -21,6 +24,41 @@ public class Friends
     private Friends()
     {
 	assert false : "You may not create instances of this class [Friends].";
+    }
+    
+    
+    
+    static
+    {
+	loadFriends();
+    }
+    
+    
+    
+    private static void loadFriends()
+    {
+    }
+    
+    public static Player[] getFriends()
+    {
+	return null;
+    }
+    
+    public static void updateFriend(final Player friend)
+    {
+    }
+    
+    public static void addFriend(final Player friend)
+    {
+    }
+    
+    public static void removeFriend(final Player friend)
+    {
+    }
+    
+    public static UUID getPersonalUUID()
+    {
+	return null;
     }
     
 }

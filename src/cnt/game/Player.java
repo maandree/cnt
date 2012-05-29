@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
+import cnt.local.*;
 
 import java.util.*;
 import java.io.*;
@@ -158,6 +159,7 @@ public class Player implements Serializable
 	synchronized (instances)
 	{   instances.put(Integer.valueOf(this.id), this);
 	    instancesUUID.put(this.uuid, this);
+	    Friends.updateFriend(this);
 	}
 	return this;
     }
