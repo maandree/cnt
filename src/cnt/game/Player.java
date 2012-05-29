@@ -7,7 +7,7 @@
  */
 package cnt.game;
 
-import java.awt.Color;
+import java.util.*;
 import java.io.*;
 
 
@@ -29,15 +29,35 @@ public class Player implements Serializable
     /**
      * Constructor
      * 
-     * @param  name  The name of the player
-     * @param  id    The ID of the player
-     * @param  ip    The IP address of the player
+     * @param  name   The name of the player
+     * @param  id     The ID of the player
+     * @param  ip     The IP address of the player
+     * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final String ip)
+    public Player(final String name, final int id, final String ip, final String... dnses)
     {
 	this.name = name;
 	this.id = id;
 	this.ip = ip;
+	this.dnses = new ArrayList<String>();
+	for (final String dns : dnses)
+	    this.dnses.add(dns);
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param  name   The name of the player
+     * @param  id     The ID of the player
+     * @param  ip     The IP address of the player
+     * @param  dnses  The player's DNS names
+     */
+    public Player(final String name, final int id, final String ip, final ArrayList<String> dnses)
+    {
+	this.name = name;
+	this.id = id;
+	this.ip = ip;
+	this.dnses = dnses;
     }
     
     
@@ -56,6 +76,11 @@ public class Player implements Serializable
      * The IP address of the player
      */
     protected String ip;
+    
+    /**
+     * The player's DNS names
+     */
+    protected ArrayList<String> dnses;
     
     
     
@@ -112,11 +137,22 @@ public class Player implements Serializable
 	return this.ip;
     }
     
+    
+    /**
+     * Gets the player's DNS names
+     * 
+     * @return  The player's DNS names
+     */
+    public ArrayList<String> getDNSes() {
+	return this.dnses;
+    }
+    
+    
     /**
      * {@inheritDoc}
      */
     public String toString() {
-	return this.name + " (" + this.id + ", " + this.ip + ")";
+	return this.name + " (" + this.id + ", " + this.ip + ", " + this.dnses.toString() + ")";
     }
     
 }
