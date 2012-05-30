@@ -15,6 +15,7 @@ import cnt.messages.*;
 // Classes needed for TCP sockets
 import java.util.*;
 import java.io.*;
+import cnt.util.*;
 
 // Classes needed for UDP socket
 import java.net.*;
@@ -47,6 +48,11 @@ public class TCPReceiver implements Runnable
 	private final Socket connection;
 	
 	/**
+	* the PipedInputStream to read from
+	*/
+	private final InputStream input = null;
+
+	/**
 	* the ObjectNetworking instance to send objects to
 	*/
 	private final ObjectNetworking objectNetworking;
@@ -56,54 +62,21 @@ public class TCPReceiver implements Runnable
 	*/
 	private final ConnectionNetworking connectionNetworking;
 
+	/**
+	* Internal stream
+	*/
+	private final PipedOutputStream internalOutput;
+
 	public void run()
 	{
-		ObjectInputStream input = null;
+		
+		// flag for setting if message is priority or not
+		boolean prio = false;			
+		
 		try
 		{
-			// flag for setting if message is priority or not
-			boolean prio = false;			
 
-			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
-			// Check to see what the message is all about
-			String msgType = input.readByte();
-			
-			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
-			
-			// Check what the message is and handle it accordingly
-			if (msgType == ConnectionNetworking.PRIORITY)
-			{
-				prio = true;
-				msgType = input.readByte();
-			}
-
-			int fromID = input.readInt();
-			switch (msgType)
-			{
-				case ConnectionNetworking.QUESTION:
-					break;
-				
-				case ConnectionNetwokring.MESSAGE:
-					break;
-
-				case ConnectionNetworking.OBJECT:
-					break;
-				
-				default:
-					break; // Drop player who sends fulty data?
-			}
-			
-			// Take ID and map the connection and peer in ConnectionNetworking
-			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
-			if (peer != null) {
-				this.connectionNetworking.sockets.put(peer, this.connection);
-				this.connectionNetworking.objectInputs.put(peer, input);
-				ObjectOutputStream out =  new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
-				out.flush();
-				this.connectionNetworking.objectOutputs.put(peer, out);
-			}
-			
-			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.sockets.size() + " connections"));
+			this.input = new PipedInputStream(new BufferedInputStream(this.connection.getInputStream()));
 
 		} catch (IOException ioe) 
 		{
@@ -112,25 +85,69 @@ public class TCPReceiver implements Runnable
 		{
 			// TODO: make some error handling happen
 		}
+			
+		Blackboard.broadcastMessage(new SystemMessage(null, "Getting new connection"));
+		
+		this.objectNetworking.connect(this);
+
+	}
 	
-		try 
+	public byte[] read() {
+
+		//* First message sent should be an new ID request or a PlayerJoined *//
+		// Check to see what the message is all about
+		char msgType = this.input.read();
+		
+		// Check what the message is and handle it accordingly
+		if (msgType == ConnectionNetworking.PRIORITY)
 		{
-			while(true)
-			{
-				Blackboard.broadcastMessage(new SystemMessage(null, "Waiting for next message"));
-				if (!this.connection.isInputShutdown())
-					Blackboard.broadcastMessage(new SystemMessage(null, "Connection has alive instream"));
-				Serializable message = (Serializable)input.readObject();
-				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
-				this.objectNetworking.receive(message);
-			}
-		} catch (IOException ioe)
-		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "IOException receving messages"));
-			Blackboard.broadcastMessage(new SystemMessage(null, "IOExceotion: " + ioe.getMessage()));
-		} catch (ClassNotFoundException cnfe)
-		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "ClassNotFoundException reading messages"));
+			prio = true;
+			msgType = input.read();
 		}
+			
+		while (true)
+		{
+			// Check to see what the message is all about
+			String msgType = input.readByte();
+			
+			// Check what the message is and handle it accordingly
+			if (msgType == ConnectionNetworking.PRIORITY)
+			{
+				prio = true;
+				msgType = input.readByte();
+			}
+			switch (msgType)
+			{
+				case ConnectionNetworking.QUESTION:
+					
+					break;
+				
+				case ConnectionNetwokring.MESSAGE:
+					this.speak();
+					break;
+	
+				case ConnectionNetworking.OBJECT:
+					this.forward();
+					break;
+				
+				default:
+					break; // Drop player who sends fulty data?
+			}
+		}	
+	}
+	
+	protected void listen()
+	{
+
+	}
+
+	protected void speak()
+	{
+	
+	}
+
+	protected void forward()
+	{
+	
 	}
 }

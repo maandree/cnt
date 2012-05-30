@@ -164,12 +164,12 @@ public class ConnectionNetworking
 	/**
 	* Map of current threaded connections to use to store ObjectOutputStreams
 	*/
-	final HashMap<Integer, ObjectOutputStream> objectOutputs = new HashMap<Integer, ObjectOutputStream>();
+	final HashMap<Integer, PipedOutputStream> outputs = new HashMap<Integer, PipedOutputStream>();
 
 	/**
 	* Map of current threaded connections to use to store ObjectInputStremas
 	*/
-	final HashMap<Integer, ObjectInputStream> objectInputs = new HashMap<Integer, ObjectInputStream>();
+	final HashMap<Integer, PipedInputStream> inputs = new HashMap<Integer, PipedInputStream>();
 
 	/**
 	* Set of already taken IDs
