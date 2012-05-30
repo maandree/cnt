@@ -6,6 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
+import cnt.local.*;
+import cnt.game.*;
 
 import java.io.*;
 import java.net.*;
@@ -20,6 +22,11 @@ import java.util.*;
 public class Diagnostics
 {
     public static String run()
+    {
+	return run(0, 10_000);
+    }
+    
+    public static String run(final int ttl, final int timeout)
     {
 	final StringBuilder buf = new StringBuilder();
 	
@@ -83,6 +90,7 @@ public class Diagnostics
 	    buf.append(" error\n");
 	}
 	
+	buf.append("Local client\n");
 	try
 	{
 	    final String publicip;
@@ -108,21 +116,100 @@ public class Diagnostics
 	    
 		line = line.substring(0, line.indexOf("</body>"));
 		line = line.substring(line.lastIndexOf(' ') + 1);
-		buf.append("Public IP: " + (publicip = line) + "\n");
+		buf.append(" Public IP: " + (publicip = line) + "\n");
 	    }
 	    final InetAddress[] addresses = InetAddress.getAllByName(publicip);
 	    for (final InetAddress address : addresses)
 	    {
-		buf.append(" " + address.toString() + "\n");
-		buf.append("  Canonical: " + address.getCanonicalHostName() + "\n");
-		buf.append("  Address: " + address.getHostAddress() + "\n");
-		buf.append("  Name: " + address.getHostName() + "\n");
+		buf.append("  " + address.toString() + "\n");
+		buf.append("   Canonical: " + address.getCanonicalHostName() + "\n");
+		buf.append("   Address: " + address.getHostAddress() + "\n");
+		buf.append("   Name: " + address.getHostName() + "\n");
 	    }
 	}
 	catch (final Throwable err)
 	{
-	    buf.append("Unable to get public IP address.\n");
+	    buf.append(" Unable to get public IP address.\n");
 	}
+	
+	for (final String dns : Friends.getPersonalDNSes())
+        {
+	    buf.append(" " + dns + "\n");
+	    try
+	    {
+		final InetAddress[] addresses = InetAddress.getAllByName(dns);
+		for (final InetAddress address : addresses)
+		{
+		    buf.append("  " + address.toString() + "\n");
+		    buf.append("   Canonical: " + address.getCanonicalHostName() + "\n");
+		    buf.append("   Address: " + address.getHostAddress() + "\n");
+		    buf.append("   Name: " + address.getHostName() + "\n");
+		}
+	    }
+	    catch (final Throwable err)
+	    {
+		buf.append("  error\n");
+	    }
+	}
+	
+	buf.append("Friends\n");
+	final Player[] friends = Friends.getFriends();
+	for (final Player friend : friends)
+	{
+	    buf.append(" " + friend.getName() + "\n");
+	    buf.append("  UUID: " + friend.getUUID().toString() + "\n");
+	    
+	    final String[] dnses = new String[friend.getDNSes().size()];
+	    friend.getDNSes().toArray(dnses);
+	    for (final String[] arr : new String[][] {{friend.getIP()}, dnses})
+		for (final String dns : arr)
+		{
+		    buf.append("  " + dns + "\n");
+		    try
+		    {
+			final InetAddress[] addresses = InetAddress.getAllByName(dns);
+			for (final InetAddress address : addresses)
+			{
+			    buf.append("   " + address.toString() + "\n");
+			    buf.append("    Canonical: " + address.getCanonicalHostName() + "\n");
+			    buf.append("    Address: " + address.getHostAddress() + "\n");
+			    buf.append("    Name: " + address.getHostName() + "\n");
+			    buf.append("    Reachability\n");
+			    
+			    final Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
+			    while (networks.hasMoreElements())
+			    {
+				final NetworkInterface network = networks.nextElement();
+				String line = "     " + network.getName() + ": ";
+				
+				if (network.isLoopback())
+				    line += "loopback";
+				else if (network.isUp() == false)
+				    line += "down";
+				else
+				    try
+				    {
+					if (address.isReachable(network, ttl, timeout))
+					    line += "REACHABLE";
+					else
+					    line += "unreachable(ttl: " + (ttl == 0 ? "default" : ttl) + ", timeout [ns]: " + timeout + ")";
+				    }
+				    catch (final Throwable err)
+				    {
+					line += "error";
+				    }
+				
+				buf.append(line + "\n");
+			    }
+			}
+		    }
+		    catch (final Throwable err)
+		    {
+			buf.append("   error\n");
+		    }
+		}
+	}
+	
 	
 	return buf.toString();
     }
