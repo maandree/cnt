@@ -7,6 +7,7 @@
  */
 package cnt.interaction.desktop;
 import cnt.game.*;
+import cnt.local.*;
 import cnt.messages.*;
 import cnt.*;
 
@@ -73,6 +74,7 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 			    System.err.println("Right clicking on index " + listItemIndex);
 			
 			    UserList.this.list.setSelectedIndex(listItemIndex);
+			    UserList.this.selected = UserList.this.playerReverseMap.get(UserList.this.model.getElementAt(listItemIndex));
 			    UserList.this.popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		    }
@@ -85,7 +87,10 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		     */
 		    public void actionPerformed(final ActionEvent e)
 		    {
-			System.err.println("[Add to friend list] click");
+			if (UserList.this.selected == null)
+			    System.err.println("This is not supposted to happen: UserList.this.selected == null"); 
+			else
+			    Friends.addFriend(UserList.this.selected);
 		    }
 	        });
     }
@@ -95,27 +100,37 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
     /**
      * The list component
      */
-    private final JList<String> list;
+    final JList<String> list;
     
     /**
      * The list's model
      */
-    private final DefaultListModel<String> model;
+    final DefaultListModel<String> model;
     
     /**
      * The popup menu
      */
-    private final JPopupMenu popup;
+    final JPopupMenu popup;
     
     /**
      * The “Add to friend list” menu item
      */
-    private final JMenuItem menuFriend;
+    final JMenuItem menuFriend;
     
     /**
-     * Mapping form players to their list item
+     * Mapping from players to their list item
      */
-    private final HashMap<Player, String> playerMap = new HashMap<Player, String>();
+    final HashMap<Player, String> playerMap = new HashMap<Player, String>();
+    
+    /**
+     * Mapping from the players' list item to the players themself
+     */
+    final HashMap<String, Player> playerReverseMap = new HashMap<String, Player>();
+    
+    /**
+     * The current right clicked player
+     */
+    Player selected = null;
     
     
     
@@ -135,7 +150,9 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
 		      colour += Integer.toString((_colour >>  0) & 255);
-		final String item = "<html><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
+
+		      final String itemtag = (player.getUUID() == null ? "(null)" : player.getUUID().toString());
+		      final String item = "<html><!-- " + itemtag + " --><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
 		this.playerMap.put(player, item);
 		this.model.addElement(item);
 	    }
