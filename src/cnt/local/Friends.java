@@ -76,15 +76,60 @@ public class Friends
      */
     private static String myFile;
     
+    /**
+     * Set with all friends
+     */
+    private static HashSet<Player> friends;
+    
+    /**
+     * The file with the friend data
+     */
+    private static String friendFile;
+    
     
     
     /**
      * Loads the friends list
      * 
      * @param  file  The file with the data
+     * 
+     * @throws  IOException  On I/O error
      */
-    private static void loadFriends(final String file)
+    @SuppressWarnings("unchecked")
+    private static void loadFriends(final String file) throws IOException
     {
+	friendFile = file;
+	final File $file = new File(file);
+	if ($file.exists() == false)
+	{
+	    friends = new HashSet<Player>();
+	    saveFriends();
+	}
+	else
+	{
+	    ObjectInputStream is = null;
+	    try
+	    {
+		is = new ObjectInputStream(new BufferedInputStream(new FileInputStream($file)));
+		friends = (HashSet<Player>)(is.readObject());
+	    }
+	    catch (final ClassNotFoundException err)
+	    {
+		throw new IOError(err);
+	    }
+	    finally
+	    {
+		if (is != null)
+		    try
+		    {
+			is.close();
+		    }
+		    catch (final Throwable err)
+		    {
+			//Do nothing
+		    }
+	    }
+	}
     }
     
     
@@ -95,7 +140,12 @@ public class Friends
      */
     public static Player[] getFriends()
     {
-	return null;
+	synchronized (Friends.class)
+	{
+	    final Player[] rc = new Player[friends.size()];
+	    friends.toArray(rc);
+	    return rc;
+	}
     }
     
     
@@ -106,6 +156,13 @@ public class Friends
      */
     public static void updateFriend(final Player friend)
     {
+	synchronized (Friends.class)
+	{
+	    if (friends.contains(friend) == false)
+		return;
+	    
+	    saveFriends();
+	}
     }
     
     
@@ -116,6 +173,14 @@ public class Friends
      */
     public static void addFriend(final Player friend)
     {
+	synchronized (Friends.class)
+	{
+	    if (friends.contains(friend))
+		return;
+	    
+	    friends.add(friend);
+	    saveFriends();
+	}
     }
     
     
@@ -126,6 +191,48 @@ public class Friends
      */
     public static void removeFriend(final Player friend)
     {
+	synchronized (Friends.class)
+	{
+	    if (friends.contains(friend) == false)
+		return;
+	    
+	    friends.remove(friend);
+	    saveFriends();
+	}
+    }
+    
+    
+    /**
+     * Updates the file with the friend information
+     */
+    private static void saveFriends()
+    {
+	ObjectOutputStream os = null;
+	try
+	{
+	    os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
+	    synchronized (Friends.class)
+	    {
+		os.writeObject(friends);
+	    }
+	    os.flush();
+	}
+	catch (final IOException err)
+	{
+	    System.err.println("Cannot save local user data: " + err.toString());
+	}
+	finally
+	{
+	    if (os != null)
+		try
+	        {
+		    os.close();
+		}
+		catch (final Throwable err)
+		{
+		    //Do nothing
+		}
+	}
     }
     
     
