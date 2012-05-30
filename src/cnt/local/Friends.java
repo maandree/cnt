@@ -9,6 +9,7 @@ package cnt.local;
 import cnt.game.*;
 
 import java.util.*;
+import java.io.*;
 
 
 /**
@@ -33,6 +34,8 @@ public class Friends
      */
     static
     {
+	myDNSes = new ArrayList<String>();
+	
 	String dir = System.getProperty("user.home");
 	final String dirsep = System.getProperty("file.separator");
 	
@@ -41,20 +44,38 @@ public class Friends
 	else
 	    dir += ".cnt" + dirsep;
 	
-	loadFriends(dir + "friends");
-	loadMe(dir + "local");
+	try
+	{
+	    final File file = new File(dir);
+	    if (file.exists() == false)
+		file.mkdir();
+	    
+	    loadFriends(dir + "friends");
+	    loadMe(dir + "local");
+	}
+	catch (final IOException err)
+	{
+	    throw new IOError(err);
+	}
     }
     
     
     
     /**
-     * Load, creates if missing, information about the local users
-     * 
-     * @param  file  The file with the data
+     * The local user's UUIḌ
      */
-    private static void loadMe(final String file)
-    {
-    }
+    private static UUID myUUID;
+    
+    /**
+     * The local user's DNS names
+     */
+    private static final ArrayList<String> myDNSes;
+    
+    /**
+     * The file with the local user data
+     */
+    private static String myFile;
+    
     
     
     /**
@@ -109,10 +130,90 @@ public class Friends
     
     
     /**
+     * Load, creates if missing, information about the local users
+     * 
+     * @param  file  The file with the data
+     * 
+     * @throws  IOException  On I/O error
+     */
+    private static void loadMe(final String file) throws IOException
+    {
+	myFile = file;
+	final File $file = new File(file);
+	if ($file.exists() == false)
+	{
+	    myUUID = UUID.randomUUID();
+	    updateMe();
+	}
+	else
+	{
+	    ObjectInputStream is = null;
+	    try
+	    {
+		is = new ObjectInputStream(new BufferedInputStream(new FileInputStream($file)));
+		Object obj;
+		for (;;)
+		    if ((obj = is.readObject()) instanceof UUID)
+		    {
+			myUUID = (UUID)obj;
+			break;
+		    }
+		    else
+			myDNSes.add((String)obj);
+	    }
+	    catch (final ClassNotFoundException err)
+	    {
+		throw new IOError(err);
+	    }
+	    finally
+	    {
+		if (is != null)
+		    try
+		    {
+			is.close();
+		    }
+		    catch (final Throwable err)
+		    {
+			//Do nothing
+		    }
+	    }
+	}
+    }
+    
+    
+    /**
      * Updates the file with the local user's information
      */
     public static void updateMe()
     {
+	ObjectOutputStream os = null;
+	try
+	{
+	    os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
+	    synchronized (myDNSes)
+	    {
+		for (final String dns : myDNSes)
+		    os.writeObject(dns);
+	    }
+	    os.writeObject(myUUID);
+	    os.flush();
+	}
+	catch (final IOException err)
+	{
+	    System.err.println("Cannot save local user data: " + err.toString());
+	}
+	finally
+	{
+	    if (os != null)
+		try
+	        {
+		    os.close();
+		}
+		catch (final Throwable err)
+		{
+		    //Do nothing
+		}
+	}
     }
     
     
@@ -123,7 +224,12 @@ public class Friends
      */
     public static String[] getPersonalDNSes()
     {
-	return null;
+	synchronized (myDNSes)
+	{
+	    final String[] rc = new String[myDNSes.size()];
+	    myDNSes.toArray(rc);
+	    return rc;
+	}
     }
     
     
@@ -134,7 +240,7 @@ public class Friends
      */
     public static UUID getPersonalUUID()
     {
-	return null;
+	return myUUID;
     }
     
 }

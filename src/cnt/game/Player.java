@@ -32,12 +32,45 @@ public class Player implements Serializable
      * 
      * @param  name   The name of the player
      * @param  id     The ID of the player
-     * @param  uuid   Universally unique ID for the player
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final UUID uuid, final String ip, final String... dnses)
+    public Player(final String name, final int id, final String ip, final String... dnses)
     {
+	this(name, Friends.getPersonalUUID(), id, ip, dnses);
+    }
+    
+    
+    /**
+     * Constructor
+     * 
+     * @param  name   The name of the player
+     * @param  id     The ID of the player
+     * @param  ip     The IP address of the player
+     * @param  dnses  The player's DNS names
+     */
+    public Player(final String name, final int id, final String ip, final ArrayList<String> dnses)
+    {
+	this(name, Friends.getPersonalUUID(), id, ip, dnses);
+    }
+    
+    
+    /**
+     * Constructor
+     * 
+     * @param  name   The name of the player
+     * @param  uuid   Universally unique ID for the player
+     * @param  id     The ID of the player
+     * @param  ip     The IP address of the player
+     * @param  dnses  The player's DNS names
+     */
+    public Player(final String name, final UUID uuid, final int id, final String ip, final String... dnses)
+    {
+	assert name != null : "Players must be named";
+	//assert uuid != null : "UUID cannot be null";
+	//assert ip != null : "ip cannot be null";
+	assert dnses != null : "DNS collection cannot be null";
+	
 	this.name = name;
 	this.id = id;
 	this.uuid = uuid;
@@ -52,13 +85,18 @@ public class Player implements Serializable
      * Constructor
      * 
      * @param  name   The name of the player
-     * @param  id     The ID of the player
      * @param  uuid   Universally unique ID for the player
+     * @param  id     The ID of the player
      * @param  ip     The IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final UUID uuid, final String ip, final ArrayList<String> dnses)
+    public Player(final String name, final UUID uuid, final int id, final String ip, final ArrayList<String> dnses)
     {
+	assert name != null : "Players must be named";
+	//assert uuid != null : "UUID cannot be null";
+	//assert ip != null : "ip cannot be null";
+	assert dnses != null : "DNS collection cannot be null";
+	
 	this.name = name;
 	this.id = id;
 	this.uuid = uuid;
