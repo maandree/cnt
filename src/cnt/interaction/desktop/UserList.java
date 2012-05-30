@@ -154,6 +154,7 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		      final String itemtag = (player.getUUID() == null ? "(null)" : player.getUUID().toString());
 		      final String item = "<html><!-- " + itemtag + " --><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
 		this.playerMap.put(player, item);
+		this.playerReverseMap.put(item, player);
 		this.model.addElement(item);
 	    }
 	    else if (message instanceof PlayerDropped)
@@ -161,6 +162,7 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		final Player player = ((PlayerDropped)message).player;
 		if (this.playerMap.containsKey(player) == false)
 		    return;
+		this.playerReverseMap.remove(this.playerMap.get(player));
 		this.playerMap.remove(player);
 		this.model.removeElement(this.playerMap.get(player));
 	    }
