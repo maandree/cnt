@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.interaction.*;
 import cnt.game.*;
 import cnt.local.*;
 import cnt.messages.*;
@@ -146,10 +147,10 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		final Player player = ((PlayerJoined)message).player;
 		if (this.playerMap.containsKey(player))
 		    return;
-		int _colour = player.getID();
-		String colour = Integer.toString((_colour >> 16) & 255) + ", ";
-		      colour += Integer.toString((_colour >>  8) & 255) + ", ";
-		      colour += Integer.toString((_colour >>  0) & 255);
+		Color _colour = ColourMapper.getColour(player.getID());
+		String colour = Integer.toString(_colour.getRed()) + ", ";
+		      colour += Integer.toString(_colour.getGreen()) + ", ";
+		      colour += Integer.toString(_colour.getBlue());
 
 		      final String itemtag = (player.getUUID() == null ? "(null)" : player.getUUID().toString());
 		      final String item = "<html><!-- " + itemtag + " --><span style=\"color: rgb(" + colour + ");\">" + player.getName() + "</span></html>";
