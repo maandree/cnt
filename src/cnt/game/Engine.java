@@ -138,8 +138,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
 					   GamePlayCommand.class,
 					   PlayerDropped.class,
-					   PlayerPause.class);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
+					   PlayerPause.class,
 					   NextPlayer.class);
 	
 	Blackboard.broadcastMessage(new GameScore(score = 0));
@@ -674,8 +673,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	    else if (message instanceof LocalPlayer)
 		localPlayer = ((LocalPlayer)message).player;
 	    else if (message instanceof PlayerPause)
-		{
-		    System.out.println("pause/unpause");
 		synchronized (pauseMonitor)
 		{
 		    if (((PlayerPause)message).player.equals(localPlayer))
@@ -683,10 +680,7 @@ public class Engine implements Blackboard.BlackboardObserver
 			paused = ((PlayerPause)message).paused;
 			if (paused == false)
 			    pauseMonitor.notifyAll();
-			if (paused == false)
-			    System.out.println("\033[1;31mRESUMING\033[0m");
 		    }
-		}
 		}
 	}
 	catch (final InterruptedException err)
