@@ -7,8 +7,6 @@ public class ColourSelector extends JFrame
     {   (new ColourSelector()).setVisible(true);
     }
     
-    
-    
     public ColourSelector()
     {
 	super("ColourSelector");
@@ -18,22 +16,6 @@ public class ColourSelector extends JFrame
 	this.setLocation(new Point(this.getLocation().x + 300,
 				   this.getLocation().y + 100 - 25));
     }
-    
-    
-    
-    private static int lspan = 1;
-    private static int hspan = 0;
-    private static int extra = 2;
-    
-    private static int degree = extra * (lspan + 1 + hspan);
-    
-    private static int[][] fixed0 = {{205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
-				     { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
-    
-    private static int[][] fixed1 = {{210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
-				     {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
-    
-    
     
     public void paint(final Graphics g)
     {
@@ -45,6 +27,32 @@ public class ColourSelector extends JFrame
     }
     
     
+    
+    /**
+     * Polynomial interpolation degreee
+     */
+    private static int degree = 4;
+    
+    /**
+     * Fixed colours on NCS S 2050
+     */
+    private static int[][] fixed0 = {{205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
+				     { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
+    
+    /**
+     * Fixed colours on NCS S 2030
+     */
+    private static int[][] fixed1 = {{210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
+				     {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
+    
+    
+    
+    /**
+     * Generates a colour from index
+     * 
+     * @param   index  Colour index
+     * @return         Colour
+     */
     private static Color generateColour(final int index)
     {
 	int hueIndex = (index & 7) | ((index >>> 4) & ~7);
@@ -62,6 +70,14 @@ public class ColourSelector extends JFrame
     }
     
     
+    /**
+     * Generates a colour from hue, saturation and luminosity
+     * 
+     * @param   hue  hue
+     * @param   sat  saturation
+     * @param   lum  luminosity
+     * @return       Colour
+     */
     private static Color generateColour(final double hue, final double sat, final double lum)
     {
 	int[] rgb = hueToColour(hue, fixed0);
@@ -82,6 +98,13 @@ public class ColourSelector extends JFrame
     }
     
     
+    /**
+     * Interpolates colour with a hue, using fixed colours evenly distributed in hue starting at 0
+     * 
+     * @param   hue    The hue of the colour to interpolate
+     * @param   fixed  Fixed colours
+     * @return         sRGB colour components: {red, green, blue}
+     */
     private static int[] hueToColour(final double hue, final int[][] fixed)
     {    
 	double[][] f = new double[fixed.length][];
@@ -104,11 +127,11 @@ public class ColourSelector extends JFrame
 	if (midH < 0)
 	    midH += fixed.length;
 	
-	int lowH = (midH - lspan) % fixed.length;
+	int lowH = (midH - 1) % fixed.length;
 	if (lowH < 0)
 	    lowH += fixed.length;
 	
-	int[] hs = new int[lspan + 1 + hspan];
+	int[] hs = new int[2];
 	for (int i = 0; i < hs.length; i++)
 	{
 	    int im = (lowH + i) % fixed.length;
@@ -150,6 +173,12 @@ public class ColourSelector extends JFrame
     }
     
     
+    /**
+     * Selects luminosity depending on luminosity index
+     * 
+     * @param   index  Luminosity index
+     * @return         Luminosity [0, ∞[
+     */
     private static double selectLum(final int index)
     {
 	double llum = 0.95;
@@ -164,12 +193,24 @@ public class ColourSelector extends JFrame
     }
     
     
+    /**
+     * Selects saturation depending on saturation index
+     * 
+     * @param   index  Saturation index
+     * @return         Saturation [0, 1]
+     */
     private static double selectSat(final int index)
     {
 	return 1. - (index / 2.);
     }
     
     
+    /**
+     * Selects hue depending on hue index
+     * 
+     * @param   index  Hue index
+     * @return         Hue [0, 400[
+     */
     private static double selectHue(final int index)
     {
 	int pln;
@@ -215,6 +256,10 @@ public class ColourSelector extends JFrame
     
     /**
      * Gaussian elimination
+     * 
+     * @param   x  Square matrix
+     * @param   y  Matrix augment
+     * @return     Coefficients
      */
     private static double[] eliminate(final double[][] x, final double[] y)
     {
@@ -249,14 +294,14 @@ public class ColourSelector extends JFrame
     /**
      * Converts from sRGB to CIELAB
      * 
-     * @param   red           The red   intensity [0–255].
-     * @param   green         The green intensity [0–255].
-     * @param   blue          The blue  intensity [0–255].
-     * @return                {L*, a*, b*}
+     * @param   red           The red   intensity [0, 255]
+     * @param   green         The green intensity [0, 255]
+     * @param   blue          The blue  intensity [0, 255]
+     * @return                CIELAB colour components: {L*, a*, b*}
      */
     private static double[] toLab(final int red, final int green, final int blue)
     {
-	//The weight of chromaticity [0–∞[, 1 is unweighted.
+	//The weight of chromaticity [0, ∞[, 1 is unweighted.
 	final double chromaWeight = 1;
 	
 	int ir = red  ;  if (ir < 0)  ir += 1 << 8;
@@ -286,10 +331,10 @@ public class ColourSelector extends JFrame
     /**
      * Converts from CIELAB to sRGB
      * 
-     * @param   l  L*
-     * @param   a  a*
-     * @param   b  b*
-     * @return     {red, green, blue}
+     * @param   l  CIELAB colour component L*
+     * @param   a  CIELAB colour component a*
+     * @param   b  CIELAB colour component b*
+     * @return     sRGB colour components: {red, green, blue}
      */
     private static int[] toRGB(final double l, final double a, final double b)
     {
@@ -338,23 +383,39 @@ public class ColourSelector extends JFrame
     }
     
     
+    /**
+     * Converts sRGB [0, 255] to linear RGB [0, 1]
+     * 
+     * @param   r  The red   intensity
+     * @param   g  The green intensity
+     * @param   b  The blue  intensity
+     * @return     Linear RGB colours components
+     */
     private static double[] toLinear(final int r, final int b, final int g)
     {
 	return new double[] {
-	    Math.pow(r / 255., 0.439764585),
-	    Math.pow(g / 255., 0.439764585),
-	    Math.pow(b / 255., 0.439764585)
-	};
+	            Math.pow(r / 255., 0.439764585),
+		    Math.pow(g / 255., 0.439764585),
+		    Math.pow(b / 255., 0.439764585)
+	        };
     }
     
     
+    /**
+     * Converts linear RGB [0, 1] to sRGB [0, 255]
+     * 
+     * @param   r  The red   intensity
+     * @param   g  The green intensity
+     * @param   b  The blue  intensity
+     * @return     sRGB colours components
+     */
     private static int[] toStandard(final double r, final double b, final double g)
     {
 	return new int[] {
-	    (int)(0.5 + 255. * Math.pow(r, 2.273943909)),
-	    (int)(0.5 + 255. * Math.pow(g, 2.273943909)),
-	    (int)(0.5 + 255. * Math.pow(b, 2.273943909))
-	};
+	            (int)(0.5 + 255. * Math.pow(r, 2.273943909)),
+		    (int)(0.5 + 255. * Math.pow(g, 2.273943909)),
+		    (int)(0.5 + 255. * Math.pow(b, 2.273943909))
+	        };
     }
     
 }
