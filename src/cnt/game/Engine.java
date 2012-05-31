@@ -68,6 +68,11 @@ public class Engine implements Blackboard.BlackboardObserver
     private static Player currentPlayer = null;
     
     /**
+     * The local player
+     */
+    private static Player localPlayer = null;
+    
+    /**
      * The momento of the falling shape at the beginning of the move
      */
     private static Shape.Momento moveInitialMomento = null;
@@ -107,6 +112,16 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static int score;
     
+    /**
+     * Whether the current player is in pause mode
+     */
+    private static boolean paused = false;
+    
+    /**
+     * Pause monitor
+     */
+    private static final Object pauseMonitor = new Object();
+    
     
     
     /**
@@ -122,7 +137,8 @@ public class Engine implements Blackboard.BlackboardObserver
 	Blackboard.registerObserver(blackboardObserver);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
 					   GamePlayCommand.class,
-					   PlayerDropped.class);
+					   PlayerDropped.class,
+					   PlayerPause.class);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
 					   NextPlayer.class);
 	
@@ -273,7 +289,17 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static void newTurn(final Player player)
     {
-	currentPlayer = player;
+	synchronized (pauseMonitor)
+	{
+	    currentPlayer = player;
+	    if (paused && player.equals(localPlayer))
+		try
+		{   pauseMonitor.wait();
+		}
+		catch (final InterruptedException err)
+		{   //TODO what do we do know?
+		}
+	}
 	
 	try
 	{
@@ -602,8 +628,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	    else
 		System.err.println("Shouldn't the matrix patches actually contain something?");
 	}
-	else
-	    System.err.println("Shouldn't there be matrix patches here?");
 	
 	if (milliseconds != 0)
 	    Thread.sleep(milliseconds);
@@ -620,8 +644,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    if (message instanceof GamePlayCommand)
 	    {
 		synchronized (Engine.class)
-		{
-		    switch (((GamePlayCommand)message).move)
+		{   switch (((GamePlayCommand)message).move)
 		    {
 			case LEFT:           move(-1);       break;
 			case RIGHT:          move(1);        break;
@@ -640,16 +663,31 @@ public class Engine implements Blackboard.BlackboardObserver
 			    
 			default:
 			    throw new Error("Unrecognised GamePlayCommand.");
-		    }
-		}
+		}   }
 	    }
 	    else if (message instanceof NextPlayer) /* do not thread */
-	    {
-		if (((NextPlayer)message).player != null)
+	    {   if (((NextPlayer)message).player != null)
 		    newTurn(((NextPlayer)message).player);
 	    }
 	    else if (message instanceof PlayerDropped)
 		playerDropped(((PlayerDropped)message).player);
+	    else if (message instanceof LocalPlayer)
+		localPlayer = ((LocalPlayer)message).player;
+	    else if (message instanceof PlayerPause)
+		{
+		    System.out.println("pause/unpause");
+		synchronized (pauseMonitor)
+		{
+		    if (((PlayerPause)message).player.equals(localPlayer))
+		    {
+			paused = ((PlayerPause)message).paused;
+			if (paused == false)
+			    pauseMonitor.notifyAll();
+			if (paused == false)
+			    System.out.println("\033[1;31mRESUMING\033[0m");
+		    }
+		}
+		}
 	}
 	catch (final InterruptedException err)
 	{
