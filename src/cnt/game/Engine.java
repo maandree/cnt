@@ -122,6 +122,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static final Object pauseMonitor = new Object();
     
+    /**
+     * The next score at which to slow down the speed
+     */
+    private static int slowDownScore = 1000;
+    
     
     
     /**
@@ -539,6 +544,13 @@ public class Engine implements Blackboard.BlackboardObserver
 	    reacted = true;
 	    score += 10;
 	}
+	
+	if (slowDownScore >= 0)
+	    while (score >= slowDownScore)
+	    {
+		slowDownScore <<= 1;
+		sleepTime += 200;
+	    }
 	
 	if (reacted)
 	    Blackboard.broadcastMessage(new GameScore(score));
