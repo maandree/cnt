@@ -6,13 +6,18 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.messages.*;
+import cnt.game.*;
+import cnt.*;
 
 import se.kth.maandree.jmenumaker.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.io.IOException;
 import java.io.IOError;
+import java.lang.ref.*;
 
 
 /**
@@ -21,7 +26,7 @@ import java.io.IOError;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 @SuppressWarnings("serial")
-public class GameFrame extends JFrame implements UpdateListener
+public class GameFrame extends JFrame implements UpdateListener, Blackboard.BlackboardObserver
 {
     /**
      * The default total frame width
@@ -57,9 +62,23 @@ public class GameFrame extends JFrame implements UpdateListener
 	this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)); //TODO temporary, should depend on screen
 	this.setLocationByPlatform(true);
 	
+	Blackboard.registerObserver(this);
+	
 	buildMenus();
 	buildInterior();
     }
+    
+    
+    
+    /**
+     * Menu items
+     */
+    private HashMap<String, WeakReference<Component>> menuItems;
+    
+    /**
+     * The local player
+     */
+    private Player localPlayer = null;
     
     
     
@@ -69,7 +88,7 @@ public class GameFrame extends JFrame implements UpdateListener
     private void buildMenus()
     {
 	try
-	{   JMenuMaker.makeMenu(this, "GameFrame.jmml", this, null);
+	{   menuItems = JMenuMaker.makeMenu(this, "GameFrame.jmml", this, null);
 	}
 	catch (final IOException err)
 	{   throw new IOError(err);
@@ -96,12 +115,22 @@ public class GameFrame extends JFrame implements UpdateListener
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
 	
-	
 	this.add(status, BorderLayout.SOUTH);
 	this.add(vSplit, BorderLayout.CENTER);
 	
 	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {   synchronized (this)
+	{   if (message instanceof LocalPlayer)
+	    {
+		this.localPlayer = ((LocalPlayer)message).player;
+    }   }   }
     
     
     /**
@@ -125,11 +154,32 @@ public class GameFrame extends JFrame implements UpdateListener
 	}
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void valueUpdated(final String id, final boolean value)
+    {
+	switch (id)
+	{
+	    case "pause":
+		if (localPlayer == null)
+		    ((JCheckBoxMenuItem)(menuItems.get(id).get())).setState(false);
+		else
+		    Blackboard.broadcastMessage(new PlayerPause(localPlayer, value));
+	        break;
+		
+	    default:
+		System.err.println("Unrecognised menu ID for MainFrame: " + id);
+		break;
+	}
+    }
+    
+    
     public void valueUpdated(final String id, final String value)  { /*Not used*/ }
     public void valueUpdated(final String id, final double value)  { /*Not used*/ }
     public void valueUpdated(final String id, final long value)    { /*Not used*/ }
     public void valueUpdated(final String id, final int value)     { /*Not used*/ }
-    public void valueUpdated(final String id, final boolean value) { /*Not used*/ }
     
 }
 

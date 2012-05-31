@@ -49,7 +49,9 @@ public class GameDemo
 	
 	rec.start();
 	
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Mattias", null, 0, null)));
+	final Player localPlayer = new Player("Mattias", null, 0, null);
+	Blackboard.broadcastMessage(new LocalPlayer(localPlayer));
+	Blackboard.broadcastMessage(new PlayerJoined(localPlayer));
 	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman",  null, 1, null)));
 	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",   null, 2, null)));
 	

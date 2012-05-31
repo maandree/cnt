@@ -34,7 +34,7 @@ public final class PlayerPause implements Blackboard.BlackboardMessage
      */
     public PlayerPause(final Player player, final boolean paused)
     {
-	assert player != null : "The must be a player";
+	assert player != null : "Their must be a player";
 	this.player = player;
 	this.paused = paused;
     }
