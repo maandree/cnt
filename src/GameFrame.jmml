@@ -1,5 +1,6 @@
 "Game" >
        "Pause"  id="pause"  type=check
+       "Emegency Pause"  id="empause"  type=check
        <
 
 
