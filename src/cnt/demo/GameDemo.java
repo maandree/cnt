@@ -71,7 +71,7 @@ public class GameDemo
 		    }
 	        });
 	
-	/*Engine.start();
+	Engine.start();
 	
 	
 	for (int d; (d = System.in.read()) != -1;)
@@ -85,7 +85,7 @@ public class GameDemo
 		case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
 		case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
 		case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-		}*/
+	    }
 	
 	ring.stop();
 	rec.stop();
