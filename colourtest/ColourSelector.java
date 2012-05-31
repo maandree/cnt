@@ -7,9 +7,7 @@ public class ColourSelector extends JFrame
     {   (new ColourSelector()).setVisible(true);
     }
     
-    static int lspan = 1;
-    static int hspan = 0;
-    static int extra = 2;
+    
     
     public ColourSelector()
     {
@@ -19,23 +17,21 @@ public class ColourSelector extends JFrame
 	this.setSize(new Dimension(1000, 1000));
 	this.setLocation(new Point(this.getLocation().x + 300,
 				   this.getLocation().y + 100 - 25));
-	
-	degree = extra * (lspan + 1 + hspan);
-	
-	fixed0 = new int[][] {
-	         {205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
-		 { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
-	
-	fixed1 = new int[][] {
-	         {210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
-		 {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
     }
     
     
     
-    private int[][] fixed0;
-    private int[][] fixed1;
-    private int degree;
+    private static int lspan = 1;
+    private static int hspan = 0;
+    private static int extra = 2;
+    
+    private static int degree = extra * (lspan + 1 + hspan);
+    
+    private static int[][] fixed0 = {{205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
+				     { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
+    
+    private static int[][] fixed1 = {{210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
+				     {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
     
     
     
@@ -49,7 +45,7 @@ public class ColourSelector extends JFrame
     }
     
     
-    private Color generateColour(final int index)
+    private static Color generateColour(final int index)
     {
 	int hueIndex = (index & 7) | ((index >>> 4) & ~7);
 	int satIndex = (index >>> 3) & 1;
@@ -66,7 +62,7 @@ public class ColourSelector extends JFrame
     }
     
     
-    private Color generateColour(final double hue, final double sat, final double lum)
+    private static Color generateColour(final double hue, final double sat, final double lum)
     {
 	int[] rgb = hueToColour(hue, fixed0);
 	int[] satrgb = hueToColour(hue, fixed1);
@@ -86,7 +82,7 @@ public class ColourSelector extends JFrame
     }
     
     
-    private int[] hueToColour(final double hue, final int[][] fixed)
+    private static int[] hueToColour(final double hue, final int[][] fixed)
     {    
 	double[][] f = new double[fixed.length][];
 	double[] frk = new double[f.length];
@@ -154,7 +150,7 @@ public class ColourSelector extends JFrame
     }
     
     
-    private double selectLum(final int index)
+    private static double selectLum(final int index)
     {
 	double llum = 0.95;
 	double hlum = 1.05;
@@ -168,13 +164,13 @@ public class ColourSelector extends JFrame
     }
     
     
-    private double selectSat(final int index)
+    private static double selectSat(final int index)
     {
 	return 1. - (index / 2.);
     }
     
     
-    private double selectHue(final int index)
+    private static double selectHue(final int index)
     {
 	int pln;
 	int pow = 1 << (pln = lb(index));
