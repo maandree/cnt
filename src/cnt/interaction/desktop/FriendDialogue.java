@@ -39,6 +39,11 @@ public class FriendDialogue extends JDialog
 	this.pack();
 	this.setSize(new Dimension(400, 600));
 	
+	this.model = new DefaultListModel<String>();
+	this.list = new JList<String>(model);
+	this.popup = new JPopupMenu();
+	this.menuFriend = new JMenuItem("Remove from friend list");
+	
 	for (final Player friend : Friends.getFriends())
 	{
 	    final String itemtag = (friend.getUUID() == null ? "(null)" : friend.getUUID().toString());
@@ -47,11 +52,6 @@ public class FriendDialogue extends JDialog
 	    this.playerReverseMap.put(item, friend);
 	    this.model.addElement(item);
 	}
-	
-	this.model = new DefaultListModel<String>();
-	this.list = new JList<String>(model);
-	this.popup = new JPopupMenu();
-	this.menuFriend = new JMenuItem("Remove from friend list");
 	
 	buildInterior();
     }
@@ -150,8 +150,8 @@ public class FriendDialogue extends JDialog
 			{
 			    final Player player = FriendDialogue.this.selected;
 			    FriendDialogue.this.playerReverseMap.remove(FriendDialogue.this.playerMap.get(player));
-			    FriendDialogue.this.playerMap.remove(player);
 			    FriendDialogue.this.model.removeElement(FriendDialogue.this.playerMap.get(player));
+			    FriendDialogue.this.playerMap.remove(player);
 			    Friends.removeFriend(player);
 			}
 		    }

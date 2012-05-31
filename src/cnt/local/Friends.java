@@ -34,32 +34,16 @@ public class Friends
      */
     static
     {
-	myDNSes = new ArrayList<String>();
-	
-	String dir = System.getProperty("user.home");
-	final String dirsep = System.getProperty("file.separator");
-	
-	if (dir.endsWith(dirsep) == false)
-	    dir += dirsep + ".cnt" + dirsep;
-	else
-	    dir += ".cnt" + dirsep;
-	
-	try
-	{
-	    final File file = new File(dir);
-	    if (file.exists() == false)
-		file.mkdir();
-	    
-	    loadFriends(dir + "friends");
-	    loadMe(dir + "local");
-	}
-	catch (final IOException err)
-	{
-	    throw new IOError(err);
-	}
+	monitor = new Object();
+	load();
     }
     
     
+    
+    /**
+     * Synchronisation monitor
+     */
+    private static final Object monitor;
     
     /**
      * The local user's UUIḌ
@@ -69,7 +53,7 @@ public class Friends
     /**
      * The local user's DNS names
      */
-    private static final ArrayList<String> myDNSes;
+    private static ArrayList<String> myDNSes;
     
     /**
      * The file with the local user data
@@ -89,6 +73,39 @@ public class Friends
     
     
     /**
+     * Loads everything
+     */
+    private static void load()
+    {
+	synchronized (monitor)
+	{
+	    myDNSes = new ArrayList<String>();
+	
+	    String dir = System.getProperty("user.home");
+	    final String dirsep = System.getProperty("file.separator");
+	    
+	    if (dir.endsWith(dirsep) == false)
+		dir += dirsep + ".cnt" + dirsep;
+	    else
+		dir += ".cnt" + dirsep;
+	
+	    try
+	    {
+		final File file = new File(dir);
+		if (file.exists() == false)
+		    file.mkdir();
+	    
+		loadFriends(dir + "friends");
+		loadMe(dir + "local");
+	    }
+	    catch (final IOException err)
+	    {
+		throw new IOError(err);
+	    }
+	}
+    }
+    
+    /**
      * Loads the friends list
      * 
      * @param  file  The file with the data
@@ -100,22 +117,29 @@ public class Friends
     {
 	friendFile = file;
 	final File $file = new File(file);
+	friends = new HashSet<Player>();
 	if ($file.exists() == false)
-	{
-	    friends = new HashSet<Player>();
 	    saveFriends();
-	}
 	else
 	{
 	    ObjectInputStream is = null;
+	    Object obj = null;
 	    try
 	    {
 		is = new ObjectInputStream(new BufferedInputStream(new FileInputStream($file)));
-		friends = (HashSet<Player>)(is.readObject());
+		while ((obj = is.readObject()) != null)
+		    friends.add((Player)obj);
 	    }
 	    catch (final ClassNotFoundException err)
 	    {
 		throw new IOError(err);
+	    }
+	    catch (final IOException | RuntimeException | Error err)
+	    {
+		System.err.println(err);
+		System.err.println("obj: " + obj);
+		System.err.println("is: " + is);
+		throw err;
 	    }
 	    finally
 	    {
@@ -140,7 +164,7 @@ public class Friends
      */
     public static Player[] getFriends()
     {
-	synchronized (Friends.class)
+	synchronized (monitor)
 	{
 	    final Player[] rc = new Player[friends.size()];
 	    friends.toArray(rc);
@@ -156,11 +180,11 @@ public class Friends
      */
     public static void updateFriend(final Player friend)
     {
-	synchronized (Friends.class)
+	synchronized (monitor)
 	{
 	    if (friends.contains(friend) == false)
 		return;
-	    
+		
 	    saveFriends();
 	}
     }
@@ -173,7 +197,7 @@ public class Friends
      */
     public static void addFriend(final Player friend)
     {
-	synchronized (Friends.class)
+	synchronized (monitor)
 	{
 	    if (friends.contains(friend))
 		return;
@@ -191,7 +215,7 @@ public class Friends
      */
     public static void removeFriend(final Player friend)
     {
-	synchronized (Friends.class)
+	synchronized (monitor)
 	{
 	    if (friends.contains(friend) == false)
 		return;
@@ -207,31 +231,34 @@ public class Friends
      */
     private static void saveFriends()
     {
-	ObjectOutputStream os = null;
-	try
+	synchronized (monitor)
 	{
-	    os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
-	    synchronized (Friends.class)
+	    System.err.println("saving: " + friends);
+	    ObjectOutputStream os = null;
+	    try
 	    {
-		os.writeObject(friends);
+		os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(friendFile))));
+		for (final Player friend : friends)
+		    os.writeObject(friend);
+		os.writeObject(null);
+		os.flush();
 	    }
-	    os.flush();
-	}
-	catch (final IOException err)
-	{
-	    System.err.println("Cannot save local user data: " + err.toString());
-	}
-	finally
-	{
-	    if (os != null)
-		try
-	        {
-		    os.close();
-		}
-		catch (final Throwable err)
-		{
-		    //Do nothing
-		}
+	    catch (final IOException err)
+	    {
+		System.err.println("Cannot save local user data: " + err.toString());
+	    }
+	    finally
+	    {
+		if (os != null)
+		    try
+		    {
+			os.close();
+		    }
+		    catch (final Throwable err)
+		    {
+			//Do nothing
+		    }
+	    }
 	}
     }
     
@@ -293,33 +320,33 @@ public class Friends
      */
     public static void updateMe()
     {
-	ObjectOutputStream os = null;
-	try
+	synchronized (monitor)
 	{
-	    os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
-	    synchronized (myDNSes)
+	    ObjectOutputStream os = null;
+	    try
 	    {
+		os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
 		for (final String dns : myDNSes)
 		    os.writeObject(dns);
+		os.writeObject(myUUID);
+		os.flush();
 	    }
-	    os.writeObject(myUUID);
-	    os.flush();
-	}
-	catch (final IOException err)
-	{
-	    System.err.println("Cannot save local user data: " + err.toString());
-	}
-	finally
-	{
-	    if (os != null)
-		try
-	        {
-		    os.close();
-		}
-		catch (final Throwable err)
-		{
-		    //Do nothing
-		}
+	    catch (final IOException err)
+	    {
+		System.err.println("Cannot save local user data: " + err.toString());
+	    }
+	    finally
+	    {
+		if (os != null)
+		    try
+		    {
+			os.close();
+		    }
+		    catch (final Throwable err)
+		    {
+			//Do nothing
+		    }
+	    }
 	}
     }
     
@@ -331,7 +358,7 @@ public class Friends
      */
     public static String[] getPersonalDNSes()
     {
-	synchronized (myDNSes)
+	synchronized (monitor)
 	{
 	    final String[] rc = new String[myDNSes.size()];
 	    myDNSes.toArray(rc);

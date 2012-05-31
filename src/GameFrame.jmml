@@ -1,3 +1,7 @@
+"Players" >
+        "Friends"  id="friends"
+        <
+
 "Help" >
-       "Network Diagnostics"  id="netdiag"
-       <
+        "Network Diagnostics"  id="netdiag"
+        <

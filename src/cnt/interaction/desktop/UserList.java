@@ -163,8 +163,8 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 		if (this.playerMap.containsKey(player) == false)
 		    return;
 		this.playerReverseMap.remove(this.playerMap.get(player));
-		this.playerMap.remove(player);
 		this.model.removeElement(this.playerMap.get(player));
+		this.playerMap.remove(player);
 	    }
 	}
     }

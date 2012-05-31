@@ -111,6 +111,10 @@ public class GameFrame extends JFrame implements UpdateListener
     {
 	switch (id)
 	{
+	    case "friends":
+		(new FriendDialogue(this)).setVisible(true);
+	        break;
+		
 	    case "netdiag":
 		(new NetworkDialogue(this)).setVisible(true);
 	        break;

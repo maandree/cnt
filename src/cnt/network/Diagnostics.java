@@ -157,7 +157,7 @@ public class Diagnostics
 	for (final Player friend : friends)
 	{
 	    buf.append(" " + friend.getName() + "\n");
-	    buf.append("  UUID: " + friend.getUUID().toString() + "\n");
+	    buf.append("  UUID: " + friend.getUUID() + "\n");
 	    
 	    final String[] dnses = new String[friend.getDNSes().size()];
 	    friend.getDNSes().toArray(dnses);
