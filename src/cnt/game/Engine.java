@@ -302,12 +302,10 @@ public class Engine implements Blackboard.BlackboardObserver
 	    fallingShape = nshape;
 	}
 	catch (final CloneNotSupportedException err)
-	{
-	    throw new Error("*Shape.clone() is not implemented");
+	{   throw new Error("*Shape.clone() is not implemented");
 	}
 	catch (final Throwable err)
-	{
-	    throw new Error("*Shape.clone() is not implemented correctly");
+	{   throw new Error("*Shape.clone() is not implemented correctly");
 	}
 	
 	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
@@ -482,19 +480,16 @@ public class Engine implements Blackboard.BlackboardObserver
     {
 	patchIn(fallingShape);
 	board.put(fallingShape);
-	
-	final int[] full = board.getFullRows();
-	Arrays.sort(full);
-	for (int i = 0, n = (full.length >> 1) - 1; i <= n; i++) //reversing
-	{
-	    full[i] ^= full[n - i];
-	    full[n - i] ^= full[i];
-	    full[i] ^= full[n - i];
-	}
+	boolean reacted = false;
 	
 	sleep(0);
-	if (full.length > 0)
+	for (;;)
 	{
+	    final int[] full = board.getFullRows();
+	    if (full.length == 0)
+		break;
+	    Arrays.sort(full);
+	    
 	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
 	    for (int x = 0; x < Board.WIDTH; x++)
 		fullLine[0][x] = true;
@@ -502,25 +497,26 @@ public class Engine implements Blackboard.BlackboardObserver
 	    final Block[][] matrix = board.getMatrix();
 	    
 	    int sub = 0;
-	    for (final int row : full)
-	    {
-		for (int y = 0; y <= row; y++)
-		{
-		    patchAway   (fullLine, 0, y);
-		    board.delete(fullLine, 0, y);
-		}
-		for (int y = sub; y < row; y++)
-		{
-		    patchIn  (new Block[][] {matrix[y - sub]}, 0, y + 1);
-		    board.put(new Block[][] {matrix[y - sub]}, 0, y + 1);
-		}
-		sub++;
-		sleep(0);
-	    }
+	    int row = full[full.length - 1];
 	    
-	    Blackboard.broadcastMessage(new GameScore(score += full.length * 10));
+	    for (int y = 0; y <= row; y++)
+	    {
+		patchAway   (fullLine, 0, y);
+		board.delete(fullLine, 0, y);
+	    }
+	    for (int y = sub; y < row; y++)
+	    {
+		patchIn  (new Block[][] {matrix[y]}, 0, y + 1);
+		board.put(new Block[][] {matrix[y]}, 0, y + 1);
+	    }
+	    sleep(0);
+	    
+	    reacted = true;
+	    score += 10;
 	}
 	
+	if (reacted)
+	    Blackboard.broadcastMessage(new GameScore(score));
 	currentPlayer = null;
     }
     
