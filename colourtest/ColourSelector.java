@@ -120,64 +120,74 @@ public class ColourSelector extends JFrame
 	    g.drawLine(50 + i, 100, 50 + i, 150);
 	}
 	
-	for (int i = 0, n = 64; i < n; i++)
+	for (int i = 0, n = 128; i < n; i++)
 	{
-	    int pln;
-	    int pow = 1 << (pln = lb(i));
-	    int j = i - pow;
-	    int jj = 0;
-	    for (int p = 0; p < pln; p++)
-	    {
-		int jl = ((j & (1 << p)) >>> p) << (pln - p - 1);
-		int jh = ((j & (1 << (pln - p - 1))) >>> (pln - p - 1)) << p;
-		    
-		jj |= jl | jh;
-	    }
-	    
-	    int c = i == 0 ? 0 : (jj * 400 / pow + 200 / pow);
-	    
-	    double llum = 0.7;
-	    double hlum = 1.05;
-	    
-	    int cr = rgb[c][0], scr = satrgb[c][0];
-	    int cg = rgb[c][1], scg = satrgb[c][1];
-	    int cb = rgb[c][2], scb = satrgb[c][2];
-	    double[] lrgb = toLinear(cr, cg, cb);
-	    double[] slrgb = toLinear(scr, scg, scb);
-	    
-	    for (int ł = 0, łn = 16; ł < łn; ł++)
-	    {
-		int łł = 0;
-		for (int p = 0; p < 5; p++)
-		{
-		    int łl = ((ł & (1 << p)) >>> p) << (3 - p);
-		    int łh = ((ł & (1 << (3 - p))) >>> (3 - p)) << p;
-		    
-		    łł |= łl | łh;
-		}
-		double lum = (double)łł / łn;
-		lum = hlum + lum * (llum - hlum);
-		
-		double lr = lrgb[0] * lum, lg = lrgb[1] * lum, lb = lrgb[2] * lum;
-		double slr = slrgb[0] * lum, slg = slrgb[1] * lum, slb = slrgb[2] * lum;
-		
-		for (int si = 0; si <= 1; si++)
-		{
-		    final int S = 2;
-		    int[] srgb = toStandard(lr * (S - si) / S + slr * si / S,
-					    lg * (S - si) / S + slg * si / S,
-					    lb * (S - si) / S + slb * si / S);
-		    g.setColor(new Color(srgb[0], srgb[1], srgb[2]));
-		    g.fillRect(50 + 900 * i / n, 710 + ł * 240 / łn + 120 * si / łn, 900 / n + 1, 120 / łn + 1);
-		}
-	    }
+	    g.setColor(generateColour(i));
+	    g.fillRect(20 + 15 * (i & 63), 400 + 15 * (i >>> 6), 15, 15);
 	}
     }
     
-    
-    private static int[] selectColour(final int index)
+    private Color generateColour(final int index)
     {
-	return null;
+	int hueIndex = (index & 7) | ((index >>> 4) & ~7);
+	int satIndex = (index >>> 3) & 1;
+	int lumIndex = (index >>> 4) & 7;
+	    
+	double hue = selectHue(hueIndex);
+	double sat = selectSat(satIndex);
+	double lum = selectLum(lumIndex);
+	    
+	return generateColour(hue, sat, lum);
+    }
+    
+    private Color generateColour(final double hue, final double sat, final double lum)
+    {
+	int $hue = (int)hue;
+	
+	int cr = rgb[$hue][0], scr = satrgb[$hue][0];
+	int cg = rgb[$hue][1], scg = satrgb[$hue][1];
+	int cb = rgb[$hue][2], scb = satrgb[$hue][2];
+	double[] lrgb = toLinear(cr, cg, cb);
+	double[] slrgb = toLinear(scr, scg, scb);
+	
+	double lr = lrgb[0] * lum, lg = lrgb[1] * lum, lb = lrgb[2] * lum;
+	double slr = slrgb[0] * lum, slg = slrgb[1] * lum, slb = slrgb[2] * lum;
+	
+	int[] srgb = toStandard(lr * sat + slr * (1. - sat),
+				lg * sat + slg * (1. - sat),
+				lb * sat + slb * (1. - sat));
+	return new Color(srgb[0], srgb[1], srgb[2]);
+    }
+    
+    private static double selectLum(final int index)
+    {
+	double llum = 0.7;
+	double hlum = 1.05;
+	
+	return ((hlum - llum) * index / 8.) + llum;
+    }
+    
+    private static double selectSat(final int index)
+    {
+	return 1. - (index / 2.);
+    }
+    
+    private static double selectHue(final int index)
+    {
+	int pln;
+	int pow = 1 << (pln = lb(index));
+	int j = index - pow;
+	int jj = 0;
+	
+	for (int p = 0; p < pln; p++)
+	{
+	    int jl = ((j & (1 << p)) >>> p) << (pln - p - 1);
+	    int jh = ((j & (1 << (pln - p - 1))) >>> (pln - p - 1)) << p;
+	    
+	    jj |= jl | jh;
+	}
+	
+	return index == 0 ? 0. : (jj * 400. / pow + 200. / pow);
     }
     
     
