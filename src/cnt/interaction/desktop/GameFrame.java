@@ -127,18 +127,31 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {   synchronized (this)
-	{   if (message instanceof LocalPlayer)
+	{
+	    if (message instanceof LocalPlayer)
 	    {
 		this.localPlayer = ((LocalPlayer)message).player;
-    }   }   }
+	    } 
+	    else if (message instanceof PlayerPause)
+	    {
+		if (this.localPlayer == ((PlayerPause)message).player)
+		    ((JCheckBoxMenuItem)(menuItems.get("pause").get())).setState(((PlayerPause)message).paused);
+	    } 
+	    else if (message instanceof EmergencyPause)
+	    {
+		final WeakReference<Component> ref = menuItems.get("empause");
+		if (ref != null)
+		    ((JCheckBoxMenuItem)(ref.get())).setState(((EmergencyPause)message).paused);
+	    }
+	}
+    }
     
     
     /**
      * {@inheritDoc}
      */
     public void itemClicked(final String id)
-    {
-	switch (id)
+    {   switch (id)
 	{
 	    case "friends":
 		(new FriendDialogue(this)).setVisible(true);
@@ -159,14 +172,17 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
      * {@inheritDoc}
      */
     public void valueUpdated(final String id, final boolean value)
-    {
-	switch (id)
+    {   switch (id)
 	{
 	    case "pause":
 		if (localPlayer == null)
 		    ((JCheckBoxMenuItem)(menuItems.get(id).get())).setState(false);
 		else
 		    Blackboard.broadcastMessage(new PlayerPause(localPlayer, value));
+	        break;
+		
+	    case "empause":
+		Blackboard.broadcastMessage(new EmergencyPause(value));
 	        break;
 		
 	    default:
