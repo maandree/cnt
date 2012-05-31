@@ -20,119 +20,44 @@ public class ColourSelector extends JFrame
 	this.setLocation(new Point(this.getLocation().x + 300,
 				   this.getLocation().y + 100 - 25));
 	
-	rgb = new int[400][];
-	satrgb = new int[400][];
+	degree = extra * (lspan + 1 + hspan);
 	
-	final int[][] fixed0 = {{205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
-			        { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
+	fixed0 = new int[][] {
+	         {205, 101, 108}, {164, 110, 176}, { 36, 149, 190}, {  0, 169, 159},
+		 { 50, 166, 121}, {156, 173,  81}, {204, 173,  71}, {218, 128,  77}};
 	
-	final int[][] fixed1 = {{210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
-			        {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
-	
-	for (final int[][][] items : new int[][][][] {{fixed0, rgb}, {fixed1, satrgb}})
-	{
-	    final int[][] fixed = items[0];
-	    final int[][] arr = items[1];
-	    
-	    double[][] f = new double[fixed.length][];
-	    double[] fX = new double[f.length];
-	    double[] fY = new double[f.length];
-	    double[] fZ = new double[f.length];
-	    for (int i = 0, n = f.length; i < n; i++)
-	    {
-		f[i] = toLinear(fixed[i][0], fixed[i][1], fixed[i][2]);
-		fX[i] = f[i][0];
-		fY[i] = f[i][1];
-		fZ[i] = f[i][2];
-	    }
-	    
-	    int index = arr.length / f.length;
-	    
-	    for (int hue = 450; hue < 850; hue++)
-	    {
-		int midH = (hue * f.length / 400) % f.length;
-		if (midH < 0)
-		    midH += f.length;
-		
-		int lowH = (midH - lspan) % f.length;
-		if (lowH < 0)
-		    lowH += f.length;
-		
-		int[] hs = new int[lspan + 1 + hspan];
-		for (int i = 0; i < hs.length; i++)
-		{
-		    int im = (lowH + i) % f.length;
-		    hs[i] = im < 0 ? (im + f.length) : im;
-		}
-		
-		int hsl = extra * hs.length;
-		double[][] xs = new double[hsl][hsl];
-		double[] X = new double[hsl];
-		double[] Y = new double[hsl];
-		double[] Z = new double[hsl];
-		for (int y = 0; y < hsl; y++)
-		{
-		    int ym = (lowH + y) % f.length;
-		    if (ym < 0)
-			ym += f.length;
-		    X[y] = fX[ym];
-		    Y[y] = fY[ym];
-		    Z[y] = fZ[ym];
-		    double c = 1, m = 400 + (lowH + y) * 400 / f.length;
-		    for (int x = 0; x < hsl; x++)
-			xs[y][x] = c *= m;
-		}
-		
-		X = eliminate(xs, X);
-		Y = eliminate(xs, Y);
-		Z = eliminate(xs, Z);
-		
-		double h = 1, x = 0, y = 0, z = 0;
-		
-		for (int i = 0; i < hsl; i++)
-		{
-		    h *= hue;
-		    x += h * X[i];
-		    y += h * Y[i];
-		    z += h * Z[i];
-		}
-		
-		arr[(++index) % arr.length] = toStandard(x, y, z);
-	    }
-	}
+	fixed1 = new int[][] {
+	         {210, 142, 143}, {184, 153, 188}, {124, 173, 197}, {111, 178, 175},
+		 {126, 184, 153}, {175, 187, 128}, {203, 179, 114}, {222, 155, 118}};
     }
     
-    private int[][] rgb;
-    private int[][] satrgb;
+    
+    
+    private int[][] fixed0;
+    private int[][] fixed1;
+    private int degree;
+    
     
     
     public void paint(final Graphics g)
     {
-	for (int i = 0; i < rgb.length; i++)
-	{
-	    Color colour = new Color(rgb[i][0], rgb[i][1], rgb[i][2]);
-	    Color satcolour = new Color(satrgb[i][0], satrgb[i][1], satrgb[i][2]);
-	    
-	    g.setColor(colour);
-	    g.drawLine(50 + i, 50, 50 + i, 100);
-	    
-	    g.setColor(satcolour);
-	    g.drawLine(50 + i, 100, 50 + i, 150);
-	}
-	
-	for (int i = 0, n = 128; i < n; i++)
+	for (int i = 0, n = 2048; i < n; i++)
 	{
 	    g.setColor(generateColour(i));
-	    g.fillRect(20 + 15 * (i & 63), 400 + 15 * (i >>> 6), 15, 15);
+	    g.fillRect(20 + 15 * (i & 63), 100 + 15 * (i >>> 6), 15, 15);
 	}
     }
+    
     
     private Color generateColour(final int index)
     {
 	int hueIndex = (index & 7) | ((index >>> 4) & ~7);
 	int satIndex = (index >>> 3) & 1;
 	int lumIndex = (index >>> 4) & 7;
-	    
+	//int hueIndex = ((index >>> 1) & 63) | ((index >>> 6) & ~63);
+	//int satIndex = (index >>> 0) & 1;
+	//int lumIndex = (index >>> 6) & 63;
+	
 	double hue = selectHue(hueIndex);
 	double sat = selectSat(satIndex);
 	double lum = selectLum(lumIndex);
@@ -140,13 +65,14 @@ public class ColourSelector extends JFrame
 	return generateColour(hue, sat, lum);
     }
     
+    
     private Color generateColour(final double hue, final double sat, final double lum)
     {
-	int $hue = (int)hue;
-	
-	int cr = rgb[$hue][0], scr = satrgb[$hue][0];
-	int cg = rgb[$hue][1], scg = satrgb[$hue][1];
-	int cb = rgb[$hue][2], scb = satrgb[$hue][2];
+	int[] rgb = hueToColour(hue, fixed0);
+	int[] satrgb = hueToColour(hue, fixed1);
+	int cr = rgb[0], scr = satrgb[0];
+	int cg = rgb[1], scg = satrgb[1];
+	int cb = rgb[2], scb = satrgb[2];
 	double[] lrgb = toLinear(cr, cg, cb);
 	double[] slrgb = toLinear(scr, scg, scb);
 	
@@ -159,20 +85,96 @@ public class ColourSelector extends JFrame
 	return new Color(srgb[0], srgb[1], srgb[2]);
     }
     
-    private static double selectLum(final int index)
-    {
-	double llum = 0.7;
-	double hlum = 1.05;
+    
+    private int[] hueToColour(final double hue, final int[][] fixed)
+    {    
+	double[][] f = new double[fixed.length][];
+	double[] frk = new double[f.length];
+	double[] fgk = new double[f.length];
+	double[] fbk = new double[f.length];
+	for (int i = 0, n = f.length; i < n; i++)
+	{
+	    f[i] = toLinear(fixed[i][0], fixed[i][1], fixed[i][2]);
+	    frk[i] = f[i][0];
+	    fgk[i] = f[i][1];
+	    fbk[i] = f[i][2];
+	}
 	
-	return ((hlum - llum) * index / 8.) + llum;
+	int $hue = (int)(hue);
+	$hue = ($hue % 400) +  400;
+	if ($hue < 450)
+	    $hue += 400;
+	int midH = ($hue * fixed.length / 400) % fixed.length;
+	if (midH < 0)
+	    midH += fixed.length;
+	
+	int lowH = (midH - lspan) % fixed.length;
+	if (lowH < 0)
+	    lowH += fixed.length;
+	
+	int[] hs = new int[lspan + 1 + hspan];
+	for (int i = 0; i < hs.length; i++)
+	{
+	    int im = (lowH + i) % fixed.length;
+	    hs[i] = im < 0 ? (im + fixed.length) : im;
+	}
+	
+	double[][] xs = new double[degree][degree];
+	double[] rk = new double[degree];
+	double[] gk = new double[degree];
+	double[] bk = new double[degree];
+	for (int y = 0; y < degree; y++)
+	{
+	    int ym = (lowH + y) % fixed.length;
+	    if (ym < 0)
+		ym += fixed.length;
+	    rk[y] = frk[ym];
+	    gk[y] = fgk[ym];
+	    bk[y] = fbk[ym];
+	    double c = 1, m = 400 + (lowH + y) * 400 / fixed.length;
+	    for (int x = 0; x < degree; x++)
+		xs[y][x] = c *= m;
+	}
+	
+	rk = eliminate(xs, rk);
+	gk = eliminate(xs, gk);
+	bk = eliminate(xs, bk);
+	
+	double h = 1, r = 0, g = 0, b = 0;
+	
+	for (int i = 0; i < degree; i++)
+	{
+	    h *= $hue;
+	    r += h * rk[i];
+	    g += h * gk[i];
+	    b += h * bk[i];
+	}
+	
+	return toStandard(r, g, b);
     }
     
-    private static double selectSat(final int index)
+    
+    private double selectLum(final int index)
+    {
+	double llum = 0.95;
+	double hlum = 1.05;
+	
+	int i = index;
+	i = ((i & 12) >> 2) | ((i & 3) << 2);
+	i = ((i & 10) >> 1) | ((i & 5) << 1);
+	i ^= 2;
+	
+	return ((hlum - llum) * (8 - i) / 8.) + llum;
+    }
+    
+    
+    private double selectSat(final int index)
     {
 	return 1. - (index / 2.);
     }
     
-    private static double selectHue(final int index)
+    
+    private double selectHue(final int index)
     {
 	int pln;
 	int pow = 1 << (pln = lb(index));
@@ -284,6 +286,7 @@ public class ColourSelector extends JFrame
 	return new double[] {rcL, rca, rcb};
     }
     
+    
     /**
      * Converts from CIELAB to sRGB
      * 
@@ -338,6 +341,7 @@ public class ColourSelector extends JFrame
 	return new int[] {rcR, rcG, rcB};
     }
     
+    
     private static double[] toLinear(final int r, final int b, final int g)
     {
 	return new double[] {
@@ -346,6 +350,7 @@ public class ColourSelector extends JFrame
 	    Math.pow(b / 255., 0.439764585)
 	};
     }
+    
     
     private static int[] toStandard(final double r, final double b, final double g)
     {
