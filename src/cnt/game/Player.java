@@ -30,44 +30,47 @@ public class Player implements Serializable
     /**
      * Constructor
      * 
-     * @param  name   The name of the player
-     * @param  id     The ID of the player
-     * @param  extip  The public IP address of the player
-     * @param  locip  The local IP address of the player
-     * @param  dnses  The player's DNS names
+     * @param  name         The name of the player
+     * @param  id           The ID of the player
+     * @param  extip        The public IP address of the player
+     * @param  locip        The local IP address of the player
+     * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
+     * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final int id, final String extip, final String locip, final String... dnses)
+    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo, final String... dnses)
     {
-	this(name, Friends.getPersonalUUID(), id, extip, locip, dnses);
+	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, dnses);
     }
     
     
     /**
      * Constructor
      * 
-     * @param  name   The name of the player
-     * @param  id     The ID of the player
-     * @param  extip  The public IP address of the player
-     * @param  locip  The local IP address of the player
-     * @param  dnses  The player's DNS names
+     * @param  name         The name of the player
+     * @param  id           The ID of the player
+     * @param  extip        The public IP address of the player
+     * @param  locip        The local IP address of the player
+     * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
+     * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final int id, final String extip, final String locip, final ArrayList<String> dnses)
+    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo, final ArrayList<String> dnses)
     {
-	this(name, Friends.getPersonalUUID(), id, extip, locip, dnses);
+	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, dnses);
     }
     
     
     /**
      * Constructor
      * 
-     * @param  name   The name of the player
-     * @param  uuid   Universally unique ID for the player
-     * @param  id     The ID of the player
-     * @param  extip  The public IP address of the player
-     * @param  locip  The local IP address of the player
-     * @param  dnses  The player's DNS names
+     * @param  name         The name of the player
+     * @param  uuid         Universally unique ID for the player
+     * @param  id           The ID of the player
+     * @param  extip        The public IP address of the player
+     * @param  locip        The local IP address of the player
+     * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
+     * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final String... dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int connectedTo, final String... dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
@@ -80,6 +83,7 @@ public class Player implements Serializable
 	this.uuid = uuid;
 	this.extip = extip;
 	this.locip = locip;
+	this.connectedTo = connectedTo;
 	this.dnses = new ArrayList<String>();
 	for (final String dns : dnses)
 	    this.dnses.add(dns);
@@ -89,14 +93,15 @@ public class Player implements Serializable
     /**
      * Constructor
      * 
-     * @param  name   The name of the player
-     * @param  uuid   Universally unique ID for the player
-     * @param  id     The ID of the player
-     * @param  extip  The public IP address of the player
-     * @param  locip  The local IP address of the player
-     * @param  dnses  The player's DNS names
+     * @param  name         The name of the player
+     * @param  uuid         Universally unique ID for the player
+     * @param  id           The ID of the player
+     * @param  extip        The public IP address of the player
+     * @param  locip        The local IP address of the player
+     * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
+     * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final ArrayList<String> dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int connectedTo, final ArrayList<String> dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
@@ -109,8 +114,10 @@ public class Player implements Serializable
 	this.uuid = uuid;
 	this.extip = extip;
 	this.locip = locip;
+	this.connectedTo = connectedTo;
 	this.dnses = dnses;
     }
+    
     
     
     /**
@@ -166,6 +173,11 @@ public class Player implements Serializable
     protected String locip;
     
     /**
+     * The ID of the player to which this player is connected, loop (this player's ID) if none
+     */
+    protected int connectedTo;
+    
+    /**
      * The player's DNS names
      */
     protected ArrayList<String> dnses;
@@ -209,8 +221,17 @@ public class Player implements Serializable
     {
 	synchronized (instances)
 	{   instances.put(Integer.valueOf(this.id), this);
+	    final Player override = instancesUUID.get(this.uuid);
 	    instancesUUID.put(this.uuid, this);
 	    Friends.updateFriend(this);
+	    
+	    override.name = this.name;
+	    override.id = this.id;
+	    override.uuid = this.uuid;
+	    override.extip = this.extip;
+	    override.locip = this.locip;
+	    override.connectedTo = this.connectedTo;
+	    override.dnses = this.dnses;
 	}
 	return this;
     }
@@ -228,7 +249,9 @@ public class Player implements Serializable
 	
 	final Player p = (Player)object;
 	
-	return this.id == p.id;
+	return ((this.uuid == null) || (p.uuid == null))
+	           ? (this.id == p.id)
+	           : (this.uuid.equals(p.uuid));
     }
     
     
@@ -236,7 +259,7 @@ public class Player implements Serializable
      * {@inheritDoc}
      */
     public int hashCode() {
-	return this.id;
+	return this.uuid.hashCode();
     }
     
     
@@ -301,10 +324,20 @@ public class Player implements Serializable
     
     
     /**
+     * Gets the ID of the player to which this player is connected, loop (this player's ID) if none
+     * 
+     * @return  The ID of the player to which this player is connected, loop (this player's ID) if none
+     */
+    public int getConnectedTo() {
+	return this.connectedTo;
+    }
+    
+    
+    /**
      * {@inheritDoc}
      */
     public String toString() {
-	return ((this.name + " (") + (this.id + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses.toString() + ")"));
+	return ((this.name + " (") + (this.id + " → ") + (this.connectedTo + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses.toString() + ")"));
     }
     
 }

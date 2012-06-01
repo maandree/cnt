@@ -48,7 +48,7 @@ public class NetGameDemo
         final String name = args[0];
         final String remote = args.length > 1 ? args[1] : null;
 	
-	final Player me = new Player(name, null, args[0].hashCode() & 0xFFF, null, null);
+	final Player me = new Player(name, null, args[0].hashCode() & 0xFFF, null, null, 0);
 	final Object monitor = new Object();
 	
 	final Player[] lowest = {null};
