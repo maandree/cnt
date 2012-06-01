@@ -28,19 +28,34 @@ public final class JoinGame implements Blackboard.BlackboardMessage
     /**
      * Constructor
      * 
+     * @param  name    The player name to use
      * @param  remote  The address to which to connect, <code>null</code> or empty if none
+     * @param  port    The port to which to connect; or if <tt>remote</tt> is <code>null</code>, the port to use
      */
-    public JoinGame(final String remote)
+    public JoinGame(final String name, final String remote, final int port)
     {
+	assert (name != null) && (name.isEmpty() == false) : "You must have a name";
+	this.name = name;
 	this.remote = ((remote == null) || remote.isEmpty()) ? null : remote;
+	this.port = port;
     }
     
     
     
     /**
+     * The player name to use
+     */
+    public final String name;
+    
+    /**
      * The address to which to connect, <code>null</code> if none
      */
     public final String remote;
+    
+    /**
+     * The port to which to connect; or if {@link #remote} is <code>null</code>, the port to use
+     */
+    public final int port;
     
     
     
@@ -49,7 +64,7 @@ public final class JoinGame implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return this.remote == null ? "New game cloud" : "Joining game cloud " + this.remote;
+	return (this.remote == null ? "New game cloud" : "Joining game cloud " + this.remote) + " on port " + port;
     }
     
     /**
