@@ -113,6 +113,11 @@ public class Engine implements Blackboard.BlackboardObserver
     private static int score;
     
     /**
+     * The next score at which to slow down the speed
+     */
+    private static int slowDownScore = 1000;
+    
+    /**
      * Whether the current player is in pause mode
      */
     private static boolean paused = false;
@@ -123,9 +128,14 @@ public class Engine implements Blackboard.BlackboardObserver
     private static final Object pauseMonitor = new Object();
     
     /**
-     * The next score at which to slow down the speed
+     * Whether the game is in emergency pause mode
      */
-    private static int slowDownScore = 1000;
+    private static boolean empaused = false;
+    
+    /**
+     * Emergancy pause monitor
+     */
+    private static final Object empauseMonitor = new Object();
     
     
     
@@ -142,6 +152,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	Blackboard.registerObserver(blackboardObserver);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
 					   GamePlayCommand.class,
+					   EmergencyPause.class,
 					   PlayerDropped.class,
 					   PlayerPause.class,
 					   NextPlayer.class);
@@ -578,6 +589,17 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     static void sleep(final int milliseconds) throws InterruptedException
     {
+	synchronized (empauseMonitor)
+	{
+	    if (empaused)
+		try
+		{   empauseMonitor.wait();
+		}
+		catch (final InterruptedException err)
+		{   //TODO what do we do know?
+		}
+	}
+	
 	if (patches.isEmpty() == false)
 	{
 	    int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
@@ -677,8 +699,21 @@ public class Engine implements Blackboard.BlackboardObserver
 		}   }
 	    }
 	    else if (message instanceof NextPlayer) /* do not thread */
-	    {   if (((NextPlayer)message).player != null)
+	    {
+		if (((NextPlayer)message).player != null)
+		{
+		    synchronized (empauseMonitor)
+		    {
+			if (empaused)
+			    try
+			    {   empauseMonitor.wait();
+			    }
+			    catch (final InterruptedException err)
+			    {   //TODO what do we do know?
+			    }
+		    }
 		    newTurn(((NextPlayer)message).player);
+		}
 	    }
 	    else if (message instanceof PlayerDropped)
 		playerDropped(((PlayerDropped)message).player);
@@ -693,6 +728,13 @@ public class Engine implements Blackboard.BlackboardObserver
 			if (paused == false)
 			    pauseMonitor.notifyAll();
 		    }
+		}
+	    else if (message instanceof EmergencyPause)
+		synchronized (empauseMonitor)
+		{
+		    empaused = ((EmergencyPause)message).paused;
+		    if (empaused == false)
+			empauseMonitor.notifyAll();
 		}
 	}
 	catch (final InterruptedException err)
