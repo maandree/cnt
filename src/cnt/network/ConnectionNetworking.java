@@ -33,7 +33,6 @@ import java.io.*;
 // Classes needed for UDP socket
 import java.net.*;
 
-
 /**
 * Connection Networking layer
 *<p>
@@ -51,26 +50,6 @@ public class ConnectionNetworking
 	*/
 	public static final int PORT = 44923;
 
-	/**
-	* Protocol standard character for priority
-	*/
-	public static final byte PRIORITY = 43;
-
-	/**
-	* Protocol standard character for message
-	*/
-	public static final byte MESSAGE = 33;
-	
-	/**
-	* Protocol standard character for question
-	*/
-	public static final byte QUESTION = 63;
-	
-	/**
-	* Protocol standard character for object
-	*/
-	public static final byte OBJECT = 79;
-	
 	/**
 	* Default Constructor
 	* <p>
@@ -164,17 +143,17 @@ public class ConnectionNetworking
 	/**
 	* Map of current threaded connections to use to store ObjectOutputStreams
 	*/
-	final HashMap<Integer, PipedOutputStream> outputs = new HashMap<Integer, PipedOutputStream>();
+	final HashMap<Integer, ObjectOutputStream> objectOutputs = new HashMap<Integer, ObjectOutputStream>();
 
 	/**
 	* Map of current threaded connections to use to store ObjectInputStremas
 	*/
-	final HashMap<Integer, PipedInputStream> inputs = new HashMap<Integer, PipedInputStream>();
+	final HashMap<Integer, ObjectInputStream> objectInputs = new HashMap<Integer, ObjectInputStream>();
 
 	/**
-	* Set of already taken IDs
+	* The time when we last updated our external ip. Provider ask us not to do so more then every 5min/host.
 	*/
-	final ArrayList<Integer> takenIDs = new ArrayList<Integer>();
+	private Date lastUpdate;
 
 	/**
 	* The UPnP RemoteService being used for UPnP devices. 
@@ -199,7 +178,7 @@ public class ConnectionNetworking
 		
 		this.isServer = true;
 		
-		final Thread serverThread = new Thread(new TCPServer(_server, this.objectNetworking));
+		final Thread serverThread = new Thread(new TCPServer(_server, this.objectNetworking, this));
 		serverThread.setDaemon(true);
 		serverThread.start();
 	}
@@ -349,17 +328,24 @@ public class ConnectionNetworking
 	*/
 	private Inet4Address getExternalIP()
 	{
-		try {
-			this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
-			return this.externalIP;
-
-		} catch (Exception err)
+		Date current = new Date();
+		// 300'000 seconds = 5 minutes. note parantecis is more for clarity then function
+		if ((this.externalIP != null) && (this.lastUpdate != null) && (current.getTime() < (this.lastUpdate.getTime() + 300000)))
+			return this.externalIP;	
+		else
 		{
-			this.externalIP = null;
-			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external IP address:" + err));
-			return null;
+			try {
+			        this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
+				return this.externalIP;
+
+			} catch (Exception err)
+			{
+				this.externalIP = null;
+				Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external IP address:" + err));
+				return null;
+			}
+			
 		}
-		
 	}
 
 	/**
@@ -442,20 +428,4 @@ public class ConnectionNetworking
 			}
 		}
 	}	
-
-	/**
-	* Creates a new ID for the connecting client
-	*
-	* @return id number of player
-	*/
-	public final Integer getNewID()
-	{
-		Collections.sort(this.takenIDs);
-		
-		int newID = takenIDs.get(this.takenIDs.size() - 1)++;
-		
-		this.takenIDs.add(new Integer(newID));
-		
-		return newID;
-	}
 }

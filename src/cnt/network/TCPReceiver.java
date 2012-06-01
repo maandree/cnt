@@ -15,7 +15,6 @@ import cnt.messages.*;
 // Classes needed for TCP sockets
 import java.util.*;
 import java.io.*;
-import cnt.util.*;
 
 // Classes needed for UDP socket
 import java.net.*;
@@ -48,11 +47,6 @@ public class TCPReceiver implements Runnable
 	private final Socket connection;
 	
 	/**
-	* the PipedInputStream to read from
-	*/
-	private final InputStream input = null;
-
-	/**
 	* the ObjectNetworking instance to send objects to
 	*/
 	private final ObjectNetworking objectNetworking;
@@ -62,21 +56,26 @@ public class TCPReceiver implements Runnable
 	*/
 	private final ConnectionNetworking connectionNetworking;
 
-	/**
-	* Internal stream
-	*/
-	private final PipedOutputStream internalOutput;
-
 	public void run()
 	{
-		
-		// flag for setting if message is priority or not
-		boolean prio = false;			
-		
+		ObjectInputStream input = null;
 		try
 		{
-
-			this.input = new PipedInputStream(new BufferedInputStream(this.connection.getInputStream()));
+			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
+			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
+			// Send message to ObjectNetworking layer, and wait for a ID number to be returned
+			Integer peer = this.objectNetworking.receive((Serializable)input.readObject());
+			// Take ID and map the connection and peer in ConnectionNetworking
+			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
+			if (peer != null) {
+				this.connectionNetworking.sockets.put(peer, this.connection);
+				this.connectionNetworking.objectInputs.put(peer, input);
+				ObjectOutputStream out =  new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
+				out.flush();
+				this.connectionNetworking.objectOutputs.put(peer, out);
+			}
+			
+			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.sockets.size() + " connections"));
 
 		} catch (IOException ioe) 
 		{
@@ -85,69 +84,25 @@ public class TCPReceiver implements Runnable
 		{
 			// TODO: make some error handling happen
 		}
-			
-		Blackboard.broadcastMessage(new SystemMessage(null, "Getting new connection"));
-		
-		this.objectNetworking.connect(this);
-
-	}
 	
-	public byte[] read() {
-
-		//* First message sent should be an new ID request or a PlayerJoined *//
-		// Check to see what the message is all about
-		char msgType = this.input.read();
-		
-		// Check what the message is and handle it accordingly
-		if (msgType == ConnectionNetworking.PRIORITY)
+		try 
 		{
-			prio = true;
-			msgType = input.read();
+			while(true)
+			{
+				Blackboard.broadcastMessage(new SystemMessage(null, "Waiting for next message"));
+				if (!this.connection.isInputShutdown())
+					Blackboard.broadcastMessage(new SystemMessage(null, "Connection has alive instream"));
+				Serializable message = (Serializable)input.readObject();
+				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
+				this.objectNetworking.receive(message);
+			}
+		} catch (IOException ioe)
+		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "IOException receving messages"));
+			Blackboard.broadcastMessage(new SystemMessage(null, "IOExceotion: " + ioe.getMessage()));
+		} catch (ClassNotFoundException cnfe)
+		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "ClassNotFoundException reading messages"));
 		}
-			
-		while (true)
-		{
-			// Check to see what the message is all about
-			String msgType = input.readByte();
-			
-			// Check what the message is and handle it accordingly
-			if (msgType == ConnectionNetworking.PRIORITY)
-			{
-				prio = true;
-				msgType = input.readByte();
-			}
-			switch (msgType)
-			{
-				case ConnectionNetworking.QUESTION:
-					
-					break;
-				
-				case ConnectionNetwokring.MESSAGE:
-					this.speak();
-					break;
-	
-				case ConnectionNetworking.OBJECT:
-					this.forward();
-					break;
-				
-				default:
-					break; // Drop player who sends fulty data?
-			}
-		}	
-	}
-	
-	protected void listen()
-	{
-
-	}
-
-	protected void speak()
-	{
-	
-	}
-
-	protected void forward()
-	{
-	
 	}
 }

@@ -33,10 +33,11 @@ public class TCPServer implements Runnable
 	* @param objectNetworking the ObjectNetworking instance to use for callback
 	* @param connectionNetworking the ConnectionNetworking instance to use for mapping incoming connections 
 	*/
-	public TCPServer(ServerSocket serverSocket, ObjectNetworking objectNetworking)
+	public TCPServer(ServerSocket serverSocket, ObjectNetworking objectNetworking, ConnectionNetworking connectionNetworking)
 	{
 		this.serverSocket = serverSocket;
 		this.objectNetworking = objectNetworking;
+		this.connectionNetworking = connectionNetworking;
 	}
 	
 	/**
