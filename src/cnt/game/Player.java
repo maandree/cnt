@@ -32,12 +32,13 @@ public class Player implements Serializable
      * 
      * @param  name   The name of the player
      * @param  id     The ID of the player
-     * @param  ip     The IP address of the player
+     * @param  extip  The public IP address of the player
+     * @param  locip  The local IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final String ip, final String... dnses)
+    public Player(final String name, final int id, final String extip, final String locip, final String... dnses)
     {
-	this(name, Friends.getPersonalUUID(), id, ip, dnses);
+	this(name, Friends.getPersonalUUID(), id, extip, locip, dnses);
     }
     
     
@@ -46,12 +47,13 @@ public class Player implements Serializable
      * 
      * @param  name   The name of the player
      * @param  id     The ID of the player
-     * @param  ip     The IP address of the player
+     * @param  extip  The public IP address of the player
+     * @param  locip  The local IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final int id, final String ip, final ArrayList<String> dnses)
+    public Player(final String name, final int id, final String extip, final String locip, final ArrayList<String> dnses)
     {
-	this(name, Friends.getPersonalUUID(), id, ip, dnses);
+	this(name, Friends.getPersonalUUID(), id, extip, locip, dnses);
     }
     
     
@@ -61,20 +63,23 @@ public class Player implements Serializable
      * @param  name   The name of the player
      * @param  uuid   Universally unique ID for the player
      * @param  id     The ID of the player
-     * @param  ip     The IP address of the player
+     * @param  extip  The public IP address of the player
+     * @param  locip  The local IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String ip, final String... dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final String... dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
-	//assert ip != null : "ip cannot be null";
+	//assert extip != null : "extip cannot be null";
+	//assert locip != null : "locip cannot be null";
 	assert dnses != null : "DNS collection cannot be null";
 	
 	this.name = name;
 	this.id = id;
 	this.uuid = uuid;
-	this.ip = ip;
+	this.extip = extip;
+	this.locip = locip;
 	this.dnses = new ArrayList<String>();
 	for (final String dns : dnses)
 	    this.dnses.add(dns);
@@ -87,20 +92,23 @@ public class Player implements Serializable
      * @param  name   The name of the player
      * @param  uuid   Universally unique ID for the player
      * @param  id     The ID of the player
-     * @param  ip     The IP address of the player
+     * @param  extip  The public IP address of the player
+     * @param  locip  The local IP address of the player
      * @param  dnses  The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String ip, final ArrayList<String> dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final ArrayList<String> dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
-	//assert ip != null : "ip cannot be null";
+	//assert extip != null : "extip cannot be null";
+	//assert locip != null : "locip cannot be null";
 	assert dnses != null : "DNS collection cannot be null";
 	
 	this.name = name;
 	this.id = id;
 	this.uuid = uuid;
-	this.ip = ip;
+	this.extip = extip;
+	this.locip = locip;
 	this.dnses = dnses;
     }
     
@@ -148,9 +156,14 @@ public class Player implements Serializable
     protected UUID uuid;
     
     /**
-     * The IP address of the player
+     * The public IP address of the player
      */
-    protected String ip;
+    protected String extip;
+    
+    /**
+     * The local IP address of the player
+     */
+    protected String locip;
     
     /**
      * The player's DNS names
@@ -258,12 +271,22 @@ public class Player implements Serializable
     
     
     /**
-     * Gets the IP address of the player
+     * Gets the public IP address of the player
      * 
-     * @return  The IP address of the player
+     * @return  The public IP address of the player
      */
-    public String getIP() {
-	return this.ip;
+    public String getPublicIP() {
+	return this.extip;
+    }
+    
+    
+    /**
+     * Gets the local IP address of the player
+     * 
+     * @return  The local IP address of the player
+     */
+    public String getLocalIP() {
+	return this.locip;
     }
     
     
@@ -281,7 +304,7 @@ public class Player implements Serializable
      * {@inheritDoc}
      */
     public String toString() {
-	return this.name + " (" + this.id + ", " + this.ip + ", " + this.dnses.toString() + ")";
+	return ((this.name + " (") + (this.id + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses.toString() + ")"));
     }
     
 }

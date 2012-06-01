@@ -161,7 +161,7 @@ public class Diagnostics
 	    
 	    final String[] dnses = new String[friend.getDNSes().size()];
 	    friend.getDNSes().toArray(dnses);
-	    for (final String[] arr : new String[][] {{friend.getIP()}, dnses})
+	    for (final String[] arr : new String[][] {{friend.getPublicIP()}, dnses})
 		for (final String dns : arr)
 		{
 		    buf.append("  " + dns + "\n");
