@@ -91,9 +91,9 @@ public class Diagnostics
 	}
 	
 	buf.append("Local client\n");
+	String publicip = null;
 	try
 	{
-	    final String publicip;
 	    {
 		final Socket sock = new Socket("checkip.dyndns.org", 80);
 		final InputStream is = new BufferedInputStream(sock.getInputStream());
@@ -161,10 +161,26 @@ public class Diagnostics
 	    
 	    final String[] dnses = new String[friend.getDNSes().size()];
 	    friend.getDNSes().toArray(dnses);
-	    for (final String[] arr : new String[][] {{friend.getPublicIP()}, dnses})
+	    final String xip, lip;
+	    for (final String[] arr : new String[][] {{xip = friend.getPublicIP(), lip = friend.getLocalIP()}, dnses})
 		for (final String dns : arr)
 		{
-		    buf.append("  " + dns + "\n");
+		    buf.append("  " + dns);
+		    if (dns == lip)
+			if (publicip == null)
+			{
+			    buf.append(" (Do not known if on same network)\n");
+			    continue;
+			}
+			else if (xip.equals(publicip))
+			    buf.append(" (Local network)\n");
+			else
+			{
+			    buf.append(" (Not on same network)\n");
+			    continue;
+			}
+		    else
+			buf.append("\n");
 		    try
 		    {
 			final InetAddress[] addresses = InetAddress.getAllByName(dns);
