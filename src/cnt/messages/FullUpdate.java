@@ -32,7 +32,7 @@ public final class FullUpdate implements Blackboard.BlackboardMessage
     public FullUpdate()
     {
 	this.gathering = true;
-	this.data = new HashMap<Class<? extends Blackboard.BlackboardObserver>, Object>();
+	this.data = new HashMap<Class<?>, Object>();
     }
     
     /**
@@ -40,7 +40,7 @@ public final class FullUpdate implements Blackboard.BlackboardMessage
      * 
      * @param  data  Full system update data
      */
-    private FullUpdate(final HashMap<Class<? extends Blackboard.BlackboardObserver>, Object> data)
+    private FullUpdate(final HashMap<Class<?>, Object> data)
     {
 	this.gathering = false;
 	this.data = data;
@@ -56,7 +56,7 @@ public final class FullUpdate implements Blackboard.BlackboardMessage
     /**
      * Full system update data
      */
-    public final HashMap<Class<? extends Blackboard.BlackboardObserver>, Object> data;
+    public final HashMap<Class<?>, Object> data;
     
     
     
