@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ import static java.awt.RenderingHints.*;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 @SuppressWarnings("serial")
-public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
+public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, Runnable
 {
     /**
      * Constructor
@@ -89,6 +90,11 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 		this.pausedImageH = this.pausedImage.getHeight();
 	    }
 	}
+	
+	
+	final Thread updateThread = new Thread(this);
+	updateThread.setDaemon(true);
+	updateThread.start();
 	
 	
 	Blackboard.registerObserver(this);
@@ -161,6 +167,12 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
      */
     private Player player = null;
     
+    /**
+     * Queued game board patches
+     */
+    final ArrayDeque<MatrixPatch> queuedPatches = new ArrayDeque<MatrixPatch>();
+    
+    
     
     
     /**
@@ -229,7 +241,11 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 	if (message instanceof MatrixPatch)
 	{
 	    final MatrixPatch patch = (MatrixPatch)message;
-	    update(patch.erase, patch.blocks, patch.offY, patch.offX);
+	    synchronized (queuedPatches)
+	    {
+		queuedPatches.offerLast(patch);
+		queuedPatches.notifyAll();
+	    }
 	}
 	else if (message instanceof LocalPlayer)
         {
@@ -247,14 +263,39 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
     
     
     /**
+     * {@inheritDoc}
+     */
+    public void run()
+    {
+	for (;;)
+	{
+	    MatrixPatch patch;
+	    synchronized (queuedPatches)
+	    {
+		if (queuedPatches.isEmpty())
+		    try
+		    {   queuedPatches.wait();
+		    }
+		    catch (final InterruptedException err)
+		    {   break;
+		    }
+		
+		patch = queuedPatches.pollFirst();
+	    }
+	    update(patch.erase, patch.blocks, patch.offX, patch.offY);
+	}
+    }
+    
+    
+    /**
      * Updates the game matrix and redraws the area
      * 
      * @param  erase   A matrix where <code>true</code> indicates removal of block
      * @param  blocks  A matrix where non-<code>null</code> indicates to add a block
-     * @param  offY    Top offset, where the first row in the matrices affect the game matrix
      * @param  offX    Left offset, where the first column in the matrices affect the game matrix
+     * @param  offY    Top offset, where the first row in the matrices affect the game matrix
      */
-    public void update(final boolean[][] erase, final Block[][] blocks, final int offY, final int offX)
+    public void update(final boolean[][] erase, final Block[][] blocks, final int offX, final int offY)
     {
 	if (erase != null)
 	    for (int y = offY < 0 ? -offY : 0, h = erase.length; y < h; y++)
