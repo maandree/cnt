@@ -65,10 +65,13 @@ public class Mover
 	if (this.data.board.canPut(this.data.fallingShape, false) == false)
 	{
 	    this.data.fallingShape.restore(this.data.moveInitialMomento);
+	    this.engine.moved();
 	    this.engine.reaction();
 	    this.data.fallingShape = null;
 	    return false;
 	}
+	else
+	    this.engine.moved();
 	
 	this.data.moveInitialMomento = this.data.moveAppliedMomento = this.data.fallingShape.store();
 	
@@ -101,6 +104,7 @@ public class Mover
 	    if (this.data.board.canPut(this.data.fallingShape, false) == false)
 	    {
 		this.data.fallingShape.setY(this.data.fallingShape.getY() - 1);
+		this.engine.moved();
 		this.engine.reaction();
 		this.data.fallingShape = null;
 		return;
@@ -126,6 +130,7 @@ public class Mover
 	
 	this.data.patcher.patchAway(this.data.fallingShape);
 	this.data.fallingShape.restore(this.data.moveInitialMomento = this.data.moveAppliedMomento);
+	this.engine.moved();
 	this.data.patcher.patchIn(this.data.fallingShape);
     }
     

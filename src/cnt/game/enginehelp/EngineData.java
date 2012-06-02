@@ -18,7 +18,7 @@ import java.util.*;
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class EngineData
+public strictfp class EngineData
 {
     //Has default constructor
     
