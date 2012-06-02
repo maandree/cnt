@@ -106,7 +106,7 @@ public class Engine implements Blackboard.BlackboardObserver
 				
 				try
 				{   synchronized (Engine.this)
-				    {   if (Engine.this.fall() == false)
+				    {   if (Engine.this.mover.fall() == false)
 					    break;
 				}   }
 				catch (final InterruptedException err)
@@ -125,7 +125,7 @@ public class Engine implements Blackboard.BlackboardObserver
 				
 				try
 				{   synchronized (Engine.this)
-				    {   Engine.this.move();
+				    {   Engine.this.mover.move();
 				}   }
 				catch (final InterruptedException err)
 			        {   System.err.println("Are you leaving?");
@@ -234,63 +234,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	    {
 		//Do nothing
 	    }
-    }
-    
-    
-    /**
-     * Makes the falling block drop on step and apply the, if any, registrered modification
-     * 
-     * @return  Whether the fall was not interrupted
-     * 
-     * @throws  InterruptedException  Can only indicate the the player is leaving
-     */
-    boolean fall() throws InterruptedException
-    {
-	return this.mover.fall();
-    }
-    
-    
-    /**
-     * Drops the falling block to the bottom
-     * 
-     * @throws  InterruptedException  Can only indicate the the player is leaving
-     */
-    private void drop() throws InterruptedException
-    {
-	this.mover.drop();
-    }
-    
-    
-    /**
-     * Applies any requested move, but does not make the shape fall
-     * 
-     * @throws  InterruptedException  Can only indicate the the player is leaving
-     */
-    void move() throws InterruptedException
-    {
-	this.mover.move();
-    }
-    
-    
-    /**
-     * Registrers a rotation, if possible, to the falling block
-     * 
-     * @param  clockwise  Whether to rotate clockwise
-     */
-    private void rotate(final boolean clockwise)
-    {
-	this.mover.rotate(clockwise);
-    }
-    
-    
-    /**
-     * Registrers a horizontal movement, if possible, to the falling block
-     * 
-     * @param  incrX  The value with which to increase the left position
-     */
-    private void move(final int incrX)
-    {
-	this.mover.move(incrX);
     }
     
     
@@ -405,18 +348,18 @@ public class Engine implements Blackboard.BlackboardObserver
 		synchronized (Engine.class)
 		{   switch (((GamePlayCommand)message).move)
 		    {
-			case LEFT:           move(-1);       break;
-			case RIGHT:          move(1);        break;
-			case CLOCKWISE:      rotate(true);   break;
-			case ANTICLOCKWISE:  rotate(false);  break;
+			case LEFT:           this.mover.move(-1);       break;
+			case RIGHT:          this.mover.move(1);        break;
+			case CLOCKWISE:      this.mover.rotate(true);   break;
+			case ANTICLOCKWISE:  this.mover.rotate(false);  break;
 			    
 			case DOWN:
-			    if (fall() == false)
+			    if (this.mover.fall() == false)
 				this.data.thread.interrupt();
 			    break;
 			    
 			case DROP:
-			    drop();
+			    this.mover.drop();
 			    this.data.thread.interrupt();
 			    break;
 			    
