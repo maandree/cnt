@@ -23,7 +23,7 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * The initial interval between falls
      */
-    private static final int INITIAL_SLEEP_TIME = 1000;
+    private static final double INITIAL_SLEEP_TIME = 1000;
     
     /**
      * The value to multiply the sleep time each time the game speeds up;
@@ -76,7 +76,7 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * The interval between falls
      */
-    private int sleepTime = INITIAL_SLEEP_TIME;
+    private double sleepTime = INITIAL_SLEEP_TIME;
     
     /**
      * The game thread
@@ -171,7 +171,7 @@ public class Engine implements Blackboard.BlackboardObserver
 			    for (;;)
 			    {
 				try
-				{   Engine.this.sleep(Engine.this.sleepTime >> 1);
+				{   Engine.this.sleep(Engine.this.sleepTime / 2);
 				}
 				catch (final InterruptedException err)
 				{   if (Engine.this.currentPlayer == null)
@@ -190,7 +190,7 @@ public class Engine implements Blackboard.BlackboardObserver
 				}
 				
 				try
-				{   Engine.this.sleep(Engine.this.sleepTime >> 1);
+				{   Engine.this.sleep(Engine.this.sleepTime / 2);
 				}
 				catch (final InterruptedException err)
 				{   if (Engine.this.currentPlayer == null)
@@ -566,7 +566,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     void nextTurn()
     {
-	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
+	sleepTime = sleepTime * SLEEP_TIME_MULTIPLER;
 	Blackboard.broadcastMessage(new NextPlayer(null));
     }
     
@@ -578,7 +578,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  If the thread is interrupted
      */
-    void sleep(final int milliseconds) throws InterruptedException
+    void sleep(final double milliseconds) throws InterruptedException
     {
 	synchronized (empauseMonitor)
 	{
@@ -653,8 +653,9 @@ public class Engine implements Blackboard.BlackboardObserver
 		System.err.println("Shouldn't the matrix patches actually contain something?");
 	}
 	
-	if (milliseconds != 0)
-	    Thread.sleep(milliseconds);
+	int time = milliseconds < 0.5 ? 0 : milliseconds < 100. ? 100 : (int)(milliseconds + 0.5);
+	if (time != 0)
+	    Thread.sleep(time);
     }
     
     
