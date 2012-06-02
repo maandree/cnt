@@ -103,21 +103,19 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			    }
 			    catch (final InterruptedException err)
 			    {   return;
-			    }
-			}
+			}   }
 			    
 			for (;;)
 			{
 			    synchronized (Engine.this.gameMonitor)
-			    {
+			    {   Engine.this.data.patcher.dispatch();
 				Engine.this.nextTurn();
 				try
 				{   Engine.this.gameMonitor.wait();
 				}
 				catch (final InterruptedException err)
 				{   return;
-				}
-			    }
+			    }   }
 			    
 			    if (Engine.this.data.gameOver)
 			    {
@@ -210,7 +208,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
     public void nextTurn()
     {
 	this.data.sleepTime *= SLEEP_TIME_MULTIPLER;
-	//FIXME data update
+	Blackboard.broadcastMessage(new EngineUpdate(this.data));
 	Blackboard.broadcastMessage(new NextPlayer(null));
     }
     
@@ -233,7 +231,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
      */
     public void moved()
     {
-	//FIXME shape update
+	Blackboard.broadcastMessage(new EngineShapeUpdate(this.data.fallingShape));
     }
     
     
@@ -314,6 +312,10 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 		    if (this.data.empaused == false)
 			this.data.empauseMonitor.notifyAll();
 		}
+	    else if (message instanceof EngineShapeUpdate)
+		this.data.fallingShape = ((EngineShapeUpdate)message).shape;
+	    else if (message instanceof EngineUpdate)
+		this.data.update(((EngineUpdate)message).data);
 	}
 	catch (final InterruptedException err)
 	{

@@ -11,6 +11,7 @@ import cnt.*;
 
 import java.lang.ref.*;
 import java.util.*;
+import java.io.Serializable;
 
 
 /**
@@ -18,8 +19,15 @@ import java.util.*;
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public strictfp class EngineData
+public strictfp class EngineData implements Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     //Has default constructor
     
     
@@ -108,6 +116,25 @@ public strictfp class EngineData
      * Matrix patcher
      */
     public transient final Patcher patcher = new Patcher();
+    
+    
+    
+    /**
+     * Updates everything that is not transient
+     * 
+     * @param  data  The updates
+     */
+    public void update(final EngineData data)
+    {
+	this.board              = data.board;
+	this.fallingShape       = data.fallingShape;
+	this.currentPlayer      = data.currentPlayer;
+	this.moveInitialMomento = data.moveInitialMomento;
+	this.sleepTime          = data.sleepTime;
+	this.gameOver           = data.gameOver;
+	this.score              = data.score;
+	this.slowDownScore      = data.slowDownScore;
+    }
     
 }
 

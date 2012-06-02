@@ -130,6 +130,11 @@ public class Blackboard
     private static /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading =
 	       new /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>>();
     
+    /**
+     * Concurrency monitor
+     */
+    private static Object monitor = new Object();
+    
     
     
     /**
@@ -193,7 +198,7 @@ public class Blackboard
      */
     public static void registerObserver(final BlackboardObserver observer)
     {
-	synchronized (Blackboard.class)
+	synchronized (monitor)
 	{
 	    System.err.println("BLACKBOARD.registerObserver(" + observer + ")");
 	    observers.put(observer, null);
@@ -208,7 +213,7 @@ public class Blackboard
      */
     public static void unregisterObserver(final BlackboardObserver observer)
     {
-	synchronized (Blackboard.class)
+	synchronized (monitor)
 	{
 	    System.err.println("BLACKBOARD.unregisterObserver(" + observer + ")");
 	    observers.remove(observer);
@@ -243,7 +248,7 @@ public class Blackboard
     @SuppressWarnings("unchecked")
     public static void registerThreadingPolicy(final BlackboardObserver observer, final ThreadingPolicy policy, final Class... messageTypes)
     {
-	synchronized (Blackboard.class)
+	synchronized (monitor)
 	{
 	    HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
 	    if (map == null)
@@ -264,12 +269,16 @@ public class Blackboard
      */
     public static void broadcastMessage(final BlackboardMessage message)
     {
-	synchronized (Blackboard.class)
+	synchronized (monitor)
 	{
 	    System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
 	    final ArrayList<Thread> threads = new ArrayList<Thread>();
 	    
-	    for (final BlackboardObserver observer : observers.keySet())
+	    final Set<BlackboardObserver> keySet = observers.keySet();
+	    final BlackboardObserver[] keys = new BlackboardObserver[keySet.size()];
+	    keySet.toArray(keys);
+	    
+	    for (final BlackboardObserver observer : keys)
 	    {
 		System.err.println("BLACKBOARD.broadcastMessage() ==> " + observer.toString());
 		final ThreadingPolicy policy;
@@ -279,8 +288,7 @@ public class Blackboard
 			     * {@inheritDoc}
 			     */
 			    public void run()
-			    {
-				observer.messageBroadcasted(message);
+			    {   observer.messageBroadcasted(message);
 			    }
 		    };
 		
