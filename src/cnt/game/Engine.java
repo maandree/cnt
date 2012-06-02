@@ -136,7 +136,7 @@ public class Engine implements Blackboard.BlackboardObserver
     public void start()
     {
 	gameOver = false;
-	sleepTime = (int)(INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER); //the division will be nullified when the games starts by nextTurn()
+	sleepTime = INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER; //the division will be nullified when the games starts by nextTurn()
 	board = new Board();
 	
 	final Engine blackboardObserver = new Engine();
