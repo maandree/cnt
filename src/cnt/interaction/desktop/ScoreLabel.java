@@ -42,5 +42,13 @@ public class ScoreLabel extends JLabel implements Blackboard.BlackboardObserver
 	}
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(ScoreLabel)";
+    }
+    
 }
 

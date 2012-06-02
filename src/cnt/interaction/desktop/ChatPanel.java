@@ -104,5 +104,13 @@ public class ChatPanel extends JPanel implements ActionListener
 	this.text.setText("");
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(ChatPanel)";
+    }
+    
 }
 

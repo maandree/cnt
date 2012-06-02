@@ -128,5 +128,13 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	this.setEditable(false);
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(MessageText)";
+    }
+    
 }
 

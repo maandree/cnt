@@ -197,5 +197,13 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
     public void valueUpdated(final String id, final long value)    { /*Not used*/ }
     public void valueUpdated(final String id, final int value)     { /*Not used*/ }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(GameFrame)";
+    }
+    
 }
 

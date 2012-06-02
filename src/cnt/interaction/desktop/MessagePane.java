@@ -28,6 +28,14 @@ public class MessagePane extends JPanel
 	this.setLayout(new BorderLayout());
 	this.add(new JScrollPane(new MessageText()), BorderLayout.CENTER);
     }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(MessagePane)";
+    }
 
 }
 

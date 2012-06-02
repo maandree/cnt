@@ -170,5 +170,13 @@ public class UserList extends JPanel implements Blackboard.BlackboardObserver
 	}
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(UserList)";
+    }
+    
 }
 

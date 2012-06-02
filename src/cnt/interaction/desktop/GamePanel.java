@@ -330,5 +330,13 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
 	this.repaint();
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(GamePanel)";
+    }
+    
 }
 
