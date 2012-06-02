@@ -58,6 +58,16 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
      */
     public final General general = new General(this);
     
+    /**
+     * Game monitor
+     */
+    public final Object gameMonitor = new Object();
+    
+    /**
+     * Start monitor
+     */
+    public final Object startMonitor = new Object();
+    
     
     
     /**
@@ -70,12 +80,13 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 	this.data.board = new Board();
 	
 	Blackboard.registerObserver(this);
-	Blackboard.registerThreadingPolicy(this, Blackboard.DAEMON_THREADING,
-					   GamePlayCommand.class,
-					   EmergencyPause.class,
-					   PlayerDropped.class,
-					   PlayerPause.class,
-					   NextPlayer.class);
+	Blackboard.registerThreadingPolicy(this, Blackboard.DAEMON_THREADING
+					   ,GamePlayCommand.class
+					   ,EmergencyPause.class
+					   ,PlayerDropped.class
+					   ,PlayerPause.class
+					   ,NextPlayer.class
+					   );
 	
 	Blackboard.broadcastMessage(new GameScore(this.data.score = 0));
 	
@@ -85,9 +96,28 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 		     * {@inheritDoc}
 		     */
 		    public void run()
-		    {   for (;;)
+		    {   
+			synchronized (Engine.this.startMonitor)
+			{   try
+			    {   Engine.this.startMonitor.wait();
+			    }
+			    catch (final InterruptedException err)
+			    {   return;
+			    }
+			}
+			    
+			for (;;)
 			{
-			    Engine.this.nextTurn();
+			    synchronized (Engine.this.gameMonitor)
+			    {
+				Engine.this.nextTurn();
+				try
+				{   Engine.this.gameMonitor.wait();
+				}
+				catch (final InterruptedException err)
+				{   return;
+				}
+			    }
 			    
 			    if (Engine.this.data.gameOver)
 			    {
@@ -135,7 +165,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 				    return;
 				}
 			    }
-		    }    }
+		    }   }
 	        };
 	
 	this.data.thread.start();
@@ -160,7 +190,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
     private void newTurn(final Player player)
     {
 	this.general.newTurn(player);
-	moved()
+	moved();
     }
     
     
@@ -199,7 +229,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
     
     
     /**
-     * Invoke if the falling shape has moved or otherwise updated
+     * Invoke when the falling shape has moved or otherwise updated
      */
     public void moved()
     {
@@ -239,11 +269,10 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 		}       }
 	    else if (message instanceof NextPlayer) /* do not thread */
 	    {
-		if (((NextPlayer)message).player != null)
-		{
-		    synchronized (this.data.empauseMonitor)
-		    {
-			if (this.data.empaused)
+		final Player player = ((NextPlayer)message).player;
+		if (player != null)
+		{   synchronized (this.data.empauseMonitor)
+		    {   if (this.data.empaused)
 			    try
 			    {   this.data.empauseMonitor.wait();
 			    }
@@ -251,13 +280,23 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			    {   //TODO what do we do know?
 			    }
 		    }
-		    newTurn(((NextPlayer)message).player);
+		    if (player.equals(this.data.localPlayer))
+			synchronized (this.gameMonitor)
+			{
+			    newTurn(player);
+			    this.gameMonitor.notify();
+			}
 		}
 	    }
 	    else if (message instanceof PlayerDropped)
 		playerDropped(((PlayerDropped)message).player);
 	    else if (message instanceof LocalPlayer)
+	    {
 		this.data.localPlayer = ((LocalPlayer)message).player;
+		synchronized (Engine.this.startMonitor)
+		{   Engine.this.startMonitor.notifyAll();
+		}
+	    }
 	    else if (message instanceof PlayerPause)
 		synchronized (this.data.pauseMonitor)
 		{

@@ -40,6 +40,7 @@ public class PeerGameDemo
      */
     public static void main(final String... args) throws Exception
     {
+	(new Engine()).start();
 	(new GameFrame()).setVisible(true);
 	new PlayerRing();
 	final Player[] player = { null };
@@ -54,7 +55,6 @@ public class PeerGameDemo
 	final Object monitor = new Object();
 	
 	final Player[] lowest = {null};
-	
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -116,9 +116,6 @@ public class PeerGameDemo
 			    synchronized (monitor)
 			    {   monitor.wait();
 			    }
-			    
-			    if (me.equals(lowest[0]))
-				(new Engine()).start();
 			    
 			    for (int d; (d = System.in.read()) != -1;)
 			        if (me.equals(player[0])) //order is important

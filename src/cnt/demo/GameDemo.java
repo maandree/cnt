@@ -41,6 +41,8 @@ public class GameDemo
      */
     public static void main(final String... args) throws IOException
     {
+	(new Engine()).start();
+	
 	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
 	final PlayerRing ring = new PlayerRing();
 	
@@ -51,7 +53,7 @@ public class GameDemo
 	final Player localPlayer = new Player("Mattias", null, 0, null, null, 0);
 	Blackboard.broadcastMessage(new PlayerJoined(localPlayer));
 	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman", null, 1, null, null, 0)));
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",  null, 2, null, null,0 )));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",  null, 2, null, null, 0)));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -71,7 +73,6 @@ public class GameDemo
 		    }
 	        });
 	
-	(new Engine()).start();
 	Blackboard.broadcastMessage(new LocalPlayer(localPlayer));
 	
 	
