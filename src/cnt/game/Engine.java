@@ -32,12 +32,6 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private static final double SLEEP_TIME_MULTIPLER = 0.995;
     
-    /**
-     * The possible, initial, shapes
-     */
-    private static final Shape[] POSSIBLE_SHAPES = {new TShape(), new IShape(), new OShape(),
-						    new LShape(), new JShape(), new SShape(), new ZShape()};
-    
     
     
     //Has default constructor
@@ -58,6 +52,11 @@ public class Engine implements Blackboard.BlackboardObserver
      * Reactor engine
      */
     public final Reactor reactor = new ClassicalReactor(this.data);
+    
+    /**
+     * General helper
+     */
+    public final General general = new General(this);
     
     
     
@@ -151,16 +150,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private void playerDropped(final Player player)
     {
-	if (player.equals(this.data.currentPlayer))
-	{
-	    this.data.currentPlayer = null;
-	    this.data.thread.interrupt();
-	    
-	    this.data.patcher.patchAway(this.data.fallingShape);
-	    
-	    this.data.fallingShape = null;
-	    nextTurn();
-	}
+	this.general.playerDropped(player);
     }
     
     
@@ -171,64 +161,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private void newTurn(final Player player)
     {
-	synchronized (this.data.pauseMonitor)
-	{
-	    this.data.currentPlayer = player;
-	    if (this.data.paused && player.equals(this.data.localPlayer))
-		try
-		{   this.data.pauseMonitor.wait();
-		}
-		catch (final InterruptedException err)
-		{   //TODO what do we do know?
-		}
-	}
-	
-	try
-	{
-	    this.data.fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length];
-	    
-	    HashMap<Shape, SoftReference<Shape>> playerShapeCache = this.data.shapeCache.get(player);
-	    Shape nshape;
-	    if (playerShapeCache == null)
-	    {
-	        this.data.shapeCache.put(player, playerShapeCache = new HashMap<Shape, SoftReference<Shape>>());
-		playerShapeCache.put(this.data.fallingShape, new SoftReference<Shape>(nshape = this.data.fallingShape.clone()));
-		nshape.setPlayer(player);
-	    }
-	    else
-	    {
-		SoftReference<Shape> ref = playerShapeCache.get(this.data.fallingShape);
-		if ((ref == null) || ((nshape = ref.get()) == null))
-		{
-		    playerShapeCache.put(this.data.fallingShape, new SoftReference<Shape>(nshape = this.data.fallingShape.clone()));
-		    nshape.setPlayer(player);
-		}
-	    }
-	    this.data.fallingShape = nshape;
-	}
-	catch (final CloneNotSupportedException err)
-	{   throw new Error("*Shape.clone() is not implemented");
-	}
-	catch (final Throwable err)
-	{   throw new Error("*Shape.clone() is not implemented correctly");
-	}
-	
-	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
-	    this.data.fallingShape.rotate(true);
-	
-	this.data.fallingShape.setX((Board.WIDTH - this.data.fallingShape.getBlockMatrix()[0].length) >> 1);
-	this.data.fallingShape.setY(0);
-	
-	this.data.gameOver = this.data.board.canPut(this.data.fallingShape, false) == false;
-	if (this.data.gameOver)
-	    do  {this.data.fallingShape.setY(this.data.fallingShape.getY() - 1); System.err.println("one up");}
-	      while (this.data.board.canPut(this.data.fallingShape, true) == false);
-	
-	this.data.moveAppliedMomento = this.data.moveInitialMomento = this.data.fallingShape.store();
-	
-	this.data.patcher.patchIn(this.data.fallingShape);
-	if (this.data.gameOver)
-	    this.data.patcher.dispatch();
+	this.general.newTurn(player);
     }
     
     
@@ -237,23 +170,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public void reaction()
     {
-	this.data.patcher.patchIn(this.data.fallingShape);
-	this.data.board.put(this.data.fallingShape);
-	int scoreBefore = this.data.score;
-	
-	this.data.patcher.dispatch();
-	this.reactor.reaction();
-	
-	if (this.data.slowDownScore >= 0)
-	    while (this.data.score >= this.data.slowDownScore)
-	    {
-		this.data.slowDownScore <<= 1;
-		this.data.sleepTime += 200;
-	    }
-	
-	if (this.data.score != scoreBefore)
-	    Blackboard.broadcastMessage(new GameScore(this.data.score));
-	this.data.currentPlayer = null;
+	this.general.reaction();
     }
     
     
@@ -261,7 +178,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * Performs everthing needed for a new turn and
      * sends a request for letting the next player start
      */
-    void nextTurn()
+    public void nextTurn()
     {
 	this.data.sleepTime *= SLEEP_TIME_MULTIPLER;
 	Blackboard.broadcastMessage(new NextPlayer(null));
@@ -277,21 +194,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     void sleep(final double milliseconds) throws InterruptedException
     {
-	synchronized (this.data.empauseMonitor)
-	{
-	    if (this.data.empaused)
-		try
-		{   this.data.empauseMonitor.wait();
-		}
-		catch (final InterruptedException err)
-		{   //TODO what do we do now?
-		}
-	}
-	
-	this.data.patcher.dispatch();
-	
-	if (milliseconds >= 0.5)
-	    Thread.sleep(milliseconds < 100. ? 100 : (int)(milliseconds + 0.5));
+	this.general.sleep(milliseconds);
     }
     
     
@@ -303,7 +206,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	try
 	{
 	    if (message instanceof GamePlayCommand)
-	    {
 		synchronized (Engine.class)
 		{   switch (((GamePlayCommand)message).move)
 		    {
@@ -325,7 +227,6 @@ public class Engine implements Blackboard.BlackboardObserver
 			default:
 			    throw new Error("Unrecognised GamePlayCommand.");
 		}   }
-	    }
 	    else if (message instanceof NextPlayer) /* do not thread */
 	    {
 		if (((NextPlayer)message).player != null)
