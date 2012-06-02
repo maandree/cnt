@@ -23,6 +23,7 @@ public class Patcher
     //Has default constructor
     
     
+    
     /**
      * All queued matrix patches for {@link Blackboard}
      */
