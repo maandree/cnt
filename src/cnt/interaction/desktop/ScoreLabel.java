@@ -7,12 +7,9 @@
  */
 package cnt.interaction.desktop;
 import cnt.messages.*;
-import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
 
 
 /**

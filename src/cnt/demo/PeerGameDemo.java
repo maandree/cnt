@@ -41,7 +41,7 @@ public class PeerGameDemo
     public static void main(final String... args) throws Exception
     {
 	(new GameFrame()).setVisible(true);
-	final PlayerRing ring = new PlayerRing();
+	new PlayerRing();
 	final Player[] player = { null };
 	
 	final char name = args[0].charAt(0);

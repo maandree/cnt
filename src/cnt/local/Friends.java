@@ -112,7 +112,6 @@ public class Friends
      * 
      * @throws  IOException  On I/O error
      */
-    @SuppressWarnings("unchecked")
     private static void loadFriends(final String file) throws IOException
     {
 	friendFile = file;

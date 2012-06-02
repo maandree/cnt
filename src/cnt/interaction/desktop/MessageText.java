@@ -8,7 +8,6 @@
 package cnt.interaction.desktop;
 import cnt.interaction.*;
 import cnt.messages.*;
-import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;

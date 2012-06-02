@@ -87,10 +87,10 @@ public class MatrixPatch implements Blackboard.BlackboardMessage
 	    for (final boolean[] row : this.erase)
 		if (row == null)
 		    return Boolean.FALSE;
-	    
+	
 	if (this.blocks != null)
 	    for (final Block[] row : this.blocks)
-		if (blocks == null)
+		if (row == null)
 		    return Boolean.FALSE;
 	    
 	return Boolean.TRUE;
