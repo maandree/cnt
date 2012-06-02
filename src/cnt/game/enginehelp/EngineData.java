@@ -73,7 +73,7 @@ public class EngineData
     /**
      * Shape for shapes with set player
      */
-    public final WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
+    public final HashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new HashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
     
     /**
      * The current game score
