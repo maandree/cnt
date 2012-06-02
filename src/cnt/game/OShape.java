@@ -6,12 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-import cnt.game.Board;
-import cnt.game.Block;
-import cnt.game.Shape;
-import cnt.game.Player;
-
-import java.io.*;
 
 
 /**
@@ -23,7 +17,7 @@ import java.io.*;
 public class OShape extends Shape
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
     

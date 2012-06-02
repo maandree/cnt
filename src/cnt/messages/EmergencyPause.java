@@ -6,10 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.messages;
-import cnt.game.*;
 import cnt.*;
-
-import java.io.Serializable;
 
 
 /**
@@ -20,7 +17,7 @@ import java.io.Serializable;
 public final class EmergencyPause implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
 	

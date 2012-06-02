@@ -7,11 +7,11 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
+import cnt.network.PlayerRing;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 import cnt.mock.*;
-import cnt.network.PlayerRing;
 
 
 /**
@@ -43,7 +43,6 @@ public class PeerGameDemo
 	(new GameFrame()).setVisible(true);
 	final PlayerRing ring = new PlayerRing();
 	final Player[] player = { null };
-	
 	
 	final char name = args[0].charAt(0);
 	final boolean serverauth = args[1].charAt(0) == 's';

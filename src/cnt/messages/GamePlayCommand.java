@@ -8,8 +8,6 @@
 package cnt.messages;
 import cnt.*;
 
-import java.io.Serializable;
-
 
 /**
  * Command sent when the player whats to make a move
@@ -19,7 +17,7 @@ import java.io.Serializable;
 public final class GamePlayCommand implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
 	

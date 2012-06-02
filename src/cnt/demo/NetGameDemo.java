@@ -42,7 +42,6 @@ public class NetGameDemo
     public static void main(final String... args) throws Exception
     {
 	(new GameFrame()).setVisible(true);
-	final PlayerRing ring = new PlayerRing();
 	final Player[] player = { null };
 	        
         final String name = args[0];

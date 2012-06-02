@@ -7,12 +7,11 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
-import cnt.network.PlayerRing;
+import cnt.network.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 
-import java.awt.Color;
 import java.io.IOException;
 
 
@@ -43,9 +42,9 @@ public class GameDemo
     public static void main(final String... args) throws IOException
     {
 	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
+	final PlayerRing ring = new PlayerRing();
 	
 	(new GameFrame()).setVisible(true);
-	final PlayerRing ring = new PlayerRing();
 	
 	rec.start();
 	

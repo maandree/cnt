@@ -10,8 +10,6 @@ import cnt.util.*;
 import cnt.game.*;
 import cnt.*;
 
-import java.io.Serializable;
-
 
 /**
  * Message to synchronise and information about player order
@@ -21,7 +19,7 @@ import java.io.Serializable;
 public final class PlayerOrder implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
     
