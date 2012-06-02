@@ -47,7 +47,7 @@ public class Launcher implements Blackboard.BlackboardObserver
 	if (message instanceof JoinGame)
 	{
 	    if (((JoinGame)message).remote == null)
-		Engine.start();
+		(new Engine()).start();
 	}
     }
     

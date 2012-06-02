@@ -72,7 +72,7 @@ public class GameDemo
 		    }
 	        });
 	
-	Engine.start();
+	(new Engine()).start();
 	Blackboard.broadcastMessage(new LocalPlayer(localPlayer));
 	
 	

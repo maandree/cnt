@@ -119,7 +119,7 @@ public class PeerGameDemo
 			    }
 			    
 			    if (me.equals(lowest[0]))
-				Engine.start();
+				(new Engine()).start();
 			    
 			    for (int d; (d = System.in.read()) != -1;)
 			        if (me.equals(player[0])) //order is important
