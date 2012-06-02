@@ -54,6 +54,11 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     public final Mover mover = new Mover(this);
     
+    /**
+     * Reactor engine
+     */
+    public final Reactor reactor = new ClassicalReactor(this.data);
+    
     
     
     /**
@@ -180,9 +185,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	try
 	{
-	    //this.data.fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length].clone();
-	    //this.data.fallingShape.setPlayer(player);
-	    
 	    this.data.fallingShape = POSSIBLE_SHAPES[(int)(Math.random() * POSSIBLE_SHAPES.length) % POSSIBLE_SHAPES.length];
 	    
 	    HashMap<Shape, SoftReference<Shape>> playerShapeCache = this.data.shapeCache.get(player);
@@ -226,60 +228,21 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	this.data.patcher.patchIn(this.data.fallingShape);
 	if (this.data.gameOver)
-	    try
-	    {
-		this.sleep(0);
-	    }
-	    catch (final InterruptedException err)
-	    {
-		//Do nothing
-	    }
+	    this.data.patcher.dispatch();
     }
     
     
     /**
      * Stations the falling block and deletes empty rows
-     * 
-     * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    public void reaction() throws InterruptedException
+    public void reaction()
     {
 	this.data.patcher.patchIn(this.data.fallingShape);
 	this.data.board.put(this.data.fallingShape);
-	boolean reacted = false;
+	int scoreBefore = this.data.score;
 	
-	sleep(0);
-	for (;;)
-	{
-	    final int[] full = this.data.board.getFullRows();
-	    if (full.length == 0)
-		break;
-	    Arrays.sort(full);
-	    
-	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
-	    for (int x = 0; x < Board.WIDTH; x++)
-		fullLine[0][x] = true;
-	    
-	    final Block[][] matrix = this.data.board.getMatrix();
-	    
-	    int sub = 0;
-	    int row = full[full.length - 1];
-	    
-	    for (int y = 0; y <= row; y++)
-	    {
-		this.data.patcher.patchAway(fullLine, 0, y);
-		this.data.board.delete(fullLine, 0, y);
-	    }
-	    for (int y = sub; y < row; y++)
-	    {
-		this.data.patcher.patchIn(new Block[][] {matrix[y]}, 0, y + 1);
-		this.data.board.put(new Block[][] {matrix[y]}, 0, y + 1);
-	    }
-	    sleep(0);
-	    
-	    reacted = true;
-	    this.data.score += 10;
-	}
+	this.data.patcher.dispatch();
+	this.reactor.reaction();
 	
 	if (this.data.slowDownScore >= 0)
 	    while (this.data.score >= this.data.slowDownScore)
@@ -288,7 +251,7 @@ public class Engine implements Blackboard.BlackboardObserver
 		this.data.sleepTime += 200;
 	    }
 	
-	if (reacted)
+	if (this.data.score != scoreBefore)
 	    Blackboard.broadcastMessage(new GameScore(this.data.score));
 	this.data.currentPlayer = null;
     }
@@ -327,12 +290,8 @@ public class Engine implements Blackboard.BlackboardObserver
 	
 	this.data.patcher.dispatch();
 	
-	int time = milliseconds < 0.5
-	           ? 0 : milliseconds < 100.
-	                 ? 100 : (int)(milliseconds + 0.5);
-	
-	if (time != 0)
-	    Thread.sleep(time);
+	if (milliseconds >= 0.5)
+	    Thread.sleep(milliseconds < 100. ? 100 : (int)(milliseconds + 0.5));
     }
     
     
