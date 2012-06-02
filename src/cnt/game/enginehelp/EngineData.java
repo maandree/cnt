@@ -5,8 +5,8 @@
  * 
  * Project for prutt12 (DD2385), KTH.
  */
-package cnt.game;
-import cnt.game.enginehelp.*;
+package cnt.game.enginehelp;
+import cnt.game.*;
 import cnt.messages.*;
 import cnt.*;
 

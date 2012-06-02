@@ -47,7 +47,12 @@ public class Engine implements Blackboard.BlackboardObserver
     /**
      * All data held by the engine
      */
-    final EngineData data = new EngineData();
+    public final EngineData data = new EngineData();
+    
+    /**
+     * Shape mover and rotate
+     */
+    public final Mover mover = new Mover(this);
     
     
     
@@ -241,30 +246,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     boolean fall() throws InterruptedException
     {
-	this.sleep(0);
-	
-	if (this.data.fallingShape == null)
-	{
-	    System.err.println("What's happening, why do we not have a falling shape?");
-	    return true;
-	}
-	
-	this.data.patcher.patchAway(this.data.fallingShape);
-	this.data.fallingShape.restore(this.data.moveInitialMomento = this.data.moveAppliedMomento);
-	this.data.fallingShape.setY(this.data.fallingShape.getY() + 1);
-	
-	if (this.data.board.canPut(this.data.fallingShape, false) == false)
-	{
-	    this.data.fallingShape.restore(this.data.moveInitialMomento);
-	    reaction();
-	    this.data.fallingShape = null;
-	    return false;
-	}
-	
-	this.data.moveInitialMomento = this.data.moveAppliedMomento = this.data.fallingShape.store();
-	
-	this.data.patcher.patchIn(this.data.fallingShape);
-	return true;
+	return this.mover.fall();
     }
     
     
@@ -275,28 +257,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private void drop() throws InterruptedException
     {
-	if (this.data.fallingShape == null)
-	{
-	    System.err.println("What's happening, why do we not have a falling shape?");
-	    return;
-	}
-	
-	this.sleep(0);
-	this.data.patcher.patchAway(this.data.fallingShape);
-	this.data.fallingShape.restore(this.data.moveInitialMomento = this.data.moveAppliedMomento);
-	
-	for (;;)
-	{
-	    this.data.fallingShape.setY(this.data.fallingShape.getY() + 1);
-	    
-	    if (this.data.board.canPut(this.data.fallingShape, false) == false)
-	    {
-		this.data.fallingShape.setY(this.data.fallingShape.getY() - 1);
-		reaction();
-		this.data.fallingShape = null;
-		return;
-	    }
-	}
+	this.mover.drop();
     }
     
     
@@ -307,17 +268,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     void move() throws InterruptedException
     {
-	this.sleep(0);
-	
-	if (this.data.fallingShape == null)
-	{
-	    System.err.println("What's happening, why do we not have a falling shape?");
-	    return;
-	}
-	
-	this.data.patcher.patchAway(this.data.fallingShape);
-	this.data.fallingShape.restore(this.data.moveInitialMomento = this.data.moveAppliedMomento);
-	this.data.patcher.patchIn(this.data.fallingShape);
+	this.mover.move();
     }
     
     
@@ -328,20 +279,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private void rotate(final boolean clockwise)
     {
-	if (this.data.fallingShape == null)
-	{
-	    System.err.println("What's happening, why do we not have a falling shape?");
-	    return;
-	}
-	
-	this.data.fallingShape.rotate(clockwise);
-	
-	if (this.data.board.canPut(this.data.fallingShape, false))
-	    this.data.moveAppliedMomento = this.data.fallingShape.store();
-	else
-	    this.data.moveAppliedMomento = this.data.moveInitialMomento;
-	
-	this.data.fallingShape.restore(this.data.moveInitialMomento);
+	this.mover.rotate(clockwise);
     }
     
     
@@ -352,20 +290,7 @@ public class Engine implements Blackboard.BlackboardObserver
      */
     private void move(final int incrX)
     {
-	if (this.data.fallingShape == null)
-	{
-	    System.err.println("What's happening, why do we not have a falling shape?");
-	    return;
-	}
-	
-	this.data.fallingShape.setX(this.data.fallingShape.getX() + incrX);
-	
-	if (this.data.board.canPut(this.data.fallingShape, false))
-	    this.data.moveAppliedMomento = this.data.fallingShape.store();
-	else
-	    this.data.moveAppliedMomento = this.data.moveInitialMomento;
-	
-	this.data.fallingShape.restore(this.data.moveInitialMomento);
+	this.mover.move(incrX);
     }
     
     
@@ -374,7 +299,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private void reaction() throws InterruptedException
+    public void reaction() throws InterruptedException
     {
 	this.data.patcher.patchIn(this.data.fallingShape);
 	this.data.board.put(this.data.fallingShape);
