@@ -27,10 +27,10 @@ public class Launcher implements Blackboard.BlackboardObserver
     
     
     
-    ///**
-    // * The started {@link LoginFrame}
-    // */
-    //private static LoginFrame loginFrame = null;
+    /**
+     * The started {@link LoginFrame}
+     */
+    private static LoginFrame loginFrame = null;
     
     /**
      * The started {@link GameFrame}
@@ -46,9 +46,8 @@ public class Launcher implements Blackboard.BlackboardObserver
      */
     public static void launch(final String... args)
     {
-	//(loginFrame = new LoginFrame()).setVisible(true);
-	//Blackboard.registerObserver(new Launcher());
-	(new GameFrame()).setVisible(true);
+	(loginFrame = new LoginFrame()).setVisible(true);
+	Blackboard.registerObserver(new Launcher());
     }
     
     
@@ -58,11 +57,11 @@ public class Launcher implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	//if (message instanceof JoinGame)
-	//{
-	//    loginFrame.setVisible(false);
-	//    (gameFrame = new GameFrame()).setVisible(true);
-	//}
+	if (message instanceof JoinGame)
+	{
+	    loginFrame.setVisible(false);
+	    (gameFrame = new GameFrame()).setVisible(true);
+	}
     }
     
 }
