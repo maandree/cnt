@@ -207,7 +207,7 @@ public class Player implements Serializable
     public static Player getInstanceByUUID(final UUID uuid)
     {
 	synchronized (instances)
-	{   return instances.get(uuid);
+	{   return instancesUUID.get(uuid);
 	}
     }
     
@@ -221,17 +221,20 @@ public class Player implements Serializable
     {
 	synchronized (instances)
 	{   instances.put(Integer.valueOf(this.id), this);
-	    final Player override = instancesUUID.get(this.uuid);
+	    final Player override = this.uuid == null ? null : instancesUUID.get(this.uuid);
 	    instancesUUID.put(this.uuid, this);
 	    Friends.updateFriend(this);
 	    
-	    override.name = this.name;
-	    override.id = this.id;
-	    override.uuid = this.uuid;
-	    override.extip = this.extip;
-	    override.locip = this.locip;
-	    override.connectedTo = this.connectedTo;
-	    override.dnses = this.dnses;
+	    if (override != null)
+	    {
+		override.name = this.name;
+		override.id = this.id;
+		override.uuid = this.uuid;
+		override.extip = this.extip;
+		override.locip = this.locip;
+		override.connectedTo = this.connectedTo;
+		override.dnses = this.dnses;
+	    }
 	}
 	return this;
     }
@@ -259,7 +262,7 @@ public class Player implements Serializable
      * {@inheritDoc}
      */
     public int hashCode() {
-	return this.uuid.hashCode();
+	return this.uuid == null ? 0 : this.uuid.hashCode();
     }
     
     
@@ -337,7 +340,7 @@ public class Player implements Serializable
      * {@inheritDoc}
      */
     public String toString() {
-	return ((this.name + " (") + (this.id + " → ") + (this.connectedTo + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses.toString() + ")"));
+	return ((this.name + " (") + (this.id + " → ") + (this.connectedTo + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses + ")"));
     }
     
 }
