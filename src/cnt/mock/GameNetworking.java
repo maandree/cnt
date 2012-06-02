@@ -10,7 +10,6 @@ import cnt.game.*;
 import cnt.messages.*;
 import cnt.*;
 
-import java.awt.*;
 import java.io.*;
 
 
