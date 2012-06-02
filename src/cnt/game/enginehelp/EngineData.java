@@ -43,7 +43,7 @@ public class EngineData
     /**
      * The local player
      */
-    public Player localPlayer = null;
+    public transient Player localPlayer = null;
     
     /**
      * The momento of the falling shape at the beginning of the move
@@ -63,7 +63,7 @@ public class EngineData
     /**
      * The game thread
      */
-    public Thread thread = null;
+    public transient Thread thread = null;
     
     /**
      * Whether the game is over
@@ -73,7 +73,7 @@ public class EngineData
     /**
      * Shape for shapes with set player
      */
-    public final HashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new HashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
+    public transient final HashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new HashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
     
     /**
      * The current game score
@@ -88,27 +88,27 @@ public class EngineData
     /**
      * Whether the current player is in pause mode
      */
-    public boolean paused = false;
+    public transient boolean paused = false;
     
     /**
      * Pause monitor
      */
-    public final Object pauseMonitor = new Object();
+    public transient final Object pauseMonitor = new Object();
     
     /**
      * Whether the game is in emergency pause mode
      */
-    public boolean empaused = false;
+    public transient boolean empaused = false;
     
     /**
      * Emergancy pause monitor
      */
-    public final Object empauseMonitor = new Object();
+    public transient final Object empauseMonitor = new Object();
     
     /**
      * Matrix patcher
      */
-    public final Patcher patcher = new Patcher();
+    public transient final Patcher patcher = new Patcher();
     
 }
 
