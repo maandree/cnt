@@ -29,21 +29,6 @@ import java.lang.ref.*;
 public class GameFrame extends JFrame implements UpdateListener, Blackboard.BlackboardObserver
 {
     /**
-     * The default total frame width
-     */
-    private static final int DEFAULT_WIDTH = 640;
-    
-    /**
-     * The default total frame height
-     */
-    private static final int DEFAULT_HEIGHT = 900;
-    
-    /**
-     * The default block width an height
-     */
-    private static final int DEFAULT_BLOCK_SIZE = 32;
-    
-    /**
      * Whether or not the views of the split panes are continuously
      * redisplayed while resizing.
      */
@@ -59,8 +44,22 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	super("cnt: Coop Network Tetris");
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //TODO only on demo
 	
-	this.setSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)); //TODO temporary, should depend on screen
-	this.setLocationByPlatform(true);
+	int height = 300;
+	int width = 300;
+	final Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+	final DisplayMode display = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+	
+	int _height = (display.getHeight() - 100 - height) / 20;
+	int _width = (display.getWidth() - 100 - width) / 10;
+	int block = _height < _width ? _height : _width;
+	if (block > 32)
+	    block = 32;
+	
+	height += 20 * block;
+	width += 10 * block;
+	
+	this.setSize(new Dimension(width, height));
+	this.setLocation(new Point(center.x - (width >> 1), center.y - (height >> 1)));
 	
 	Blackboard.registerObserver(this);
 	
@@ -118,7 +117,7 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	this.add(status, BorderLayout.SOUTH);
 	this.add(vSplit, BorderLayout.CENTER);
 	
-	gamePanel.setPreferredSize(new Dimension(10 * DEFAULT_BLOCK_SIZE, 20 * DEFAULT_BLOCK_SIZE));
+	gamePanel.setPreferredSize(new Dimension(10 * 32, 20 * 32));
     }
     
     

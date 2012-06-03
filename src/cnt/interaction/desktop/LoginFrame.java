@@ -33,9 +33,15 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	super("CNT: Coop Network Tetris");
 	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+	final int width = 400;
+	final int height = 300;
+	
+	final Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+	final DisplayMode display = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+	
 	this.pack();
-	this.setSize(new Dimension(400, 300));
-        this.setLocationByPlatform(true);
+	this.setSize(new Dimension(width, height));
+	this.setLocation(new Point(center.x - (width >> 1), center.y - (height >> 1)));
 	
 	final Player[] players = Friends.getFriends();
 	final Friend[] friends = new Friend[players.length + 1];
