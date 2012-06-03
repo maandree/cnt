@@ -17,24 +17,24 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-/**
-* Helper class for the ChatDemo class
-*/
 
+/**
+ * Helper class for {@link ChatDemo}
+ */
 class Listener implements Blackboard.BlackboardObserver
 {
-	public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	try
 	{
-		try
-        	{
-	    		if (message instanceof UserMessage)
-				System.out.println((UserMessage)message);
-            		else if (message instanceof ChatMessage)
-				System.out.println((ChatMessage)message);
-		}
-		catch (final Exception err)
-		{
-	   		//FIXME error!
-		}
+	    if (message instanceof UserMessage)
+		System.out.println((UserMessage)message);
+	    else if (message instanceof ChatMessage)
+		System.out.println((ChatMessage)message);
 	}
+	catch (final Exception err)
+	{
+	    //Do nothing
+	}
+    }
 }

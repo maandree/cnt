@@ -1,3 +1,15 @@
-"Help" >
-       "Network Diagnostics"  id="netdiag"
+"Game" >
+       "Pause"           id="pause"    type=check
+       "Emegency Pause"  id="empause"  type=check
+       --
+       "Audiable Bell"   id="abell"    type=CHECK
+       "Visual Bell"     id="vbell"    type=CHECK
        <
+
+"Players" >
+        "Friends"  id="friends"
+        <
+
+"Help" >
+        "Network Diagnostics"  id="netdiag"
+        <

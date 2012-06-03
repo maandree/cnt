@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.interaction.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
@@ -280,7 +281,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver
 		for (int x = offX < 0 ? -offX : 0, w = blocks[y].length; x < w; x++)
 		    if (blocks[y][x] != null)
 			if (x + offX < this.matrix[Y].length)
-			    this.matrix[Y][x + offX] = new Color(blocks[y][x].getColor());
+			    this.matrix[Y][x + offX] = ColourMapper.getColour(blocks[y][x].getColor());
 			else
 			    break;
 	    }

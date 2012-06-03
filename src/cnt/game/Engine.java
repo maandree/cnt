@@ -39,80 +39,101 @@ public class Engine implements Blackboard.BlackboardObserver
     
     
     
-    /**
-     * <p>Constructor.</p>
-     * <p>
-     *   Used for {@link Blackboard} listening.
-     * </p>
-     */
-    private Engine()
-    {
-        //Privatise default constructor
-    }
+    //Has default constructor
     
     
     
     /**
      * The current board with all stationed blocks
      */
-    private static Board board = null;
+    private Board board = null;
     
     /**
      * The current falling shape
      */
-    private static Shape fallingShape = null;
+    private Shape fallingShape = null;
     
     /**
      * The current player
      */
-    private static Player currentPlayer = null;
+    private Player currentPlayer = null;
+    
+    /**
+     * The local player
+     */
+    private Player localPlayer = null;
     
     /**
      * The momento of the falling shape at the beginning of the move
      */
-    private static Shape.Momento moveInitialMomento = null;
+    private Shape.Momento moveInitialMomento = null;
     
     /**
      * The momento of the falling shape at the end of the move
      */
-    private static Shape.Momento moveAppliedMomento = null;
+    private Shape.Momento moveAppliedMomento = null;
     
     /**
      * The interval between falls
      */
-    private static int sleepTime = INITIAL_SLEEP_TIME;
+    private int sleepTime = INITIAL_SLEEP_TIME;
     
     /**
      * The game thread
      */
-    private static Thread thread = null;
+    private Thread thread = null;
     
     /**
      * Whether the game is over
      */
-    private static boolean gameOver = true;
+    private boolean gameOver = true;
     
     /**
      * All queued matrix patches for {@link Blackboard}
      */
-    private static final ArrayList<MatrixPatch> patches = new ArrayList<MatrixPatch>();
+    private final ArrayList<MatrixPatch> patches = new ArrayList<MatrixPatch>();
     
     /**
      * Shape for shapes with set player
      */
-    private static final WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
+    private final WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>> shapeCache = new WeakHashMap<Player, HashMap<Shape, SoftReference<Shape>>>();
     
     /**
      * The current game score
      */
-    private static int score;
+    private int score;
+    
+    /**
+     * The next score at which to slow down the speed
+     */
+    private int slowDownScore = 1000;
+    
+    /**
+     * Whether the current player is in pause mode
+     */
+    private boolean paused = false;
+    
+    /**
+     * Pause monitor
+     */
+    private final Object pauseMonitor = new Object();
+    
+    /**
+     * Whether the game is in emergency pause mode
+     */
+    private boolean empaused = false;
+    
+    /**
+     * Emergancy pause monitor
+     */
+    private final Object empauseMonitor = new Object();
     
     
     
     /**
      * Starts the engine
      */
-    public static void start()
+    public void start()
     {
 	gameOver = false;
 	sleepTime = (int)(INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER); //the division will be nullified when the games starts by nextTurn()
@@ -122,8 +143,9 @@ public class Engine implements Blackboard.BlackboardObserver
 	Blackboard.registerObserver(blackboardObserver);
 	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.DAEMON_THREADING,
 					   GamePlayCommand.class,
-					   PlayerDropped.class);
-	Blackboard.registerThreadingPolicy(blackboardObserver, Blackboard.NO_THREADING,
+					   EmergencyPause.class,
+					   PlayerDropped.class,
+					   PlayerPause.class,
 					   NextPlayer.class);
 	
 	Blackboard.broadcastMessage(new GameScore(score = 0));
@@ -137,9 +159,9 @@ public class Engine implements Blackboard.BlackboardObserver
 		    {
 			for (;;)
 			{
-			    Engine.nextTurn();
+			    Engine.this.nextTurn();
 			    
-			    if (Engine.gameOver)
+			    if (Engine.this.gameOver)
 			    {
 				Blackboard.broadcastMessage(new GameOver());
 				Blackboard.unregisterObserver(blackboardObserver);
@@ -149,17 +171,17 @@ public class Engine implements Blackboard.BlackboardObserver
 			    for (;;)
 			    {
 				try
-				{   Engine.sleep(Engine.sleepTime >> 1);
+				{   Engine.this.sleep(Engine.this.sleepTime >> 1);
 				}
 				catch (final InterruptedException err)
-				{   if (Engine.currentPlayer == null)
+				{   if (Engine.this.currentPlayer == null)
 					break;
 				    continue;
 				}
 				
 				try
-				{   synchronized (Engine.class)
-				    {   if (Engine.fall() == false)
+				{   synchronized (Engine.this)
+				    {   if (Engine.this.fall() == false)
 					    break;
 				}   }
 				catch (final InterruptedException err)
@@ -168,17 +190,17 @@ public class Engine implements Blackboard.BlackboardObserver
 				}
 				
 				try
-				{   Engine.sleep(Engine.sleepTime >> 1);
+				{   Engine.this.sleep(Engine.this.sleepTime >> 1);
 				}
 				catch (final InterruptedException err)
-				{   if (Engine.currentPlayer == null)
+				{   if (Engine.this.currentPlayer == null)
 					break;
 				    continue;
 				}
 				
 				try
-				{   synchronized (Engine.class)
-				    {   Engine.move();
+				{   synchronized (Engine.this)
+				    {   Engine.this.move();
 				}   }
 				catch (final InterruptedException err)
 			        {   System.err.println("Are you leaving?");
@@ -198,7 +220,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @param  shape  The shape to remove
      */
-    private static void patchAway(final Shape shape)
+    private void patchAway(final Shape shape)
     {
 	final int offX = shape.getX();
 	final int offY = shape.getY();
@@ -213,7 +235,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * @param  offX    Offset on the x-axis
      * @param  offY    Offset on the y-axis
      */
-    private static void patchAway(final boolean[][] blocks, final int offX, final int offY)
+    private void patchAway(final boolean[][] blocks, final int offX, final int offY)
     {
 	final MatrixPatch patch = new MatrixPatch(blocks, null, offY, offX);
 	patches.add(patch);
@@ -225,7 +247,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @param  shape  The shape to add
      */
-    private static void patchIn(final Shape shape)
+    private void patchIn(final Shape shape)
     {
 	final int offX = shape.getX();
 	final int offY = shape.getY();
@@ -240,7 +262,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * @param  offX    Offset on the x-axis
      * @param  offY    Offset on the y-axis
      */
-    private static void patchIn(final Block[][] blocks, final int offX, final int offY)
+    private void patchIn(final Block[][] blocks, final int offX, final int offY)
     {
 	final MatrixPatch patch = new MatrixPatch(null, blocks, offY, offX);
 	patches.add(patch);
@@ -251,7 +273,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * Invoked when a player drops out, the falling block is removed
      * if the dropped out player is the playing player
      */
-    private static void playerDropped(final Player player)
+    private void playerDropped(final Player player)
     {
 	if (player.equals(currentPlayer))
 	{
@@ -271,9 +293,19 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @param  player  The player playing on the new turn
      */
-    private static void newTurn(final Player player)
+    private void newTurn(final Player player)
     {
-	currentPlayer = player;
+	synchronized (pauseMonitor)
+	{
+	    currentPlayer = player;
+	    if (paused && player.equals(localPlayer))
+		try
+		{   pauseMonitor.wait();
+		}
+		catch (final InterruptedException err)
+		{   //TODO what do we do know?
+		}
+	}
 	
 	try
 	{
@@ -302,12 +334,10 @@ public class Engine implements Blackboard.BlackboardObserver
 	    fallingShape = nshape;
 	}
 	catch (final CloneNotSupportedException err)
-	{
-	    throw new Error("*Shape.clone() is not implemented");
+	{   throw new Error("*Shape.clone() is not implemented");
 	}
 	catch (final Throwable err)
-	{
-	    throw new Error("*Shape.clone() is not implemented correctly");
+	{   throw new Error("*Shape.clone() is not implemented correctly");
 	}
 	
 	for (int r = 0, rn = (int)(Math.random() * 4); r < rn; r++)
@@ -327,7 +357,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	if (gameOver)
 	    try
 	    {
-		sleep(0);
+		this.sleep(0);
 	    }
 	    catch (final InterruptedException err)
 	    {
@@ -343,9 +373,9 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    static boolean fall() throws InterruptedException
+    boolean fall() throws InterruptedException
     {
-	Engine.sleep(0);
+	this.sleep(0);
 	
 	if (fallingShape == null)
 	{
@@ -377,7 +407,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void drop() throws InterruptedException
+    private void drop() throws InterruptedException
     {
 	if (fallingShape == null)
 	{
@@ -385,7 +415,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    return;
 	}
 	
-	Engine.sleep(0);
+	this.sleep(0);
 	patchAway(fallingShape);
 	fallingShape.restore(moveInitialMomento = moveAppliedMomento);
 	
@@ -409,9 +439,9 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    static void move() throws InterruptedException
+    void move() throws InterruptedException
     {
-	Engine.sleep(0);
+	this.sleep(0);
 	
 	if (fallingShape == null)
 	{
@@ -430,7 +460,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @param  clockwise  Whether to rotate clockwise
      */
-    private static void rotate(final boolean clockwise)
+    private void rotate(final boolean clockwise)
     {
 	if (fallingShape == null)
 	{
@@ -454,7 +484,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @param  incrX  The value with which to increase the left position
      */
-    private static void move(final int incrX)
+    private void move(final int incrX)
     {
 	if (fallingShape == null)
 	{
@@ -478,23 +508,20 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  Can only indicate the the player is leaving
      */
-    private static void reaction() throws InterruptedException
+    private void reaction() throws InterruptedException
     {
 	patchIn(fallingShape);
 	board.put(fallingShape);
-	
-	final int[] full = board.getFullRows();
-	Arrays.sort(full);
-	for (int i = 0, n = (full.length >> 1) - 1; i <= n; i++) //reversing
-	{
-	    full[i] ^= full[n - i];
-	    full[n - i] ^= full[i];
-	    full[i] ^= full[n - i];
-	}
+	boolean reacted = false;
 	
 	sleep(0);
-	if (full.length > 0)
+	for (;;)
 	{
+	    final int[] full = board.getFullRows();
+	    if (full.length == 0)
+		break;
+	    Arrays.sort(full);
+	    
 	    final boolean[][] fullLine = new boolean[1][Board.WIDTH];
 	    for (int x = 0; x < Board.WIDTH; x++)
 		fullLine[0][x] = true;
@@ -502,25 +529,33 @@ public class Engine implements Blackboard.BlackboardObserver
 	    final Block[][] matrix = board.getMatrix();
 	    
 	    int sub = 0;
-	    for (final int row : full)
-	    {
-		for (int y = 0; y <= row; y++)
-		{
-		    patchAway   (fullLine, 0, y);
-		    board.delete(fullLine, 0, y);
-		}
-		for (int y = sub; y < row; y++)
-		{
-		    patchIn  (new Block[][] {matrix[y - sub]}, 0, y + 1);
-		    board.put(new Block[][] {matrix[y - sub]}, 0, y + 1);
-		}
-		sub++;
-		sleep(0);
-	    }
+	    int row = full[full.length - 1];
 	    
-	    Blackboard.broadcastMessage(new GameScore(score += full.length * 10));
+	    for (int y = 0; y <= row; y++)
+	    {
+		patchAway   (fullLine, 0, y);
+		board.delete(fullLine, 0, y);
+	    }
+	    for (int y = sub; y < row; y++)
+	    {
+		patchIn  (new Block[][] {matrix[y]}, 0, y + 1);
+		board.put(new Block[][] {matrix[y]}, 0, y + 1);
+	    }
+	    sleep(0);
+	    
+	    reacted = true;
+	    score += 10;
 	}
 	
+	if (slowDownScore >= 0)
+	    while (score >= slowDownScore)
+	    {
+		slowDownScore <<= 1;
+		sleepTime += 200;
+	    }
+	
+	if (reacted)
+	    Blackboard.broadcastMessage(new GameScore(score));
 	currentPlayer = null;
     }
     
@@ -529,7 +564,7 @@ public class Engine implements Blackboard.BlackboardObserver
      * Performs everthing needed for a new turn and
      * sends a request for letting the next player start
      */
-    static void nextTurn()
+    void nextTurn()
     {
 	sleepTime = (int)(sleepTime * SLEEP_TIME_MULTIPLER);
 	Blackboard.broadcastMessage(new NextPlayer(null));
@@ -543,8 +578,19 @@ public class Engine implements Blackboard.BlackboardObserver
      * 
      * @throws  InterruptedException  If the thread is interrupted
      */
-    static void sleep(final int milliseconds) throws InterruptedException
+    void sleep(final int milliseconds) throws InterruptedException
     {
+	synchronized (empauseMonitor)
+	{
+	    if (empaused)
+		try
+		{   empauseMonitor.wait();
+		}
+		catch (final InterruptedException err)
+		{   //TODO what do we do know?
+		}
+	}
+	
 	if (patches.isEmpty() == false)
 	{
 	    int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
@@ -606,8 +652,6 @@ public class Engine implements Blackboard.BlackboardObserver
 	    else
 		System.err.println("Shouldn't the matrix patches actually contain something?");
 	}
-	else
-	    System.err.println("Shouldn't there be matrix patches here?");
 	
 	if (milliseconds != 0)
 	    Thread.sleep(milliseconds);
@@ -624,8 +668,7 @@ public class Engine implements Blackboard.BlackboardObserver
 	    if (message instanceof GamePlayCommand)
 	    {
 		synchronized (Engine.class)
-		{
-		    switch (((GamePlayCommand)message).move)
+		{   switch (((GamePlayCommand)message).move)
 		    {
 			case LEFT:           move(-1);       break;
 			case RIGHT:          move(1);        break;
@@ -644,16 +687,46 @@ public class Engine implements Blackboard.BlackboardObserver
 			    
 			default:
 			    throw new Error("Unrecognised GamePlayCommand.");
-		    }
-		}
+		}   }
 	    }
 	    else if (message instanceof NextPlayer) /* do not thread */
 	    {
 		if (((NextPlayer)message).player != null)
+		{
+		    synchronized (empauseMonitor)
+		    {
+			if (empaused)
+			    try
+			    {   empauseMonitor.wait();
+			    }
+			    catch (final InterruptedException err)
+			    {   //TODO what do we do know?
+			    }
+		    }
 		    newTurn(((NextPlayer)message).player);
+		}
 	    }
 	    else if (message instanceof PlayerDropped)
 		playerDropped(((PlayerDropped)message).player);
+	    else if (message instanceof LocalPlayer)
+		localPlayer = ((LocalPlayer)message).player;
+	    else if (message instanceof PlayerPause)
+		synchronized (pauseMonitor)
+		{
+		    if (((PlayerPause)message).player.equals(localPlayer))
+		    {
+			paused = ((PlayerPause)message).paused;
+			if (paused == false)
+			    pauseMonitor.notifyAll();
+		    }
+		}
+	    else if (message instanceof EmergencyPause)
+		synchronized (empauseMonitor)
+		{
+		    empaused = ((EmergencyPause)message).paused;
+		    if (empaused == false)
+			empauseMonitor.notifyAll();
+		}
 	}
 	catch (final InterruptedException err)
 	{

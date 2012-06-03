@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.interaction.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
@@ -48,12 +49,12 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	    if (message instanceof ChatMessage)
 	    {
 		final ChatMessage msg = (ChatMessage)message;
-		addUserText(msg.message, msg.player.getName(), new Color(msg.player.getColor()));
+		addUserText(msg.message, msg.player.getName(), ColourMapper.getColour(msg.player.getID()));
 	    }
 	    else if (message instanceof SystemMessage)
 	    {
 		final SystemMessage msg = (SystemMessage)message;
-		addSystemText(msg.message, msg.player == null ? null : new Color(msg.player.getColor()));
+		addSystemText(msg.message, msg.player == null ? null : ColourMapper.getColour(msg.player.getID()));
 	    }
 	}
     }

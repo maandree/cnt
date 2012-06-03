@@ -208,6 +208,6 @@ public class LShape extends Shape
 	    for (final Block[] row : state)
 		for (final Block block : row)
 		    if (block != null)
-			block.setColor(value.getColor());
+			block.setColor(value.getID());
     }
 }

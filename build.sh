@@ -1,14 +1,16 @@
 ## enable, for this terminal session, completion for run under bash
 . run.sh --completion--
 
-if [[ ! $1 = "-pdf" ]]; then
+if [[ $1 = "+pdf" ]]; then
     ## create PDF files from dia files
-    dia Documentation/CNT_class_diagram.dia -e Documentation/CNT_class_diagram.pdf 2>/dev/null
-    dia Documentation/CNT_join_diagram.dia  -e Documentation/CNT_join_diagram.pdf  2>/dev/null
+    dia Documentation/CNT_class_diagram.dia    -e Documentation/CNT_class_diagram.pdf    2>/dev/null
+    dia Documentation/CNT_join_diagram.dia     -e Documentation/CNT_join_diagram.pdf     2>/dev/null
+    dia Documentation/CNT_network_diagram.dia  -e Documentation/CNT_network_diagram.pdf  2>/dev/null
 
      ## rotate PDF files to landscape
-    pdf270 Documentation/CNT_class_diagram.pdf -o Documentation/CNT_class_diagram.pdf 2>/dev/null
-    pdf270 Documentation/CNT_join_diagram.pdf  -o Documentation/CNT_join_diagram.pdf  2>/dev/null
+    pdf270 Documentation/CNT_class_diagram.pdf    -o Documentation/CNT_class_diagram.pdf    2>/dev/null
+    pdf270 Documentation/CNT_join_diagram.pdf     -o Documentation/CNT_join_diagram.pdf     2>/dev/null
+    pdf270 Documentation/CNT_network_diagram.pdf  -o Documentation/CNT_network_diagram.pdf  2>/dev/null
 fi
 
 ## create directory for Java binaries

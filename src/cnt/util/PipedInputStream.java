@@ -1,4 +1,4 @@
-package cnt.mock;
+package cnt.util;
 
 import java.io.IOException;
 import java.io.InputStream;

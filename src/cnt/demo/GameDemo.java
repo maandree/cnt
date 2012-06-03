@@ -49,9 +49,10 @@ public class GameDemo
 	
 	rec.start();
 	
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Mattias", "Mattias".hashCode() | (255 << 24))));
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman",  "Peyman" .hashCode() | (255 << 24))));
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",   "Calle"  .hashCode() | (255 << 24))));
+	final Player localPlayer = new Player("Mattias", null, 0, null, null, 0);
+	Blackboard.broadcastMessage(new PlayerJoined(localPlayer));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman", null, 1, null, null, 0)));
+	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",  null, 2, null, null,0 )));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
@@ -71,7 +72,8 @@ public class GameDemo
 		    }
 	        });
 	
-	Engine.start();
+	(new Engine()).start();
+	Blackboard.broadcastMessage(new LocalPlayer(localPlayer));
 	
 	
 	for (int d; (d = System.in.read()) != -1;)

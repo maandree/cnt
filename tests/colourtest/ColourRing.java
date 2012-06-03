@@ -25,68 +25,132 @@ public class ColourRing extends JFrame
 	this.setLocation(new Point(this.getLocation().x + 300,
 				   this.getLocation().y + 100 - 25));
 	
-	double[] f0 = {205, 101, 108};  f0 = toLinear((int)(f0[0]), (int)(f0[1]), (int)(f0[2]));
-	double[] f1 = {164, 110, 176};  f1 = toLinear((int)(f1[0]), (int)(f1[1]), (int)(f1[2]));
-	double[] f2 = { 36, 149, 190};  f2 = toLinear((int)(f2[0]), (int)(f2[1]), (int)(f2[2]));
-	double[] f3 = {  0, 169, 159};  f3 = toLinear((int)(f3[0]), (int)(f3[1]), (int)(f3[2]));
-	double[] f4 = { 50, 166, 121};  f4 = toLinear((int)(f4[0]), (int)(f4[1]), (int)(f4[2]));
-	double[] f5 = {156, 173,  81};  f5 = toLinear((int)(f5[0]), (int)(f5[1]), (int)(f5[2]));
-	double[] f6 = {204, 173,  71};  f6 = toLinear((int)(f6[0]), (int)(f6[1]), (int)(f6[2]));
-	double[] f7 = {218, 128,  77};  f7 = toLinear((int)(f7[0]), (int)(f7[1]), (int)(f7[2]));
-	
-	double[] fX = {f0[0], f1[0], f2[0], f3[0], f4[0], f5[0], f6[0], f7[0]};
-	double[] fY = {f0[1], f1[1], f2[1], f3[1], f4[1], f5[1], f6[1], f7[1]};
-	double[] fZ = {f0[2], f1[2], f2[2], f3[2], f4[2], f5[2], f6[2], f7[2]};
-	
-	rgb = new int[400 / step][];
-	int index = rgb.length / 8;
-	
-	for (int hue = 450; hue < 850; hue += step)
 	{
-	    int midH = (hue / 50) & 7;
-	    int lowH = (midH - lspan) & 7;
+	    double[] f0 = {205, 101, 108};  f0 = toLinear((int)(f0[0]), (int)(f0[1]), (int)(f0[2]));
+	    double[] f1 = {164, 110, 176};  f1 = toLinear((int)(f1[0]), (int)(f1[1]), (int)(f1[2]));
+	    double[] f2 = { 36, 149, 190};  f2 = toLinear((int)(f2[0]), (int)(f2[1]), (int)(f2[2]));
+	    double[] f3 = {  0, 169, 159};  f3 = toLinear((int)(f3[0]), (int)(f3[1]), (int)(f3[2]));
+	    double[] f4 = { 50, 166, 121};  f4 = toLinear((int)(f4[0]), (int)(f4[1]), (int)(f4[2]));
+	    double[] f5 = {156, 173,  81};  f5 = toLinear((int)(f5[0]), (int)(f5[1]), (int)(f5[2]));
+	    double[] f6 = {204, 173,  71};  f6 = toLinear((int)(f6[0]), (int)(f6[1]), (int)(f6[2]));
+	    double[] f7 = {218, 128,  77};  f7 = toLinear((int)(f7[0]), (int)(f7[1]), (int)(f7[2]));
 	    
-	    int[] hs = new int[lspan + 1 + hspan];
-	    for (int i = 0; i < hs.length; i++)
-		hs[i] = (lowH + i) & 7;
-	    
-	    int hsl = extra * hs.length;
-	    double[][] xs = new double[hsl][hsl];
-	    double[] X = new double[hsl];
-	    double[] Y = new double[hsl];
-	    double[] Z = new double[hsl];
-	    for (int y = 0; y < hsl; y++)
+	    double[] fX = {f0[0], f1[0], f2[0], f3[0], f4[0], f5[0], f6[0], f7[0]};
+	    double[] fY = {f0[1], f1[1], f2[1], f3[1], f4[1], f5[1], f6[1], f7[1]};
+	    double[] fZ = {f0[2], f1[2], f2[2], f3[2], f4[2], f5[2], f6[2], f7[2]};
+	
+	    rgb = new int[400 / step][];
+	    int index = rgb.length / 8;
+	
+	    for (int hue = 450; hue < 850; hue += step)
 	    {
-		X[y] = fX[(lowH + y) & 7];
-		Y[y] = fY[(lowH + y) & 7];
-		Z[y] = fZ[(lowH + y) & 7];
-		double c = 1, m = 400 + (lowH + y) * 50;
-		for (int x = 0; x < hsl; x++)
-		    xs[y][x] = c *= m;
+		int midH = (hue / 50) & 7;
+		int lowH = (midH - lspan) & 7;
+	    
+		int[] hs = new int[lspan + 1 + hspan];
+		for (int i = 0; i < hs.length; i++)
+		    hs[i] = (lowH + i) & 7;
+	    
+		int hsl = extra * hs.length;
+		double[][] xs = new double[hsl][hsl];
+		double[] X = new double[hsl];
+		double[] Y = new double[hsl];
+		double[] Z = new double[hsl];
+		for (int y = 0; y < hsl; y++)
+		{
+		    X[y] = fX[(lowH + y) & 7];
+		    Y[y] = fY[(lowH + y) & 7];
+		    Z[y] = fZ[(lowH + y) & 7];
+		    double c = 1, m = 400 + (lowH + y) * 50;
+		    for (int x = 0; x < hsl; x++)
+			xs[y][x] = c *= m;
+		}
+	    
+		X = eliminate(xs, X);
+		Y = eliminate(xs, Y);
+		Z = eliminate(xs, Z);
+	    
+		double h = 1;
+		double x = 0;
+		double y = 0;
+		double z = 0;
+	    
+		for (int i = 0; i < hsl; i++)
+		{
+		    h *= hue;
+		    x += h * X[i];
+		    y += h * Y[i];
+		    z += h * Z[i];
+		}
+	    
+		rgb[(++index) % rgb.length] = toStandard(x, y, z);
 	    }
-	    
-	    X = eliminate(xs, X);
-	    Y = eliminate(xs, Y);
-	    Z = eliminate(xs, Z);
-	    
-	    double h = 1;
-	    double x = 0;
-	    double y = 0;
-	    double z = 0;
-	    
-	    for (int i = 0; i < hsl; i++)
+	}
+	{
+	    double[] f0 = {210, 142, 143};  f0 = toLinear((int)(f0[0]), (int)(f0[1]), (int)(f0[2]));
+	    double[] f1 = {184, 153, 188};  f1 = toLinear((int)(f1[0]), (int)(f1[1]), (int)(f1[2]));
+	    double[] f2 = {124, 173, 197};  f2 = toLinear((int)(f2[0]), (int)(f2[1]), (int)(f2[2]));
+	    double[] f3 = {111, 178, 175};  f3 = toLinear((int)(f3[0]), (int)(f3[1]), (int)(f3[2]));
+	    double[] f4 = {126, 184, 153};  f4 = toLinear((int)(f4[0]), (int)(f4[1]), (int)(f4[2]));
+	    double[] f5 = {175, 187, 128};  f5 = toLinear((int)(f5[0]), (int)(f5[1]), (int)(f5[2]));
+	    double[] f6 = {203, 179, 114};  f6 = toLinear((int)(f6[0]), (int)(f6[1]), (int)(f6[2]));
+	    double[] f7 = {222, 155, 118};  f7 = toLinear((int)(f7[0]), (int)(f7[1]), (int)(f7[2]));
+	
+	    double[] fX = {f0[0], f1[0], f2[0], f3[0], f4[0], f5[0], f6[0], f7[0]};
+	    double[] fY = {f0[1], f1[1], f2[1], f3[1], f4[1], f5[1], f6[1], f7[1]};
+	    double[] fZ = {f0[2], f1[2], f2[2], f3[2], f4[2], f5[2], f6[2], f7[2]};
+	
+	    satrgb = new int[400 / step][];
+	    int index = satrgb.length / 8;
+	
+	    for (int hue = 450; hue < 850; hue += step)
 	    {
-		h *= hue;
-		x += h * X[i];
-		y += h * Y[i];
-		z += h * Z[i];
-	    }
+		int midH = (hue / 50) & 7;
+		int lowH = (midH - lspan) & 7;
 	    
-	    rgb[(++index) % rgb.length] = toStandard(x, y, z);
+		int[] hs = new int[lspan + 1 + hspan];
+		for (int i = 0; i < hs.length; i++)
+		    hs[i] = (lowH + i) & 7;
+	    
+		int hsl = extra * hs.length;
+		double[][] xs = new double[hsl][hsl];
+		double[] X = new double[hsl];
+		double[] Y = new double[hsl];
+		double[] Z = new double[hsl];
+		for (int y = 0; y < hsl; y++)
+		{
+		    X[y] = fX[(lowH + y) & 7];
+		    Y[y] = fY[(lowH + y) & 7];
+		    Z[y] = fZ[(lowH + y) & 7];
+		    double c = 1, m = 400 + (lowH + y) * 50;
+		    for (int x = 0; x < hsl; x++)
+			xs[y][x] = c *= m;
+		}
+	    
+		X = eliminate(xs, X);
+		Y = eliminate(xs, Y);
+		Z = eliminate(xs, Z);
+	    
+		double h = 1;
+		double x = 0;
+		double y = 0;
+		double z = 0;
+	    
+		for (int i = 0; i < hsl; i++)
+		{
+		    h *= hue;
+		    x += h * X[i];
+		    y += h * Y[i];
+		    z += h * Z[i];
+		}
+	    
+		satrgb[(++index) % satrgb.length] = toStandard(x, y, z);
+	    }
 	}
     }
     
     private int[][] rgb;
+    private int[][] satrgb;
     
     
     public void paint(final Graphics g)
@@ -116,12 +180,37 @@ public class ColourRing extends JFrame
 	for (int i = 0; i <= rgb.length; i++)
 	    diffs[i] = Math.log(diffs[i] / adiff + 1) / Math.log(2.);
 	
+	double[] satlast = toLab(satrgb[satrgb.length - 1][0],
+				 satrgb[satrgb.length - 1][1],
+				 satrgb[satrgb.length - 1][2]);
+	double[] satdiffs = new double[satrgb.length + 1];
+	double satadiff = 0;
+	
+	for (int i = 0; i < satrgb.length; i++)
+	{
+	    double[] cur = toLab(satrgb[i][0], satrgb[i][1], satrgb[i][2]);
+	    
+	    double dl = cur[0] - satlast[0];
+	    double da = cur[1] - satlast[1];
+	    double db = cur[2] - satlast[2];
+	    double diff = dl * dl + da * da + db * db;
+	    diff = Math.pow(diff, 0.5);
+	    satadiff += satdiffs[i] = diff;
+	    
+	    satlast = cur;
+	}
+	satdiffs[satrgb.length] = satdiffs[0];
+	satadiff /= satrgb.length;
+	for (int i = 0; i <= satrgb.length; i++)
+	    satdiffs[i] = Math.log(satdiffs[i] / satadiff + 1) / Math.log(2.);
+	
 	Color[] colours = new Color[800];
+	Color[] satcolours = new Color[800];
 	
 	int arc = 0;
 	for (int i = 0; i < rgb.length; i++)
 	{
-	    double z = i - rgb.length * 5 / 8;
+	    double z = i - rgb.length * 4 / 8;
 	    if (z < 0.)
 		z = -z;
 	    z = z * 2 / rgb.length;
@@ -129,17 +218,36 @@ public class ColourRing extends JFrame
 		z = 2 - z;
 	    z /= 3 * 2;
 	    z += 1;
+	    double k1 = 1.5;
+	    double k2 = 2;
+	    double k3 = 3;
+	    
+	    /*double z = 1;
+	    double k1 = 1;
+	    double k2 = 1;
+	    double k3 = -1.5;*/
 	    
 	    Color colour;
+	    Color satcolour = new Color(satrgb[i][0], satrgb[i][1], satrgb[i][2]);
 	    g.setColor(colour = new Color(rgb[i][0], rgb[i][1], rgb[i][2]));
 	    int x1 = x;
 	    x += (step << 1) * z;
 	    for (int j = x1 - 40, n = x - 40; j < n; j++)
+	    {
 		colours[j] = colour;
-	    g.fillRect(x1, y, x - x1, 100);
+		satcolours[j] = satcolour;
+	    }
+	    g.fillRect(x1, y, x - x1, 50);
+	    g.setColor(satcolour);
+	    g.fillRect(x1, y + 50, x - x1, 50);
 	    int arc1 = arc;
-	    arc += 360 * (z / 1.5) / rgb.length;
-	    g.fillArc(400, 500, 200, 200, -arc1 * 2 + 90, (arc - arc1) * -3);
+	    arc += 360 * (z / k1) / rgb.length;
+	    g.setColor(colour);
+	    g.fillArc(400, 500, 200, 200, (int)(-arc1 * k2 + 90), (int)((arc - arc1) * -k3));
+	    //g.fillArc(400, 500, 200, 200, -360 * i / rgb.length + 90, (int)(360 * -k3 / rgb.length));
+	    g.setColor(satcolour);
+	    g.fillArc(450, 550, 100, 100, (int)(-arc1 * k2 + 90), (int)((arc - arc1) * -k3));
+	    //g.fillArc(450, 550, 100, 100, -360 * i / rgb.length + 90, (int)(360 * -k3 / rgb.length));
 	}
 	
 	y += 100;
@@ -155,6 +263,7 @@ public class ColourRing extends JFrame
 		z = 2 - z;
 	    z /= 3 * 2;
 	    z += 1;
+	    //double z = 1;
 	    
 	    int x1 = x;
 	    x += (step << 1) * z;
@@ -163,6 +272,29 @@ public class ColourRing extends JFrame
 		g.fillRect(x1, 40, step << 1, 100);
 	}
 	if (diffs[diffs.length - 1] == 0.)
+	    g.fillRect(x, 40, step << 1, 100);
+	
+	x = 40;
+	g.setColor(Color.GRAY);
+	for (int i = 0; i < satdiffs.length - 1; i++)
+	{
+	    double z = i - satrgb.length * 5 / 8;
+	    if (z < 0.)
+		z = -z;
+	    z = z * 2 / satrgb.length;
+	    if (z > 1.)
+		z = 2 - z;
+	    z /= 3 * 2;
+	    z += 1;
+	    //double z = 1;
+	    
+	    int x1 = x;
+	    x += (step << 1) * z;
+	    g.drawLine(x1, y + (int)(satdiffs[i] * 100), x, y + (int)(satdiffs[i + 1] * 100));
+	    if (diffs[i] == 0.)
+		g.fillRect(x1, 40, step << 1, 100);
+	}
+	if (satdiffs[satdiffs.length - 1] == 0.)
 	    g.fillRect(x, 40, step << 1, 100);
 	
 	int xx = 0;
@@ -204,6 +336,11 @@ public class ColourRing extends JFrame
 	    int cb = colours[c].getBlue();
 	    double[] lrgb = toLinear(cr, cg, cb);
 	    
+	    int scr = satcolours[c].getRed();
+	    int scg = satcolours[c].getGreen();
+	    int scb = satcolours[c].getBlue();
+	    double[] slrgb = toLinear(scr, scg, scb);
+	    
 	    int yy = 690;
 	    for (int ł = 0, łn = 16; ł < łn; ł++)
 	    {
@@ -221,15 +358,15 @@ public class ColourRing extends JFrame
 		lum = hlum + lum * (llum - hlum);
 		
 		double lr = lrgb[0] * lum, lg = lrgb[1] * lum, lb = lrgb[2] * lum;
-		double avg = (lr + lg + lb) / 3;
+		double slr = slrgb[0] * lum, slg = slrgb[1] * lum, slb = slrgb[2] * lum;
 		
 		
-		for (int si = 0; si < 2; si++)
+		for (int si = 0; si <= 1; si++)
 		{
-		    final int S = 3;
-		    int[] srgb = toStandard(lr * (S - si) / S + avg * si / S,
-					    lg * (S - si) / S + avg * si / S,
-					    lb * (S - si) / S + avg * si / S);
+		    final int S = 2;
+		    int[] srgb = toStandard(lr * (S - si) / S + slr * si / S,
+					    lg * (S - si) / S + slg * si / S,
+					    lb * (S - si) / S + slb * si / S);
 		    g.setColor(new Color(srgb[0], srgb[1], srgb[2]));
 		    g.fillRect(xx + 900 * i / n, yy + ł * 240 / łn + 120 * si / łn, 900 / n + 1, 120 / łn + 1);
 		}

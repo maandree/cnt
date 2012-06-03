@@ -13,11 +13,11 @@ import java.io.Serializable;
 
 
 /**
- * Broadcasted when a player pauses or unpauses
+ * Pause (unpause) triggered in case of emegency, such as networking problems
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public final class PlayerPause implements Blackboard.BlackboardMessage
+public final class EmergencyPause implements Blackboard.BlackboardMessage
 {
     /**
      * Compatibility versioning for {@link Serializable}
@@ -29,22 +29,14 @@ public final class PlayerPause implements Blackboard.BlackboardMessage
     /**
      * Constructor
      * 
-     * @param  player  The player
-     * @param  paused  <code>true</code> if the player paused, otherwise, if unpaused, <code>false</code>
+     * @param  paused  <code>true</code> if paused is triggered, otherwise, if unpaused is triggered, <code>false</code>
      */
-    public PlayerPause(final Player player, final boolean paused)
+    public EmergencyPause(final boolean paused)
     {
-	assert player != null : "Their must be a player";
-	this.player = player;
 	this.paused = paused;
     }
     
     
-    
-    /**
-     * The player
-     */
-    public final Player player;
     
     /**
      * <code>true</code> if the player paused, otherwise, if unpaused, <code>false</code>
@@ -58,7 +50,7 @@ public final class PlayerPause implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return this.player + (this.paused ? " paused" : " unpaused");
+	return "Emergency" + (this.paused ? " pause" : " unpause");
     }
 	
     /**
@@ -66,6 +58,6 @@ public final class PlayerPause implements Blackboard.BlackboardMessage
      */
     public Boolean checkIntegrity()
     {
-	return this.player == null ? Boolean.FALSE : null;
+	return Boolean.TRUE;
     }
 }

@@ -48,7 +48,7 @@ public class NetGameDemo
         final String name = args[0];
         final String remote = args.length > 1 ? args[1] : null;
 	
-	final Player me = new Player(name, name.hashCode() | (255 << 24));
+	final Player me = new Player(name, null, args[0].hashCode() & 0xFFF, null, null, 0);
 	final Object monitor = new Object();
 	
 	final Player[] lowest = {null};
@@ -76,7 +76,7 @@ public class NetGameDemo
 			else if (message instanceof PlayerJoined)
 			{
 			    final Player player = ((PlayerJoined)message).player;
-			    if ((lowest[0] == null) || (lowest[0].getColor() > player.getColor()))
+			    if ((lowest[0] == null) || (lowest[0].getID() > player.getID()))
 				lowest[0] = player;
 			    players++;
 			    if (players == 2)
@@ -116,7 +116,7 @@ public class NetGameDemo
 			    }
 			    
 			    if (me.equals(lowest[0]))
-				Engine.start();
+				(new Engine()).start();
 			    
 			    for (int d; (d = System.in.read()) != -1;)
 			        if (me.equals(player[0])) //order is important

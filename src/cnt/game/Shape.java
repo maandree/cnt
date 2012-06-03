@@ -220,7 +220,7 @@ public abstract class Shape implements Cloneable, Serializable
 	for (final Block[] row : this.shape)
 	    for (final Block block : row)
 		if (block != null)
-		    block.setColor(value.getColor());
+		    block.setColor(value.getID());
     }
     
     

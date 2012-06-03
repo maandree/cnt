@@ -62,7 +62,7 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 		 */
 		public int compare(final Player p, final Player q)
 		{
-		    return p.getColor() - q.getColor();
+		    return p.getID() - q.getID();
 		}
 	    };
     

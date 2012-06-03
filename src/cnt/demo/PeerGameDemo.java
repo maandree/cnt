@@ -51,7 +51,7 @@ public class PeerGameDemo
 	final int serverport = Integer.parseInt(args[3]);
 	final String remote = args[4];
 	
-	final Player me = new Player(args[0], args[0].hashCode() | (255 << 24));
+	final Player me = new Player(args[0], null, args[0].hashCode() & 0xFFF, null, null, 0);
 	final Object monitor = new Object();
 	
 	final Player[] lowest = {null};
@@ -79,7 +79,7 @@ public class PeerGameDemo
 			else if (message instanceof PlayerJoined)
 			{
 			    final Player player = ((PlayerJoined)message).player;
-			    if ((lowest[0] == null) || (lowest[0].getColor() > player.getColor()))
+			    if ((lowest[0] == null) || (lowest[0].getID() > player.getID()))
 				lowest[0] = player;
 			    players++;
 			    if (players == 2)
@@ -119,7 +119,7 @@ public class PeerGameDemo
 			    }
 			    
 			    if (me.equals(lowest[0]))
-				Engine.start();
+				(new Engine()).start();
 			    
 			    for (int d; (d = System.in.read()) != -1;)
 			        if (me.equals(player[0])) //order is important
