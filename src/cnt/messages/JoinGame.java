@@ -8,8 +8,6 @@
 package cnt.messages;
 import cnt.*;
 
-import java.io.Serializable;
-
 
 /**
  * Join game message
@@ -19,7 +17,7 @@ import java.io.Serializable;
 public final class JoinGame implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
     

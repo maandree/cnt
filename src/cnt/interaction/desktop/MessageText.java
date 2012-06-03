@@ -8,7 +8,6 @@
 package cnt.interaction.desktop;
 import cnt.interaction.*;
 import cnt.messages.*;
-import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;
@@ -127,6 +126,14 @@ public class MessageText extends JTextPane implements Blackboard.BlackboardObser
 	
 	this.setSelectionStart(pos1);	this.setSelectionEnd(pos1);
 	this.setEditable(false);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(MessageText)";
     }
     
 }

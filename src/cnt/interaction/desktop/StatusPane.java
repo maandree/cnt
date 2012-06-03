@@ -45,4 +45,12 @@ public class StatusPane extends JPanel
 	super.add(panel, contraints);
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(StatusPane)";
+    }
+    
 }

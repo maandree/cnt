@@ -7,12 +7,9 @@
  */
 package cnt.interaction.desktop;
 import cnt.messages.*;
-import cnt.game.*;
 import cnt.*;
 
 import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
 
 
 /**
@@ -43,6 +40,14 @@ public class ScoreLabel extends JLabel implements Blackboard.BlackboardObserver
 	    final GameScore msg = (GameScore)message;
 	    this.setText("Score: " + msg.score);
 	}
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(ScoreLabel)";
     }
     
 }

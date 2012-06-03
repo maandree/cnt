@@ -158,4 +158,12 @@ public class FriendDialogue extends JDialog
 	        });
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(FriendDialogue)";
+    }
+    
 }

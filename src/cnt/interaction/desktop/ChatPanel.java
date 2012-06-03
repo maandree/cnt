@@ -12,7 +12,6 @@ import cnt.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 
 
 /**
@@ -103,6 +102,14 @@ public class ChatPanel extends JPanel implements ActionListener
 	Blackboard.broadcastMessage(new UserMessage(msg));
 	
 	this.text.setText("");
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(ChatPanel)";
     }
     
 }

@@ -7,12 +7,11 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
-import cnt.network.PlayerRing;
+import cnt.network.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 
-import java.awt.Color;
 import java.io.IOException;
 
 
@@ -42,21 +41,25 @@ public class GameDemo
      */
     public static void main(final String... args) throws IOException
     {
+	(new Engine()).start();
+	
 	final Recorder rec = new Recorder("/dev/shm/recording.cnt");
+	final PlayerRing ring = new PlayerRing();
 	
 	(new GameFrame()).setVisible(true);
-	final PlayerRing ring = new PlayerRing();
 	
 	rec.start();
 	
+	final Player[] players = new Player[3];;
 	final Player localPlayer = new Player("Mattias", null, 0, null, null, 0);
-	Blackboard.broadcastMessage(new PlayerJoined(localPlayer));
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Peyman", null, 1, null, null, 0)));
-	Blackboard.broadcastMessage(new PlayerJoined(new Player("Calle",  null, 2, null, null,0 )));
+	Blackboard.broadcastMessage(new PlayerJoined(players[0] = localPlayer));
+	Blackboard.broadcastMessage(new PlayerJoined(players[1] = new Player("Peyman", null, 1, null, null, 0)));
+	Blackboard.broadcastMessage(new PlayerJoined(players[2] = new Player("Calle",  null, 2, null, null, 0)));
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
 		    private int score = 0;
+		    private int ptr = -1;
 		    
 		    /**
 		     * {@inheritDoc}
@@ -69,10 +72,16 @@ public class GameDemo
 			else if (message instanceof GameOver)
 			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
 			}
+			else if (message instanceof NextPlayer)
+			{   if (((NextPlayer)message).player == null)
+			    {
+				final Player player = players[ptr = (ptr + 1) % 3];
+				Blackboard.broadcastMessage(new LocalPlayer(player));
+				Blackboard.broadcastMessage(new NextPlayer(player));
+			}   }
 		    }
 	        });
 	
-	(new Engine()).start();
 	Blackboard.broadcastMessage(new LocalPlayer(localPlayer));
 	
 	

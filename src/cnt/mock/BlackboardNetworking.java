@@ -67,15 +67,26 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	try
 	{
 	    System.err.println("Potationally forwarding: " + message);
-	    if      (message instanceof GamePlayCommand)  this.gameNetworking.forward(message);
-	    else if (message instanceof MatrixPatch)      this.gameNetworking.forward(message);
-	    else if (message instanceof ChatMessage)      this.gameNetworking.forward(message);
-	    else if (message instanceof PlayerJoined)     this.gameNetworking.forward(message);
-	    else if (message instanceof PlayerDropped)    this.gameNetworking.forward(message);
-	    else if (message instanceof GameScore)        this.gameNetworking.forward(message);
-	    else if (message instanceof GameOver)         this.gameNetworking.forward(message);
-	    else if (message instanceof PlayerOrder)      this.gameNetworking.forward(message);
-	    else if (message instanceof SystemMessage)    ; /* Do nothing */
+	    if      (message instanceof ChatMessage)        this.gameNetworking.forward(message);
+	    else if (message instanceof EmergencyPause)     this.gameNetworking.forward(message);
+	    else if (message instanceof EngineShapeUpdate)  this.gameNetworking.forward(message);
+	    else if (message instanceof EngineUpdate)       this.gameNetworking.forward(message);
+	    else if (message instanceof FullUpdate)         this.gameNetworking.forward(message);
+	    else if (message instanceof GameOver)           this.gameNetworking.forward(message);
+	    else if (message instanceof GamePlayCommand)    ; /* Do nothing */
+	    else if (message instanceof GameScore)          this.gameNetworking.forward(message);
+	    else if (message instanceof JoinGame)           this.gameNetworking.forward(message);
+	    else if (message instanceof MatrixPatch)        this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerDropped)      this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerJoined)       this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerOrder)        this.gameNetworking.forward(message);
+	    else if (message instanceof PlayerPause)        this.gameNetworking.forward(message);
+	    else if (message instanceof SystemMessage)       ; /* Do nothing */
+	    else if (message instanceof LocalPlayer)
+	    {
+		LocalPlayer msg = (LocalPlayer)message;
+		this.gameNetworking.setLocalPlayer(msg.player);
+	    }
 	    else if (message instanceof NextPlayer)
 	    {
 		if (((NextPlayer)message).player != null)
@@ -85,11 +96,6 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    {
 		UserMessage msg = (UserMessage)message;
 		this.gameNetworking.chat(msg.message);
-	    }
-	    else if (message instanceof LocalPlayer)
-	    {
-		LocalPlayer msg = (LocalPlayer)message;
-		this.gameNetworking.setLocalPlayer(msg.player);
 	    }
 	    else
 		assert false : "Update message types in BlackboardNetworking";

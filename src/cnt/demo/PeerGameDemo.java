@@ -7,11 +7,11 @@
  */
 package cnt.demo;
 import cnt.interaction.desktop.*;
+import cnt.network.PlayerRing;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.*;
 import cnt.mock.*;
-import cnt.network.PlayerRing;
 
 
 /**
@@ -40,10 +40,9 @@ public class PeerGameDemo
      */
     public static void main(final String... args) throws Exception
     {
+	(new Engine()).start();
 	(new GameFrame()).setVisible(true);
-	final PlayerRing ring = new PlayerRing();
-	final Player[] player = { null };
-	
+	new PlayerRing();
 	
 	final char name = args[0].charAt(0);
 	final boolean serverauth = args[1].charAt(0) == 's';
@@ -51,16 +50,12 @@ public class PeerGameDemo
 	final int serverport = Integer.parseInt(args[3]);
 	final String remote = args[4];
 	
-	final Player me = new Player(args[0], null, args[0].hashCode() & 0xFFF, null, null, 0);
-	final Object monitor = new Object();
-	
-	final Player[] lowest = {null};
-	
+	int id = args[0].hashCode() & 0xFFF;
+	final Player me = new Player(args[0], null, id, null, null, serverauth ? id : ~id);
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
 		    private int score = 0;
-		    private int players = 0;
 		    
 		    /**
 		     * {@inheritDoc}
@@ -72,20 +67,6 @@ public class PeerGameDemo
 			}
 			else if (message instanceof GameOver)
 			{   System.out.println("\033[33mGame over (" + this.score + " points)!\033[0m");
-			}
-			else if (message instanceof NextPlayer)
-			{   player[0] = ((NextPlayer)message).player;
-			}
-			else if (message instanceof PlayerJoined)
-			{
-			    final Player player = ((PlayerJoined)message).player;
-			    if ((lowest[0] == null) || (lowest[0].getID() > player.getID()))
-				lowest[0] = player;
-			    players++;
-			    if (players == 2)
-				synchronized (monitor)
-			        {    monitor.notify();
-				}
 			}
 		    }
 	        });
@@ -114,31 +95,18 @@ public class PeerGameDemo
 		    {
 			try
 			{
-			    synchronized (monitor)
-			    {   monitor.wait();
-			    }
-			    
-			    if (me.equals(lowest[0]))
-				(new Engine()).start();
-			    
 			    for (int d; (d = System.in.read()) != -1;)
-			        if (me.equals(player[0])) //order is important
+				switch (d)
 				{
-				    System.err.println("\033[32m" + me + " == " + player[0] + "\033[39m");
-				    switch (d)
-				    {
-				        case 'q':  return;
-					case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
-					case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
-					case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
-					case 'A':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
-					case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
-					case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
-					case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
-				    }
+				    case 'q':  return;
+				    case 's':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;
+				    case 'd':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));      break;
+				    case ' ':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));           break;
+				    case 'A':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));  break;  //up arrow
+				    case 'B':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));           break;  //down arrow
+				    case 'C':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.RIGHT));          break;  //right arrow
+				    case 'D':  Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.LEFT));           break;  //left arrow
 				}
-				else
-				    System.err.println("\033[31m" + me + " != " + player[0] + "\033[39m");
 			}
 			catch (final Throwable err)
 			{

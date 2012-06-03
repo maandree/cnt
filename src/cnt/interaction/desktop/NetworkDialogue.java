@@ -112,5 +112,13 @@ public class NetworkDialogue extends JDialog
 	thread.start();
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {   return "(NetworkDialogue)";
+    }
+    
 }
 

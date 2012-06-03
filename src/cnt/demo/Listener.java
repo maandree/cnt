@@ -6,16 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.demo;
-import cnt.interaction.desktop.*;
-import cnt.game.*;
-import cnt.network.*;
 import cnt.messages.*;
 import cnt.*;
-
-import java.awt.*;
-import java.util.*;
-import java.io.*;
-import java.net.*;
 
 
 /**
@@ -28,9 +20,9 @@ class Listener implements Blackboard.BlackboardObserver
 	try
 	{
 	    if (message instanceof UserMessage)
-		System.out.println((UserMessage)message);
+		System.out.println(message);
 	    else if (message instanceof ChatMessage)
-		System.out.println((ChatMessage)message);
+		System.out.println(message);
 	}
 	catch (final Exception err)
 	{

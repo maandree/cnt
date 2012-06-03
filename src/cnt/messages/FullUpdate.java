@@ -9,7 +9,6 @@ package cnt.messages;
 import cnt.*;
 
 import java.util.HashMap;
-import java.io.Serializable;
 
 
 /**
@@ -20,7 +19,7 @@ import java.io.Serializable;
 public final class FullUpdate implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
     

@@ -6,17 +6,16 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.messages;
-import cnt.util.*;
 import cnt.game.*;
 import cnt.*;
 
 
 /**
- * Message to synchronise and information about player order
+ * Partial game engine update message with the falling shape
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public final class PlayerOrder implements Blackboard.BlackboardMessage
+public final class EngineShapeUpdate implements Blackboard.BlackboardMessage
 {
     /**
      * Compatibility versioning for {@link java.io.Serializable}
@@ -28,19 +27,19 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
     /**
      * Constructor
      * 
-     * @param  order  A list with the order of the players
+     * @param  shape  The falling shape
      */
-    public PlayerOrder(final ACDLinkedList<Player> order)
+    public EngineShapeUpdate(final Shape shape)
     {
-	this.order = order;
+	this.shape = shape;
     }
     
     
     
     /**
-     * A list with the order of the players
+     * The falling shape
      */
-    public final ACDLinkedList<Player> order;
+    public final Shape shape;
     
     
     
@@ -49,9 +48,9 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return this.order == null ? "[no list, that's wierd]" : this.order.toString();
+	return "Partial engine update: falling shape";
     }
-    
+	
     /**
      * {@inheritDoc}
      */
@@ -59,6 +58,5 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
     {
 	return null;
     }
-    
+	
 }
-

@@ -323,7 +323,7 @@ public class ColourMapper
     }
     
     
-    /**
+    /* *
      * Converts from sRGB to CIELAB
      * 
      * @param   red           The red   intensity [0, 255]
@@ -331,7 +331,7 @@ public class ColourMapper
      * @param   blue          The blue  intensity [0, 255]
      * @return                CIELAB colour components: {L*, a*, b*}
      */
-    private static double[] toLab(final int red, final int green, final int blue)
+    /*private static double[] toLab(final int red, final int green, final int blue)
     {
 	//The weight of chromaticity [0, ∞[, 1 is unweighted.
 	final double chromaWeight = 1;
@@ -357,10 +357,10 @@ public class ColourMapper
 	final double rcb = 200 * (y - z) * chromaWeight;
 	
 	return new double[] {rcL, rca, rcb};
-    }
+    }*/
     
     
-    /**
+    /* *
      * Converts from CIELAB to sRGB
      * 
      * @param   l  CIELAB colour component L*
@@ -368,7 +368,7 @@ public class ColourMapper
      * @param   b  CIELAB colour component b*
      * @return     sRGB colour components: {red, green, blue}
      */
-    private static int[] toRGB(final double l, final double a, final double b)
+    /*private static int[] toRGB(final double l, final double a, final double b)
     {
 	double y = (l + 16) / 116;
 	double x = a / 500 + y;
@@ -412,7 +412,7 @@ public class ColourMapper
 	int rcB = (int)(B + 0.5);  rcB = rcB < 0 ? 0 : rcB > 255 ? 255 : rcB;
 	
 	return new int[] {rcR, rcG, rcB};
-    }
+    }*/
     
     
     /**

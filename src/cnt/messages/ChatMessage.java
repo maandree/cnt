@@ -9,8 +9,6 @@ package cnt.messages;
 import cnt.game.*;
 import cnt.*;
 
-import java.io.Serializable;
-
 
 /**
  * Chat message class
@@ -20,7 +18,7 @@ import java.io.Serializable;
 public final class ChatMessage implements Blackboard.BlackboardMessage
 {
     /**
-     * Compatibility versioning for {@link Serializable}
+     * Compatibility versioning for {@link java.io.Serializable}
      */
     private static final long serialVersionUID = 1L;
 	

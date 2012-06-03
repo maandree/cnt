@@ -6,8 +6,6 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-import cnt.Blackboard;
-import cnt.Blackboard.*;
 
 import java.io.Serializable;
 

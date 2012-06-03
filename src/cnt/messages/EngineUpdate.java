@@ -6,17 +6,16 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.messages;
-import cnt.util.*;
-import cnt.game.*;
+import cnt.game.enginehelp.*;
 import cnt.*;
 
 
 /**
- * Message to synchronise and information about player order
+ * Full game engine update message
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public final class PlayerOrder implements Blackboard.BlackboardMessage
+public final class EngineUpdate implements Blackboard.BlackboardMessage
 {
     /**
      * Compatibility versioning for {@link java.io.Serializable}
@@ -28,19 +27,19 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
     /**
      * Constructor
      * 
-     * @param  order  A list with the order of the players
+     * @param  data  Engine data
      */
-    public PlayerOrder(final ACDLinkedList<Player> order)
+    public EngineUpdate(final EngineData data)
     {
-	this.order = order;
+	this.data = data;
     }
     
     
     
     /**
-     * A list with the order of the players
+     * Engine data
      */
-    public final ACDLinkedList<Player> order;
+    public final EngineData data;
     
     
     
@@ -49,9 +48,9 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return this.order == null ? "[no list, that's wierd]" : this.order.toString();
+	return "Full engine update";
     }
-    
+	
     /**
      * {@inheritDoc}
      */
@@ -59,6 +58,5 @@ public final class PlayerOrder implements Blackboard.BlackboardMessage
     {
 	return null;
     }
-    
+	
 }
-

@@ -6,10 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.game;
-import cnt.game.Board;
-import cnt.game.Block;
 
-import java.io.*;
+import java.io.Serializable;
 
 
 /**
@@ -56,8 +54,15 @@ public abstract class Shape implements Cloneable, Serializable
     /**
      * Momento class for {@link Shape}
      */
-    public static abstract class Momento
+    public static abstract class Momento implements Serializable
     {
+	/**
+	 * Compatibility versioning for {@link java.io.Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
 	/**
 	 * Constructor
 	 * 
