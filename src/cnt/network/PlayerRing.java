@@ -38,19 +38,9 @@ public class PlayerRing implements Blackboard.BlackboardObserver
     private ACDLinkedList<Player> ring = new ACDLinkedList<Player>();
     
     /**
-     * All players sorted by colour
-     */
-    private Player[] colourSorted = new Player[8];
-    
-    /**
      * The local player
      */
     private Player localPlayer = null;
-    
-    /**
-     * The number of players
-     */
-    private int playerCount = 0;
     
     /**
      * Player comparator, comparing by colour
@@ -79,23 +69,7 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    if (this.ring.contains(player))
 		return;
 	    this.ring.insertBefore(player);
-	    if (this.playerCount == this.colourSorted.length)
-	    {
-		final Player[] tmp = new Player[this.playerCount + 8];
-		System.arraycopy(this.colourSorted, 0, tmp, 0, this.playerCount);
-		this.colourSorted = tmp;
-	    }
-	    
-	    int pos = Arrays.binarySearch(this.colourSorted, 0, this.playerCount, player, this.comparator);
-	    if (pos >= 0)
-	    {
-		System.out.println("\033[0;1;31mID confliction\033[0m");
-		//FIXME: ID confliction
-	    }
-	    System.arraycopy(this.colourSorted, ~pos, this.colourSorted, -pos, this.playerCount - ~pos); //safe for atleast sun-java 5,6 and openjdk 7
-	    this.colourSorted[~pos] = player;
-	    
-	    if ((++this.playerCount >= 2) && (this.colourSorted[0].equals(this.localPlayer)))
+	    if (player.equals(this.localPlayer) == false)
 		Blackboard.broadcastMessage(new PlayerOrder(this.ring));
 	}
 	else if (message instanceof PlayerDropped)
@@ -104,11 +78,6 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    if (this.ring.contains(player) == false)
 		return;
 	    this.ring.remove(this.ring.find(player));
-	    
-	    int pos = Arrays.binarySearch(this.colourSorted, 0, this.playerCount, player, this.comparator);
-	    System.arraycopy(this.colourSorted, pos + 1, this.colourSorted, pos, this.playerCount - pos - 1);
-	    
-	    this.playerCount--;
 	}
 	else if (message instanceof NextPlayer)
 	{
@@ -118,6 +87,8 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 		Blackboard.broadcastMessage(new NextPlayer(this.ring.get()));
 		this.ring.next();
 	    }
+	    else
+		this.ring.jump(this.ring.find(player));
 	}
 	else if (message instanceof LocalPlayer)
 	{
@@ -131,19 +102,6 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 		return;
 	    System.err.println("\033[1;32mGot new player ring\033[0m");
 	    this.ring = newRing;
-	    int pc = 0;
-	    for (final Player player : this.ring)
-	    {
-		if (Arrays.binarySearch(this.colourSorted, 0, this.playerCount, player, this.comparator) < 0)
-		    Blackboard.broadcastMessage(new PlayerJoined(player));
-		pc++;
-	    }
-	    this.playerCount = pc;
-	    this.colourSorted = new Player[this.playerCount / 8 * 8 + 8];
-	    int ptr = 0;
-	    for (final Player player : this.ring)
-		this.colourSorted[ptr++] = player;
-	    Arrays.sort(this.colourSorted, 0, this.playerCount, this.comparator);
 	}
     }
     
