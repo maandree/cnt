@@ -70,6 +70,7 @@ public class Toolkit
 				// We don't want loopback or IPv6. TODO: better way of sorting out IPv6
 				if ( !eth.getAddress().isLoopbackAddress() && !eth.getAddress().toString().contains(":") )
 				{
+					// Choose the first address that is plausable, hopefully it is the correct one. Might cause problems on multihomed machines.
 					System.out.println("\nChoosen Address: [" + eth.getAddress().toString().substring(1) + "]\n");
 					// Remove \ from begining of string and return it
 					return eth.getAddress().toString().substring(1);
