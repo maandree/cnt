@@ -7,6 +7,7 @@
  */
 package cnt.interaction.desktop;
 import cnt.messages.*;
+import cnt.network.Toolkit;
 import cnt.game.*;
 import cnt.*;
 
@@ -103,9 +104,30 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	this.setLayout(new BorderLayout());
 	
 	final StatusPane status = new StatusPane();
+	
+	String xip = "?", lip = "?";
+	try
+	{   xip = Toolkit.getPublicIP();
+	    xip = xip == null ? "?" : xip.isEmpty() ? "?" : xip;
+	}
+	catch (final Throwable err)
+	    { /* Do nothing */ }
+	try
+	{   lip = Toolkit.getLocalIP();
+	    lip = lip == null ? "?" : lip.isEmpty() ? "?" : lip;
+	}
+	catch (final Throwable err)
+	    { /* Do nothing */ }
+	
+	final JLabel xipLabel, lipLabel;
+	status.add(xipLabel = new JLabel("WAN: " + xip), "LEFT");
+	status.add(lipLabel = new JLabel("LAN: " + lip), "LEFT");
 	status.add(new ScoreLabel(), "RIGHT");
 	status.add(new JPanel(), "FILL");
 	status.setPreferredSize(new Dimension(0, 20));
+	
+	xipLabel.setFont(xipLabel.getFont().deriveFont(Font.PLAIN));
+	lipLabel.setFont(xipLabel.getFont());
 	
 	final JPanel gamePanel   = new GamePanel();
 	final JPanel playerPanel = new UserList();
