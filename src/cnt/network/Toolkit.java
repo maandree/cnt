@@ -19,6 +19,23 @@ import java.util.*;
  */
 public class Toolkit
 {
+    /**
+     * Non-constructor
+     */
+    private Toolkit()
+    {
+        assert false : "You may not create instances of this class [Toolkit].";
+    }
+    
+    
+    
+    /**
+     * Gets the LAN's public IP address
+     * 
+     * @return  The LAN's public IP address
+     * 
+     * @throws  IOException  If it was not possible to get the IP address
+     */
     public static String getPublicIP() throws IOException
     {
 	final Socket sock = new Socket("checkip.dyndns.org", 80);
@@ -45,42 +62,65 @@ public class Toolkit
 	
 	return line;
     }
-
+    
+    
+    /**
+     * Gets the LAN local IP address of the machine
+     * 
+     * @return  The LAN local IP address
+     */
     public static String getLocalIP()
     {
-	/*
-	* This is all because InetAddress.getLocalHost.getHostAddress() returns 127.0.1.1 to where we cannot portforward
-	* See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4665037 for details of problem.
-	* This hopefully solves it. 
-	*/
-	try {
-		//Get all interfaces
-		for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();)
+	// This is all because InetAddress.getLocalHost().getHostAddress() returns loopback (127.0.*.1) to where we cannot portforward
+	// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4665037 for details of problem.
+	// This hopefully solves it. 
+	
+	try
+        {
+	    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) //Get all interfaces
+	    {
+		NetworkInterface iface = en.nextElement();
+		if (!iface.isUp()) // If the interface is not up, then we don't want to use it.
+		    continue;
+		
+		
+		for (InterfaceAddress eth : iface.getInterfaceAddresses()) // Get ALL addresses listed on the interface
 		{
-			NetworkInterface iface = en.nextElement();
-			// If the interface is not up, then we don't want to use it.
-			if (!iface.isUp())
-				continue;
-			
-			// Get ALL address listed on the interface
-			for (InterfaceAddress eth : iface.getInterfaceAddresses())
-			{
-				
-				System.out.println("\n\nPossible Address: [" + eth.getAddress().toString().substring(1) + "]\n");
-				// We don't want loopback or IPv6. TODO: better way of sorting out IPv6
-				if ( !eth.getAddress().isLoopbackAddress() && !eth.getAddress().toString().contains(":") )
-				{
-					System.out.println("\nChoosen Address: [" + eth.getAddress().toString().substring(1) + "]\n");
-					// Remove \ from begining of string and return it
-					return eth.getAddress().toString().substring(1);
-				}
-			}
+		    System.err.println("Possible Address: " + eth.getAddress().getHostAddress());
+		    
+		    // We don't want loopback or IPv6. TODO: better way of sorting out IPv6
+		    if ((eth.getAddress().isLoopbackAddress() == false) && (eth.getAddress().getHostAddress().contains(":") == false))
+		    {
+			System.err.println("Choosen Address: " + eth.getAddress().getHostAddress());
+			return eth.getAddress().getHostAddress();
+		    }
 		}
-	} catch (SocketException se) {
-		System.err.println("\n\nError with socket determening internal IP\n");
+	    }
 	}
+	catch (SocketException se)
+	{    System.err.println("Error with socket determening internal IP");
+	}
+	
 	// If no IP was found return empty string
 	return "";
     }
+    
+    
+    /**
+     * Tests whether a host is reachable
+     * 
+     * @param   host  The remote host's address, IP or DNS
+     * @return        Whether the host is reachable
+     */
+    public static boolean isReachable(final String host)
+    {
+	try
+	{   return InetAddress.getByName(host).isReachable(5_000);
+	}
+	catch (final Exception err)
+        {   return false;
+	}
+    }
+    
 }
 

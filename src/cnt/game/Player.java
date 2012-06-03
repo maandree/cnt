@@ -7,6 +7,7 @@
  */
 package cnt.game;
 import cnt.local.*;
+import cnt.network.Toolkit;
 
 import java.util.*;
 import java.io.*;
@@ -333,6 +334,20 @@ public class Player implements Serializable
      */
     public int getConnectedTo() {
 	return this.connectedTo;
+    }
+    
+    
+    /**
+     * Gets the first reachable DNS, with the public IP address as fallback
+     * 
+     * @return  The first reachable DNS
+     */
+    public String getReachable()
+    {
+	for (final String dns : this.dnses)
+	    if (Toolkit.isReachable(dns))
+		return dns;
+	return this.extip;
     }
     
     

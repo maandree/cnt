@@ -7,6 +7,8 @@
  */
 package cnt.interaction.desktop;
 import cnt.messages.*;
+import cnt.local.*;
+import cnt.game.*;
 import cnt.*;
 
 import se.kth.maandree.libandree.gui.layout.DockLayout;
@@ -21,7 +23,7 @@ import java.awt.event.*;
  * The login frame where the user joins or creates a game
  */
 @SuppressWarnings("serial")
-public class LoginFrame extends JFrame implements ActionListener, DocumentListener
+public class LoginFrame extends JFrame implements ActionListener, DocumentListener, ItemListener
 {
     /**
      * Constructor
@@ -35,6 +37,13 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	this.setSize(new Dimension(400, 300));
         this.setLocationByPlatform(true);
 	
+	final Player[] players = Friends.getFriends();
+	final Friend[] friends = new Friend[players.length + 1];
+	friends[0] = new Friend(null);
+	for (int i = 0, n = players.length; i < n; i++)
+	    friends[i + 1] = new Friend(players[i]);
+	friendList = new JComboBox<Friend>(friends);
+	
 	buildInterior();
 	
 	remoteField  .addActionListener(this);
@@ -44,6 +53,8 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	
 	remoteField.getDocument().addDocumentListener(this);
 	portField  .getDocument().addDocumentListener(this);
+	
+	friendList.addItemListener(this);
     }
     
     
@@ -64,6 +75,11 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
     private final JTextField portField = new JTextField();
     
     /**
+     * List of friends
+     */
+    private final JComboBox<Friend> friendList;
+    
+    /**
      * Create/Join game button
      */
     private final JButton startButton = new JButton("Create");
@@ -72,6 +88,40 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
      * Network diagnostics button
      */
     private final JButton diagnosButton = new JButton("Diagnostics");
+    
+    
+    
+    /**
+     * Friend displayer
+     */
+    public class Friend
+    {
+	/**
+	 * Constructor
+	 * 
+	 * @param  player  The player
+	 */
+	public Friend(final Player player)
+	{
+	    this.player = player;
+	}
+	
+	
+
+	/**
+	 * The player
+	 */
+	public final Player player;
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String toString()
+	{   return this.player == null ? "" : this.player.getName();
+	}
+    }
     
     
     
@@ -109,7 +159,7 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	remoteLabel.setToolTipText("The IP address, DNS name or friend to connect to to play, \nleave empty to create a new game.");
 	this.remoteField.setToolTipText(remoteLabel.getToolTipText());
 	
-	final JLabel portLabel = new JLabel("Port:");
+	final JLabel portLabel = new JLabel("Port:"); 
 	portLabel.setLabelFor(portField);
 	portLabel.setDisplayedMnemonic('P');
 	portLabel.setDisplayedMnemonicIndex(0);
@@ -125,27 +175,36 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	    width = portLabel.getPreferredSize().width;
 	width += 8;
 	
+	final JPanel nilPanel = new JPanel();
+	
 	nameLabel  .setPreferredSize(new Dimension(width, nameLabel  .getPreferredSize().height));
 	remoteLabel.setPreferredSize(new Dimension(width, remoteLabel.getPreferredSize().height));
 	portLabel  .setPreferredSize(new Dimension(width, portLabel  .getPreferredSize().height));
+	nilPanel   .setPreferredSize(new Dimension(width, nilPanel   .getPreferredSize().height));
 	
 	final JPanel   namePanel = new JPanel(new BorderLayout());
 	final JPanel remotePanel = new JPanel(new BorderLayout());
 	final JPanel   portPanel = new JPanel(new BorderLayout());
+	final JPanel friendPanel = new JPanel(new BorderLayout());
 	namePanel  .add(  nameLabel, BorderLayout.WEST);
 	remotePanel.add(remoteLabel, BorderLayout.WEST);
+	friendPanel.add(nilPanel,    BorderLayout.WEST);
 	portPanel  .add(  portLabel, BorderLayout.WEST);
 	namePanel  .add(this.  nameField, BorderLayout.CENTER);
 	remotePanel.add(this.remoteField, BorderLayout.CENTER);
+	friendPanel.add(this.friendList,  BorderLayout.CENTER);
 	portPanel  .add(this.  portField, BorderLayout.CENTER);
 	
 	final JPanel spacing0 = new JPanel();  spacing0.setPreferredSize(new Dimension(8, 8));
 	final JPanel spacing1 = new JPanel();  spacing1.setPreferredSize(new Dimension(8, 8));
+	final JPanel spacing2 = new JPanel();  spacing1.setPreferredSize(new Dimension(8, 8));
 	
 	this.add(  namePanel, DockLayout.TOP);
 	this.add(   spacing0, DockLayout.TOP);
 	this.add(remotePanel, DockLayout.TOP);
 	this.add(   spacing1, DockLayout.TOP);
+	this.add(friendPanel, DockLayout.TOP);
+	this.add(   spacing2, DockLayout.TOP);
 	this.add(  portPanel, DockLayout.TOP);
 	
 	final JPanel buttonPanel = new JPanel(new BorderLayout());
@@ -198,7 +257,6 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	else if (source == this.portField)
 	{   this.startButton.setEnabled(ok);
 	}
-	
     }
     
     
@@ -236,7 +294,6 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	}
     }
     
-    
     /**
      * {@inheritDoc}
      */
@@ -244,12 +301,27 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
     {   changedUpdate(e);
     }
     
-    
     /**
      * {@inheritDoc}
      */
     public void removeUpdate(final DocumentEvent e)
     {   changedUpdate(e);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void itemStateChanged(final ItemEvent e)
+    {
+	if (e.getStateChange() == ItemEvent.SELECTED)
+	{
+	    final Friend friend = (Friend)(e.getItem());
+	    if (friend.player == null)
+		this.remoteField.setText("");
+	    else
+		this.remoteField.setText(friend.player.getReachable());
+	}
     }
     
     
