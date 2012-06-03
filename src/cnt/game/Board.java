@@ -7,14 +7,23 @@
  */
 package cnt.game;
 
+import java.io.Serializable;
+
 
 /**
  * Game board with all stationed shapes
  * 
  * @author  Peyman Eshtiagh
  */
-public class Board 
+public class Board implements Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * The width of the board
      */
