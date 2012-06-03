@@ -62,7 +62,8 @@ public final class JoinGame implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return (this.remote == null ? "New game cloud" : "Joining game cloud " + this.remote) + " on port " + port;
+	return this.remote == null ? ("New game cloud on " + (port == 0 ? "random port" : ("port " + port)))
+	                           : ("Joining game cloud " + this.remote + " on port " + port);
     }
     
     /**

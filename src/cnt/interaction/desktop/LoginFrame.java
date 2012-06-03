@@ -6,18 +6,22 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.messages.*;
+import cnt.*;
 
 import se.kth.maandree.libandree.gui.layout.DockLayout;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
+import java.awt.event.*;
 
 
 /**
  * The login frame where the user joins or creates a game
  */
 @SuppressWarnings("serial")
-public class LoginFrame extends JFrame
+public class LoginFrame extends JFrame implements ActionListener, DocumentListener
 {
     /**
      * Constructor
@@ -32,7 +36,42 @@ public class LoginFrame extends JFrame
         this.setLocationByPlatform(true);
 	
 	buildInterior();
+	
+	remoteField  .addActionListener(this);
+	portField    .addActionListener(this);
+	startButton  .addActionListener(this);
+	diagnosButton.addActionListener(this);
+	
+	remoteField.getDocument().addDocumentListener(this);
+	portField  .getDocument().addDocumentListener(this);
     }
+    
+    
+    
+    /**
+     * Text field for the player name
+     */
+    private final JTextField nameField = new JTextField();
+    
+    /**
+     * Text field for the remote player
+     */
+    private final JTextField remoteField = new JTextField();
+    
+    /**
+     * Text field for the game port
+     */
+    private final JTextField portField = new JTextField();
+    
+    /**
+     * Create/Join game button
+     */
+    private final JButton startButton = new JButton("Create");
+    
+    /**
+     * Network diagnostics button
+     */
+    private final JButton diagnosButton = new JButton("Diagnostics");
     
     
     
@@ -56,23 +95,26 @@ public class LoginFrame extends JFrame
 	this.add(marginLeft,   DockLayout.LEFT);
 	this.add(marginRight,  DockLayout.RIGHT);
 	
-	final JTextField nameField = new JTextField();
 	final JLabel nameLabel = new JLabel("Name:");
 	nameLabel.setLabelFor(nameField);
 	nameLabel.setDisplayedMnemonic('N');
 	nameLabel.setDisplayedMnemonicIndex(0);
+	nameLabel.setToolTipText("Your display name in the game.");
+	this.nameField.setToolTipText(nameLabel.getToolTipText());
 	
-	final JTextField remoteField = new JTextField();
 	final JLabel remoteLabel = new JLabel("Remote:");
 	remoteLabel.setLabelFor(remoteField);
 	remoteLabel.setDisplayedMnemonic('R');
 	remoteLabel.setDisplayedMnemonicIndex(0);
+	remoteLabel.setToolTipText("The IP address, DNS name or friend to connect to to play, \nleave empty to create a new game.");
+	this.remoteField.setToolTipText(remoteLabel.getToolTipText());
 	
-	final JTextField portField = new JTextField();
 	final JLabel portLabel = new JLabel("Port:");
 	portLabel.setLabelFor(portField);
 	portLabel.setDisplayedMnemonic('P');
 	portLabel.setDisplayedMnemonicIndex(0);
+	portLabel.setToolTipText("The port the remote client has openned to game on, \nleave empty if you create a new game and want a random port.");
+	this.portField.setToolTipText(portLabel.getToolTipText());
 	
 	int width = 0;
 	if (width < nameLabel.getPreferredSize().width)
@@ -93,9 +135,9 @@ public class LoginFrame extends JFrame
 	namePanel  .add(  nameLabel, BorderLayout.WEST);
 	remotePanel.add(remoteLabel, BorderLayout.WEST);
 	portPanel  .add(  portLabel, BorderLayout.WEST);
-	namePanel  .add(  nameField, BorderLayout.CENTER);
-	remotePanel.add(remoteField, BorderLayout.CENTER);
-	portPanel  .add(  portField, BorderLayout.CENTER);
+	namePanel  .add(this.  nameField, BorderLayout.CENTER);
+	remotePanel.add(this.remoteField, BorderLayout.CENTER);
+	portPanel  .add(this.  portField, BorderLayout.CENTER);
 	
 	final JPanel spacing0 = new JPanel();  spacing0.setPreferredSize(new Dimension(8, 8));
 	final JPanel spacing1 = new JPanel();  spacing1.setPreferredSize(new Dimension(8, 8));
@@ -105,6 +147,109 @@ public class LoginFrame extends JFrame
 	this.add(remotePanel, DockLayout.TOP);
 	this.add(   spacing1, DockLayout.TOP);
 	this.add(  portPanel, DockLayout.TOP);
+	
+	final JPanel buttonPanel = new JPanel(new BorderLayout());
+	buttonPanel.setPreferredSize(startButton.getPreferredSize());
+	this.startButton.setToolTipText("Start playing");
+	this.diagnosButton.setToolTipText("Run network diagnostics");
+	buttonPanel.add(this.startButton, BorderLayout.EAST);
+	buttonPanel.add(this.diagnosButton, BorderLayout.WEST);
+	this.add(buttonPanel, DockLayout.BOTTOM);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void actionPerformed(final ActionEvent e)
+    {
+	final Object source = e.getSource();
+	
+	final boolean newGame = this.remoteField.getText().isEmpty();
+	
+	int port;
+	try
+	{   if (this.portField.getText().isEmpty())
+		port = 0;
+	    else
+		port = Integer.parseInt(this.portField.getText());
+	}
+	catch (final Exception err)
+	{   port = -1;
+	}
+	
+	boolean ok = port > 1024;
+	ok |= port == 0;
+	ok &= port != 49151;
+	ok &= port != 49152;
+	ok &= port < 65535;
+	ok &= (port != 0) || newGame;
+	
+	if (source == this.diagnosButton)
+	{   (new NetworkDialogue(this)).setVisible(true);
+	}
+	else if (source == this.startButton)
+	{   Blackboard.broadcastMessage(new JoinGame(this.nameField.getText(), this.remoteField.getText(), port));
+	}
+	else if (source == this.remoteField)
+	{   this.startButton.setText(newGame ? "Create" : "Join");
+	    this.startButton.setEnabled(ok);
+	}
+	else if (source == this.portField)
+	{   this.startButton.setEnabled(ok);
+	}
+	
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void changedUpdate(final DocumentEvent e)
+    {
+	final boolean newGame = this.remoteField.getText().isEmpty();
+	
+	int port;
+	try
+        {   if (this.portField.getText().isEmpty())
+		port = 0;
+	    else
+		port = Integer.parseInt(this.portField.getText());
+	}
+	catch (final Exception err)
+	{   port = -1;
+	}
+	
+	boolean ok = port > 1024;
+	ok |= port == 0;
+	ok &= port != 49151;
+	ok &= port != 49152;
+	ok &= port < 65535;
+	ok &= (port != 0) || newGame;
+	    
+	if (e.getDocument() == this.remoteField.getDocument())
+	{   this.startButton.setText(newGame ? "Create" : "Join");
+	    this.startButton.setEnabled(ok);
+	}
+	else if (e.getDocument() == this.portField.getDocument())
+	{   this.startButton.setEnabled(ok);
+	}
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void insertUpdate(final DocumentEvent e)
+    {   changedUpdate(e);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void removeUpdate(final DocumentEvent e)
+    {   changedUpdate(e);
     }
     
     
