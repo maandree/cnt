@@ -54,8 +54,15 @@ public abstract class Shape implements Cloneable, Serializable
     /**
      * Momento class for {@link Shape}
      */
-    public static abstract class Momento
+    public static abstract class Momento implements Serializable
     {
+	/**
+	 * Compatibility versioning for {@link java.io.Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
 	/**
 	 * Constructor
 	 * 

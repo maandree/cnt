@@ -114,6 +114,13 @@ public class LShape extends Shape
     public static class Momento extends Shape.Momento
     {
 	/**
+	 * Compatibility versioning for {@link java.io.Serializable}
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param  shape  The shape of which to save the state

@@ -93,6 +93,13 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 	this.data.thread = new Thread()
 	        {
 		    /**
+		     * Whether the game is one the first turn
+		     */
+		    private boolean firstTurn = true;
+		    
+		    
+		    
+		    /**
 		     * {@inheritDoc}
 		     */
 		    public void run()
@@ -108,8 +115,12 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			for (;;)
 			{
 			    synchronized (Engine.this.gameMonitor)
-			    {   Engine.this.data.patcher.dispatch();
-				Engine.this.nextTurn();
+			    {   if ((firstTurn == false) || (Engine.this.data.localPlayer.getID() == Engine.this.data.localPlayer.getConnectedTo()))
+				{   Engine.this.data.patcher.dispatch();
+				    Engine.this.nextTurn();
+				}
+				if (firstTurn)
+				    firstTurn = false;
 				try
 				{   Engine.this.gameMonitor.wait();
 				}

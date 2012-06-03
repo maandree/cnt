@@ -63,10 +63,10 @@ elif [[ $1 = "peergame" ]]; then
     javaSeven -ea -cp bin$jars cnt.demo.PeerGameDemo $2 $3 $4 $5 $6
     stty icanon
 
-elif [[ $1 = "netgame" ]]; then
-    stty -icanon
-    javaSeven -ea -cp bin$jars cnt.demo.NetGameDemo $2 $3 $4 $5 $6
-    stty icanon
+#elif [[ $1 = "netgame" ]]; then
+#    stty -icanon
+#    javaSeven -ea -cp bin$jars cnt.demo.NetGameDemo $2 $3 $4 $5 $6
+#    stty icanon
 
 #elif [[ $1 = "connection" ]]; then
 #    javaSeven -ea -cp bin$jars cnt.demo.ConnectionDemo $2 $3 $4 $5 $6
@@ -83,7 +83,7 @@ elif [[ $1 = "--completion--" ]]; then
 	    #COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat netgame' -- "$cur" ) \
 	    #            $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
 	    
-	    COMPREPLY=( $( compgen -W 'main main-da chat game replay peergame netgame' -- "$cur" ) )
+	    COMPREPLY=( $( compgen -W 'main main-da chat game replay peergame' -- "$cur" ) )
 	fi
     }
     
