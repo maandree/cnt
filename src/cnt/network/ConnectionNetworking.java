@@ -114,10 +114,11 @@ public class ConnectionNetworking
 			ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 			ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
-			this.send( new Handshake(-1), output ); // We don't have our or other clients ID, use special send.
+			// Handshake(ID (0< if asking), urgent?, ObjectOutputStream)
+			this.send( new Handshake(-1), true, output );
 	
 			// Get answer
-			Handshake answer = null;
+			HandshakeAnswer answer = null;
 			try
 			{
 				answer = input.readObject();
@@ -161,6 +162,10 @@ public class ConnectionNetworking
 	*/
 	public final Player localPlayer;
 	
+	/**
+	* Local UUID
+	*/
+	public final UUID localUUID;
 	/**
 	* Local players ID, needed before local Player can be created
 	*/
@@ -314,7 +319,7 @@ public class ConnectionNetworking
 				
 				System.err.println("\n\nError sending message to [" + id + "]: Skipping, he will get it in the full update he gets when he reconnects\n");
 				if (id < this.localID)
-					this.reconnect();
+					this.reconnect(id);
 		}
 	}
 
@@ -359,7 +364,7 @@ public class ConnectionNetworking
 				{
 					System.err.println("\n\nErrer routing message to [" + id +"]: Skipping, he will get it in the full update he gets when he reconnects\n");
 					if (id < this.localID)
-						this.reconnect();
+						this.reconnect(id);
 				}
 			}
 		}
@@ -395,11 +400,23 @@ public class ConnectionNetworking
 	}
 
 	/**
-	* Used to try to reconnect when a connection failure is discovered
+	* Adds the ID that needs to be reconnected to the Reconnector
+	*
+	* @param id the player ID that lost connection
 	*/
-	public void reconnect()
+	public serializable void reconnect(int id)
 	{
+		Reconnector.getInstance(this).addID(id);
+	}
 
+	/**
+	* Removes ID that connected to us from Reconnector
+	*
+	* @param id the player ID the connected
+	*/
+	public serializable void connected(int id)
+	{
+		Reconnector.getInstance(this).removeID(id);
 	}
 
 	/**
