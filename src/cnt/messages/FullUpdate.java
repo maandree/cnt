@@ -89,7 +89,7 @@ public final class FullUpdate implements Blackboard.BlackboardMessage
      */
     public String toString()
     {
-	return (this.gathering ? "Gathering" : "Retreived") + " full updata data";
+	return (this.gathering ? "Gathering" : "Retreived") + " full update data";
     }
 	
     /**

@@ -15,7 +15,6 @@ import se.kth.maandree.jmenumaker.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.IOError;
@@ -130,9 +129,9 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	xipLabel.setFont(xipLabel.getFont().deriveFont(Font.PLAIN));
 	lipLabel.setFont(xipLabel.getFont());
 	
-	final JPanel gamePanel   = new GamePanel();
-	final JPanel playerPanel = new UserList();
-	final JPanel chatPanel   = new ChatPanel();
+	final GamePanel gamePanel   = new GamePanel();
+	final UserList  playerPanel = new UserList();
+	final ChatPanel chatPanel   = new ChatPanel();
 	
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
@@ -166,15 +165,6 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 		    ((JCheckBoxMenuItem)(ref.get())).setState(((EmergencyPause)message).paused);
 	    }
 	}
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    protected void processKeyEvent(final KeyEvent e)
-    {
-	System.out.println(e);
     }
     
     

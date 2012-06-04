@@ -14,6 +14,7 @@ import cnt.*;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.io.File;
@@ -36,8 +37,24 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
     public GamePanel()
     {
 	this.setBackground(Color.BLACK);
+	this.setFocusable(true);
+	this.setRequestFocusEnabled(true);
 	
 	this.matrix = new Color[this.height][this.width];
+	
+	
+	this.addMouseListener(new MouseAdapter()
+	    {
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void mouseClicked(final MouseEvent e)
+		{
+		    GamePanel.this.grabFocus();
+		    System.err.println(e);
+		}
+	    });
 	
 	
 	{
@@ -328,6 +345,54 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
 	    }
 	
 	this.repaint();
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    protected void processKeyEvent(final KeyEvent e)
+    {
+	if (e.getID() != KeyEvent.KEY_PRESSED)
+	    return; 
+
+	final boolean shift = e.isShiftDown();
+	switch (e.getKeyCode())
+	{
+	    case KeyEvent.VK_S:
+		Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.ANTICLOCKWISE));
+		break;
+		
+	    case KeyEvent.VK_D:
+		Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.CLOCKWISE));
+		break;
+		
+	    case KeyEvent.VK_UP:
+		Blackboard.broadcastMessage(new GamePlayCommand(shift ? GamePlayCommand.Move.CLOCKWISE : GamePlayCommand.Move.ANTICLOCKWISE));
+		break;
+		
+	    case KeyEvent.VK_DOWN:
+		Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DOWN));
+		break;
+		
+	    case KeyEvent.VK_LEFT:
+		Blackboard.broadcastMessage(new GamePlayCommand(shift ? GamePlayCommand.Move.ANTICLOCKWISE : GamePlayCommand.Move.LEFT));
+		break;
+		
+	    case KeyEvent.VK_RIGHT:
+		Blackboard.broadcastMessage(new GamePlayCommand(shift ? GamePlayCommand.Move.CLOCKWISE : GamePlayCommand.Move.RIGHT));
+		break;
+		
+	    case KeyEvent.VK_SPACE:
+		Blackboard.broadcastMessage(new GamePlayCommand(GamePlayCommand.Move.DROP));
+		break;
+		
+	    case KeyEvent.VK_PAUSE:
+	    case KeyEvent.VK_P:
+		if (this.player != null)
+		    Blackboard.broadcastMessage(new PlayerPause(this.player, !this.paused));
+		break;
+	}
     }
     
     
