@@ -87,8 +87,8 @@ public class Reconnector
 	*/
 	public synchronized void removeID(int id)
 	{
-		if (this.deadIDs.contains(id))
-			this.deadIDs.remove(id);
+	    if (this.deadIDs.contains(id))
+		this.deadIDs.remove(id);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class Reconnector
 				HandshakeAnswer answer = null;
 				try
 				{
-					answer = input.readObject();
+				    answer = (HandshakeAnswer)(input.readObject());
 				} catch (Exception err) {
 					if (this.connectionNetworking.isServer)
 					{

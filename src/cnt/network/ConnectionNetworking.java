@@ -36,7 +36,8 @@ import java.net.*;
 *   Provides socket sockets for higher levels of networking.
 * </p>
 *
-* @author Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
 public class ConnectionNetworking
 {
@@ -44,22 +45,22 @@ public class ConnectionNetworking
 	* Default Constructor
 	* <p>
 	* The default constructor will try to start a new cloud and act server.
-	*</p>
 	* 
 	* @param gameNetworking the GameNetworking instance to send objects to
 	*/
-	public ConnectionNetworking(GameNetworking gameNetworking, String playerName)
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName) throws IOException
 	{
+	    final int localPort = this.port = Toolkit.getRandomPort();
 	    this.upnpKit = new UPnPKit();
 		this.gameNetworking = gameNetworking;
 	
 		Blackboard.broadcastMessage(new SystemMessage(null, "Starting up sockets..."));
 
 		// Check if public ip is same as internal ip
-		if (!getExternalIP().equals(getInternalIP()))
+		if (getExternalIP().equals(getInternalIP()) == false)
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
-			if(this.upnpKit.createPortForward(PORT))
+			if(this.upnpKit.createPortForward(localPort))
 			{
 				startTCP();
 			} else 
@@ -79,22 +80,20 @@ public class ConnectionNetworking
 	* Constructor which tries to connect to an already existing cloud.
 	*
 	* @param gameNetworking the gamenetworking instance to send objects to
-	*
 	* @param playerName name of local player
-	*
 	* @param foreignHost string with DNS name or IPv4 address to connect to
-	*
 	* @param port the port to make the connection to
 	*/
-	public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) throws IOException
 	{
+	    final int localPort = this.port = Toolkit.getRandomPort();
 	    this.upnpKit = new UPnPKit();
 		this.gameNetworking = gameNetworking;
 
 		// Check if public ip is same as internal ip
 		if (!getExternalIP().equals(getInternalIP()))
 		{
-			if(this.upnpKit.createPortForward(PORT))
+			if(this.upnpKit.createPortForward(localPort))
 			{
 				startTCP();
 			} else 
@@ -116,17 +115,16 @@ public class ConnectionNetworking
 			// Get answer
 			HandshakeAnswer answer = null;
 			try
-			{
-				answer = input.readObject();
-			} catch (Exception err) {
-				if (this.isServer)
-					Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
-				else
-				{
-					Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
-					Blackboard.broadcastMessage(new GameOver());
-				}
+		        {   answer = (HandshakeAnswer)(input.readObject());
 			}
+			catch (Exception err)
+		        {   if (this.isServer)
+				Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
+			    else
+			    {
+				Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
+				Blackboard.broadcastMessage(new GameOver());
+			}   }
 			
 			
 			// By now we should have our ID and the ID from the host we connected to
@@ -225,14 +223,7 @@ public class ConnectionNetworking
 	{
 		ServerSocket _server = null;
 		try {
-			if (this.port != null) 
-			{
-				_server = new ServerSocket(this.port);
-			} else 
-			{
-				_server = new ServerSocket(0);
-				this.port = _server.getLocalPort();
-			}
+			_server = new ServerSocket(this.port);
 		} catch (IOException err) 
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Cannot start ServerSocket. Something is wrong."));
@@ -315,10 +306,10 @@ public class ConnectionNetworking
 		
 		final Set<Integer> keySet = this.outputs.keySet();
 		final Integer[] _playerIDs = new Integer[keySet.size()];
-		this.outputs.keySet().toArray(playerIDs);
+		this.outputs.keySet().toArray(_playerIDs);
 		playerIDs = new int[_playerIDs.length];
 		for (int i = 0, n = playerIDs.length; i < n; i++)
-		    playerIDs = _playerIDs[i];
+		    playerIDs[i] = _playerIDs[i];
 	    }
 	    //else if (packet.getMessage() instanceof Whisper)
 	    //{
@@ -327,18 +318,24 @@ public class ConnectionNetworking
 	    
 	    
 	    final ObjectOutputStream[] sendTo;
+	    final int[] sendToID;
 	    int ptr = 0;
 	    if (packet.getMessage() instanceof Anycast)
 	    {
 		sendTo = new ObjectOutputStream[] { output };
+		sendToID = new int[] { -1 };
 		ptr = 1;
 	    }
 	    else
 	    {
 		sendTo = new ObjectOutputStream[playerIDs.length];
+		sendToID = new int[playerIDs.length];
 		for (final int player : playerIDs)
 		    if (packet.addHasGotPacket(player))
+		    {
+			sendToID[ptr] = player;
 			sendTo[ptr++] = this.outputs.get(player);
+		    }
 	    }
 	    
 	    for (int i = 0; i < ptr; i++)
@@ -353,9 +350,9 @@ public class ConnectionNetworking
 			Blackboard.broadcastMessage(new SystemMessage(null, "Special Send failed!"));
 		    else
 		    {
-			System.err.println("\n\nErrer routing message to [" + id +"]: Skipping, he will get it in the full update he gets when he reconnects\n");
-			if (id < this.localID)
-			    this.reconnect(id);
+			System.err.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
+			if (sendToID[i] < this.localID)
+			    this.reconnect(sendToID[i]);
 		    }
 		}
 	}
@@ -404,8 +401,8 @@ public class ConnectionNetworking
 	private Inet4Address getInternalIP()
 	{
 
-		this.internalIP = Toolkit.getLocalIP();
-		return this.internalIP;
+	    this.internalIP = (Inet4Address)(InetAddress.getByName(Toolkit.getLocalIP()));
+	    return this.internalIP;
 	}
 	
 	/**
@@ -417,7 +414,7 @@ public class ConnectionNetworking
 	*/
 	private Inet4Address getExternalIP()
 	{
-		this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
-		return this.externalIP;	
+	    this.externalIP = (Inet4Address)(Inet4Address.getByName(Toolkit.getPublicIP()));
+	     return this.externalIP;	
 	}
 }
