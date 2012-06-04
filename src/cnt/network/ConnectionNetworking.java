@@ -69,7 +69,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	else
 	    startTCP();
 	
-	this.createPlayer(playerName);
+	this.localPlayer = new Player(playerName, this.localID = 0, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), this.foreignID = 0);
+	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
     
     
@@ -98,7 +99,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	try 
 	{
-	    Socket connection = this.connect(foreignHost, port, false);
+	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
 	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 	    
@@ -121,7 +122,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    
 	    
 	    // By now we should have our ID and the ID from the host we connected to
-	    if (this.foreignID != null)
+	    if (this.foreignID != -1)
 	    {
 		this.outputs.put(this.foreignID, output);
 		TCPReceiver receiver = new TCPReceiver(connection, input, this.gameNetworking, this);
@@ -135,7 +136,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	}
 	
 	// Create the local player
-	this.createPlayer(playerName);
+	this.localPlayer = new Player(playerName, this.localID, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), this.foreignID);
+	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
     
 
@@ -163,7 +165,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * Foreign players ID, needed before local Player can be created
      */
-    public final int foreignID;
+    public int foreignID = -1;
 
     /**
      * The randomly picked port the client is running on
@@ -235,7 +237,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		
 	this.isServer = true;
 	
-	final Thread serverThread = new Thread(new TCPServer(server, this.gameNetworking, this));
+	final Thread serverThread = new Thread(new TCPServer(server, this));
 	serverThread.setDaemon(true);
 	serverThread.start();
     }
@@ -452,7 +454,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
         {
 	    final Player player = ((PlayerJoined)message).player;
 	    
-	    if (this.joinedIDs.contains(Integer.valueOf(player.getID())) && (player.equals(this.ocalPlayer) == false))
+	    if (this.joinedIDs.contains(Integer.valueOf(player.getID())) && (player.equals(this.localPlayer) == false))
 		this.highestID++;
 	    
 	    this.joinedIDs.add(Integer.valueOf(player.getID()));
