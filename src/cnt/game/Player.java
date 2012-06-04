@@ -36,27 +36,10 @@ public class Player implements Serializable
      * @param  extip        The public IP address of the player
      * @param  locip        The local IP address of the player
      * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
-     * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo, final String... dnses)
+    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo)
     {
-	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, dnses);
-    }
-    
-    
-    /**
-     * Constructor
-     * 
-     * @param  name         The name of the player
-     * @param  id           The ID of the player
-     * @param  extip        The public IP address of the player
-     * @param  locip        The local IP address of the player
-     * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
-     * @param  dnses        The player's DNS names
-     */
-    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo, final ArrayList<String> dnses)
-    {
-	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, dnses);
+	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, Friends.getPersonalDNSes());
     }
     
     

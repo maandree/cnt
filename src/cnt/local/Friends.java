@@ -276,7 +276,7 @@ public class Friends
 	if ($file.exists() == false)
 	{
 	    myUUID = UUID.randomUUID();
-	    updateMe();
+	    updateMe(null);
 	}
 	else
 	{
@@ -288,11 +288,15 @@ public class Friends
 		for (;;)
 		    if ((obj = is.readObject()) instanceof UUID)
 		    {
+			System.err.println("Loading UUID: " + obj);
 			myUUID = (UUID)obj;
 			break;
 		    }
 		    else
+		    {
+			System.err.println("Loading DNS: " + obj);
 			myDNSes.add((String)obj);
+		    }
 	    }
 	    catch (final ClassNotFoundException err)
 	    {
@@ -316,17 +320,25 @@ public class Friends
     
     /**
      * Updates the file with the local user's information
+     * 
+     * @param  me  The player
      */
-    public static void updateMe()
+    public static void updateMe(final Player me)
     {
 	synchronized (monitor)
 	{
+	    if (me != null)
+		myDNSes = me.getDNSes();
 	    ObjectOutputStream os = null;
 	    try
 	    {
 		os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(new File(myFile))));
 		for (final String dns : myDNSes)
+		{
+		    System.err.println("Saving DNS: " + dns);
 		    os.writeObject(dns);
+		}
+		System.err.println("Saving UUID: " + myUUID);
 		os.writeObject(myUUID);
 		os.flush();
 	    }

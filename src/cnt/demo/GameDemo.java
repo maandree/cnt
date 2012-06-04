@@ -51,7 +51,7 @@ public class GameDemo
 	rec.start();
 	
 	final Player[] players = new Player[3];;
-	final Player localPlayer = new Player("Mattias", null, 0, null, null, 0);
+	final Player localPlayer = new Player("Mattias", 0, null, null, 0);
 	Blackboard.broadcastMessage(new PlayerJoined(players[0] = localPlayer));
 	Blackboard.broadcastMessage(new PlayerJoined(players[1] = new Player("Peyman", null, 1, null, null, 0)));
 	Blackboard.broadcastMessage(new PlayerJoined(players[2] = new Player("Calle",  null, 2, null, null, 0)));

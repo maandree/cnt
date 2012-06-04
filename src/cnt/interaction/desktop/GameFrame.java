@@ -179,7 +179,7 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	        break;
 		
 	    case "dnses":
-		(new DNSDialogue(this)).setVisible(true);
+		(new DNSDialogue(this, this.localPlayer)).setVisible(true);
 	        break;
 		
 	    case "netdiag":
