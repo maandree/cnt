@@ -25,30 +25,23 @@ public class TCPServer implements Runnable
      * Constructor
      *
      * @param  serverSocket          The socket to listen to for inkoming connections
-     * @param  objectNetworking      The {@link ObjectNetworking} instance to use for callback
      * @param  connectionNetworking  The {@link ConnectionNetworking} instance to use for mapping incoming connections 
      */
-    public TCPServer(ServerSocket serverSocket, ObjectNetworking objectNetworking, ConnectionNetworking connectionNetworking)
+    public TCPServer(ServerSocket serverSocket, ConnectionNetworking connectionNetworking)
     {
 	this.serverSocket = serverSocket;
-	this.objectNetworking = objectNetworking;
 	this.connectionNetworking = connectionNetworking;
     }
     
     
     
     /**
-     * the ServerSocket instance to use as a TCP server
+     * The {@link ServerSocket} instance to use as a TCP server
      */
     private final ServerSocket serverSocket;
 	
     /**
-     * the ObjectNetworking instance to send objects to
-     */
-    private final ObjectNetworking objectNetworking;
-	
-    /**
-     * the ConnectionNetworking instance to map incoming connections to
+     * The {@link ConnectionNetworking} instance to map incoming connections to
      */
     private final ConnectionNetworking connectionNetworking;
     
@@ -71,7 +64,7 @@ public class TCPServer implements Runnable
 	    {   // TODO: make some error handling happen
 	    }
 	    
-	    TCPReceiver receiver = new TCPReceiver(in_conn, this.objectNetworking, this.connectionNetworking);
+	    TCPReceiver receiver = new TCPReceiver(in_conn, this.connectionNetworking);
 	    
 	    (new Thread(receiver)).start();
 	}
