@@ -83,7 +83,7 @@ public class Packet implements Comparable<Packet>, Serializable
      */
     public int compareTo(final Packet other)
     {
-	this.uuid.compareTo(other.uuid);
+	return this.uuid.compareTo(other.uuid);
     }
     
     

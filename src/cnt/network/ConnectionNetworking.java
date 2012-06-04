@@ -340,6 +340,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    for (int i = 0, n = playerIDs.length; i < n; i++)
 		playerIDs[i] = _playerIDs[i];
 	}
+	else
+	    playerIDs = new int[0];
 	//else if (packet.getMessage() instanceof Whisper)
 	//{
 	//	playerIDs = new int[((Whisper)(packet.getMessage())).getReceiver()]; //may not be connected to us
@@ -432,7 +434,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      *
      * @return internal ip
      */
-    private Inet4Address getInternalIP()
+    private Inet4Address getInternalIP() throws UnknownHostException
     {
 	this.internalIP = (Inet4Address)(InetAddress.getByName(Toolkit.getLocalIP()));
 	return this.internalIP;
@@ -446,7 +448,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      *
      * @return external ip
      */
-    private Inet4Address getExternalIP()
+    private Inet4Address getExternalIP() throws IOException
     {
 	this.externalIP = (Inet4Address)(Inet4Address.getByName(Toolkit.getPublicIP()));
 	return this.externalIP;	

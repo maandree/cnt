@@ -113,8 +113,8 @@ public class Reconnector
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
 				
-				Socket dead = this.connectionNetworking.connections.get(id);
-				Socket connection = this.connectionNetworking.connect(dead.getLocalHostAddress(), dead.getLocalPort(), true);
+				Socket dead = this.connectionNetworking.sockets.get(id);
+				Socket connection = this.connectionNetworking.connect((Inet4Address)(dead.getInetAddress()), dead.getPort(), true);
 				if (connection == null)
 				{
 					//* We couldn't connect so we dop the player
@@ -123,17 +123,17 @@ public class Reconnector
 					continue;
 				}
 				
-				ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
-
-				this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
-				
-				HandshakeAnswer answer = null;
 				try
 				{
+				    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+				    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
+				    
+				    this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
+				    
+				    HandshakeAnswer answer = null;
 				    answer = (HandshakeAnswer)(input.readObject());
 				} catch (Exception err) {
-					if (this.connectionNetworking.isServer)
+				    if (this.connectionNetworking.isServer)
 					{
 						Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
 						this.deadIDs.remove(id);

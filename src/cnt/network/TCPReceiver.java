@@ -85,6 +85,8 @@ public class TCPReceiver implements Runnable
      */
 	public void run()
 	{
+		try
+		{
 		if (this.input == null)
 			this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 		
@@ -94,11 +96,9 @@ public class TCPReceiver implements Runnable
 		/* prepair id to map sockets and streams to */
 		int peer;
 
-		Packet packet = (Packet)this.input.readObject();
+		Packet packet = (Packet)(this.input.readObject());
 
 		/* Start sorting the packet */
-		try
-		{
 			if (packet.getMessage().getMessage() instanceof Handshake)
 			{
 				output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
