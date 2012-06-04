@@ -112,8 +112,15 @@ public class TCPReceiver implements Runnable
 					peer = this.connectionNetworking.getHighestID() + 1;
 					output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
 					output.flush();
+					
 				} else
 					peer = message.getID();
+
+				FullUpdate update = new FullUpdate();
+				Blackboard.broadcastMessage(update);
+				output.writeObject(update);
+				output.flush();
+			
 			} else {
 				this.connection.close();
 				return;

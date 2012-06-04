@@ -112,6 +112,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    {   answer = (HandshakeAnswer)(input.readObject());
 		this.foreignID = answer.server;
 		PacketFactory.setID(this.localID = answer.client);
+		FullUpdate update = (FullUpdate)(input.readObject());
+		Blackboard.broadcastMessage(update);
 	    }
 	    catch (Exception err)
 	    {   if (this.isServer)
