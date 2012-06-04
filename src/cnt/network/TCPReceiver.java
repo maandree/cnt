@@ -43,7 +43,7 @@ public class TCPReceiver implements Runnable
      * @param  gameNetworking        The {@link GameNetworking} instance to use for callback
      * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
      */
-    public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+    public TCPReceiver(Socket connection, ObjectInputStream stream, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
     {
 	this.connection = connection;
 	this.input = stream;
@@ -83,23 +83,34 @@ public class TCPReceiver implements Runnable
 	{
 		try
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
 			if (this.input == null)
 				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 			
-			/**
-			* REWRITE EVERYTHING BELOW HERE!!!
-			*/		
-	
-			 this.gameNetworking.receive((Serializable)input.readObject());
+			/* prepair outgoing stream */
+			ObjectOutputStream output;
+
+			Packet packet = this.input.readObject();
+
+			/* Start sorting the packet */
+			if (packet.getMessage().getMessage() instanceof Handshake)
+			{
+				Handshake message = packet.getMessage().getMessage();
+				if (message.getID() < 0)
+				{
+					output = new ObjectOutpuStream(new BufferedOutputStream(this.connection.getOutputStream()));
+					int id = this.connetionNetworking.getHighestID() + 1;
+
+				
+			}
+			
 			// Take ID and map the connection and peer in ConnectionNetworking
 			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
 			if (peer != null) {
 				this.connectionNetworking.sockets.put(peer, this.connection);
-				this.connectionNetworking.objectInputs.put(peer, input);
+				this.connectionNetworking.inputs.put(peer, input);
 				ObjectOutputStream out =  new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
 				out.flush();
-				this.connectionNetworking.objectOutputs.put(peer, out);
+				this.connectionNetworking.outputs.put(peer, out);
 			}
 			
 			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.sockets.size() + " connections"));
