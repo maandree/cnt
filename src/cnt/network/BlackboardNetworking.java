@@ -110,11 +110,8 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
     
     /**
      * Wait for, receive, and locally broadcast a message
-     * 
-     * @throws  IOException             On networking exception
-     * @throws  ClassNotFoundException  In the message type is not a part of the program
      */
-    public void receiveAndBroadcast(final Serializable object)
+    public void receiveAndBroadcast(final Serializable object) 
     {
 	    broadcastMessage((Blackboard.BlackboardMessage)object);
     }
@@ -123,11 +120,8 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
      * Broadcasts a message
      * 
      * @param  message  The message to broadcast
-     * 
-     * @throws  IOException             On networking exception
-     * @throws  ClassNotFoundException  In the message type is not a part of the program
      */
-    protected void broadcastMessage(final Blackboard.BlackboardMessage message) throws IOException, ClassNotFoundException
+    protected void broadcastMessage(final Blackboard.BlackboardMessage message)
     {
 	synchronized (this.ignore)
 	{

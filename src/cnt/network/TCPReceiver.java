@@ -7,7 +7,9 @@
  */
 package cnt.network;
 import cnt.Blackboard;
+import cnt.Blackboard.*;
 import cnt.messages.*;
+import cnt.game.Player;
 
 import java.util.*;
 import java.io.*;
@@ -25,13 +27,12 @@ public class TCPReceiver implements Runnable
      * Constructor 
      *
      * @param  connection            The incoming connection as a socket
-     * @param  gameNetworking        The {@link GameNetworking} instance to use for callback
      * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
      */
-    public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+    public TCPReceiver(Socket connection, ConnectionNetworking connectionNetworking)
     {
 	
-	    this(connection, null, gameNetworking, connectionNetworking);
+	    this(connection, null, connectionNetworking);
     }
 
     /**
@@ -39,14 +40,13 @@ public class TCPReceiver implements Runnable
      *
      * @param  connection            The incoming connection as a socket
      * @param  stream                The {@link ObjectInputStream} to use
-     * @param  gameNetworking        The {@link GameNetworking} instance to use for callback
      * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
      */
-    public TCPReceiver(Socket connection, ObjectInputStream stream, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+    public TCPReceiver(Socket connection, ObjectInputStream stream, ConnectionNetworking connectionNetworking)
     {
 	this.connection = connection;
 	this.input = stream;
-	this.gameNetworking = gameNetworking;
+	this.gameNetworking = connectionNetworking.gameNetworking;
 	this.connectionNetworking = connectionNetworking;
 
     }
@@ -94,7 +94,7 @@ public class TCPReceiver implements Runnable
 		/* prepair id to map sockets and streams to */
 		int peer;
 
-		Packet packet = this.input.readObject();
+		Packet packet = (Packet)this.input.readObject();
 
 		/* Start sorting the packet */
 		try
@@ -103,11 +103,11 @@ public class TCPReceiver implements Runnable
 			{
 				output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
 			
-				Handshake message = packet.getMessage().getMessage();
+				Handshake message = (Handshake)packet.getMessage().getMessage();
 				if (message.getID() < 0)
 				{
-					peer = this.connetionNetworking.getHighestID() + 1;
-					output.writeObject(new HandshakeAnswer(id, this.connectionNetworking.localID));
+					peer = this.connectionNetworking.getHighestID() + 1;
+					output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
 					output.flush();
 				} else
 					peer = message.getID();
@@ -124,12 +124,12 @@ public class TCPReceiver implements Runnable
 		// Take ID and map the connection and peer in ConnectionNetworking
 		this.connectionNetworking.sockets.put(peer, this.connection);
 		this.connectionNetworking.inputs.put(peer, input);
-		this.connectionNetworking.outputs.put(peer, out);
+		this.connectionNetworking.outputs.put(peer, output);
 		try 
 		{
 			while(true)
 			{
-				Packet packet = (Packet)this.input.readObject();
+				packet = (Packet)this.input.readObject();
 				if (packet.getMessage() instanceof Broadcast)
 				{
 					this.connectionNetworking.send(packet);
@@ -138,9 +138,10 @@ public class TCPReceiver implements Runnable
 					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
 						System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
 
-				} else if (pack.getMessage() instanceof Whisper)
+				} else if (packet.getMessage() instanceof Whisper)
 				{
-					if (pack.getMessage().getReceiver() != this.connectionNetworking.localID)
+					Whisper message = (Whisper)packet.getMessage();
+					if (message.getReceiver() != this.connectionNetworking.localID)
 						this.connectionNetworking.send(packet);
 					else
 					{
@@ -154,11 +155,11 @@ public class TCPReceiver implements Runnable
 			
 		} catch (IOException ioe)
 		{
-			if (this.foreingID < this.connectionNetworking.localID)
+			if (this.foreignID < this.connectionNetworking.localID)
 				this.connectionNetworking.reconnect(this.foreignID);
 		} catch (Exception err)
 		{
-			Blackboard.boradcastMessage(new PlayerDrop(Player.getInstance(this.foreignID)));
+			Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(this.foreignID)));
 			try
 			{
 				this.connection.close();

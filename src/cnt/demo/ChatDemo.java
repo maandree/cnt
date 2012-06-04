@@ -57,12 +57,14 @@ public class ChatDemo
 	
 	Blackboard.broadcastMessage(new SystemMessage(null, "Done setting up. Trying to connect to [" + remote + "]"));
 	
+	/* OLD
 	if (remote != null)
 	{
-	    blackboardNetworking.gameNetworking.objectNetworking.connectionNetworking.connect(
+	    blackboardNetworking.gameNetworking.connectionNetworking.connect(
                          (Inet4Address)(Inet4Address.getByName(remote)),
 			 args.length > 2 ? Integer.parseInt(args[2]) : 1
 		    );
 	}
+	*/
     }
 }

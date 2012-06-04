@@ -26,23 +26,40 @@ public class GameNetworking
      * @param  blackboardNetworking  The previous layer in the protocol stack
      */
     public GameNetworking(final BlackboardNetworking blackboardNetworking)
-    {
-	this.blackboardNetworking = blackboardNetworking;
-    }
+    { }
     
     
     
     /**
      * The previous layer in the protocol stack
      */
-    public final BlackboardNetworking blackboardNetworking;
+    public BlackboardNetworking blackboardNetworking;
     
+    /**
+     * The next layer in the protocol stack
+     */
+    public ConnectionNetworking connectionNetworking;
+
     /**
      * The local player
      */
     private Player player = null;
     
-    
+    /**
+     * Set BlackboardNetworking instance to use
+     */
+    public void setBlackboardNetworking(BlackboardNetworking blackboardNetworking)
+    {
+	    this.blackboardNetworking = blackboardNetworking;
+    }
+
+    /**
+     * Set ConnectionNetwroking instance to use
+     */
+    public void setConnectionNetworking(ConnectionNetworking connectionNetworking)
+    {
+	    this.connectionNetworking = connectionNetworking;
+    }
     
     /**
      * Forward a message to the next layer in the protocol stack
@@ -53,7 +70,7 @@ public class GameNetworking
      */
     public void forward(final Serializable message) throws IOException
     {
-	this.connectionNetworking.send(message);
+	this.connectionNetworking.send(PacketFactory.createBroadcast(message, false));
     }
     
     
@@ -94,8 +111,8 @@ public class GameNetworking
 	{   this.blackboardNetworking.receiveAndBroadcast(object);
 	}
 	catch (Exception err)
-	{   //TODO: fix error handling
-	    return null;
+	{
+	    return; 
 	}
     }
     
