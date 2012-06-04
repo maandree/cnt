@@ -11,6 +11,7 @@ package cnt.network;
 // Blackboardclass to send messages with
 import cnt.Blackboard;
 import cnt.messages.*;
+import cnt.game.Player;
 
 // Classes needed for UPnP
 import org.teleal.cling.*;
@@ -26,12 +27,10 @@ import org.teleal.cling.support.model.*;
 import org.teleal.cling.controlpoint.*;
 import cnt.util.IGDListener;
 
-// Classes needed for TCP sockets
 import java.util.*;
 import java.io.*;
-
-// Classes needed for UDP socket
 import java.net.*;
+
 
 /**
 * Connection Networking layer
@@ -90,7 +89,7 @@ public class ConnectionNetworking
 	*
 	* @param port the port to make the connection to
 	*/
-	public synchronized ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
 	{
 
 		this.gameNetworking = gameNetworking;
@@ -337,18 +336,18 @@ public class ConnectionNetworking
 			return;
 		}
 
-		int[] playerIDs = this.outputs.ketSet().toArray(new int[0]);
+		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
 
 		ArrayList<Integer> sendList = new ArrayList<Integer>();
 
 		sendList.addAll(Arrays.asList(sentTo));
-		if (!sendList.contains(Integer(this.localID)))
-			sendList.add(Integer(this.localID));
+		if (!sendList.contains(Integer.valueOf(this.localID)))
+			sendList.add(Integer.valueOf(this.localID));
 
 		for (int id : playerIDs)
 		{
-			if (!sendList.contains(Integer(id)))
-				sendList.add(Integer(id));
+			if (!sendList.contains(Integer.valueOf(id)))
+				sendList.add(Integer.valueOf(id));
 		}
 		
 		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sendList.toArray(new int[0]));

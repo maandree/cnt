@@ -11,6 +11,7 @@ import cnt.messages.*;
 import cnt.*; //Blackboard class to send messages with
 
 import java.util.*;
+import java.net.*;
 import java.io.*;
 
 
@@ -41,7 +42,7 @@ public class Reconnector
 	/**
 	* Monitor object to use for internal monitoring
 	*/
-	private final Object montior = new Object();
+	private final Object monitor = new Object();
 
 	/**
 	* Set of IDs for the connections that are dead and we need to reconnect,
@@ -76,7 +77,7 @@ public class Reconnector
 	{
 		this.deadIDs.add(id);
 		synchronized (monitor)
-		{   this.monitor.notify();
+		{   monitor.notify();
 		}
 	}
 
@@ -117,7 +118,7 @@ public class Reconnector
 				if (connection == null)
 				{
 					//* We couldn't connect so we dop the player
-					Blackboard.broadcastMessage(new PlayerDroped(playerRing.get(id)));
+					Blackboard.broadcastMessage(new PlayerDropped(playerRing.get(id)));
 					this.deadIDs.remove(id);
 					continue;
 				}
@@ -134,7 +135,7 @@ public class Reconnector
 				} catch (Exception err) {
 					if (this.connectionNetworking.isServer)
 					{
-						Blackboard.broadcastMessage(new PlayerDropd(playerRing.get(id)));
+						Blackboard.broadcastMessage(new PlayerDropped(playerRing.get(id)));
 						this.deadIDs.remove(id);
 					} else
 					{
