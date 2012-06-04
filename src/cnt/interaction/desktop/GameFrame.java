@@ -171,6 +171,15 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
     /**
      * {@inheritDoc}
      */
+    protected void processKeyEvent(final KeyEvent e)
+    {
+	System.out.println(e);
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
     public void itemClicked(final String id)
     {   switch (id)
 	{
