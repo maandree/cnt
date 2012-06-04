@@ -138,7 +138,7 @@ public class TCPReceiver implements Runnable
 					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
 						System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
 
-				else if (pack.getMessage() instanceof Whisper)
+				} else if (pack.getMessage() instanceof Whisper)
 				{
 					if (pack.getMessage().getReceiver() != this.connectionNetworking.localID)
 						this.connectionNetworking.send(packet);
@@ -149,6 +149,7 @@ public class TCPReceiver implements Runnable
 						else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
 							System.err.println("\n\nGot a ConnectionMessage in a Whisper while being connected, shouldn't happen\n");
 					}
+				}
 			}
 			
 		} catch (IOException ioe)
