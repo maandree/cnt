@@ -39,7 +39,7 @@ import java.net.*;
  * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public class ConnectionNetworking
+public class ConnectionNetworking implements Blackboard.BlackboardObserver
 {
     /**
      * Constructor starting a cloud
@@ -151,6 +151,11 @@ public class ConnectionNetworking
     public final Player localPlayer;
     
     /**
+     * The highest known ID
+     */
+    public int highestID = 0;
+    
+    /**
      * Local players ID, needed before local Player can be created
      */
     public final int localID;
@@ -195,7 +200,6 @@ public class ConnectionNetworking
      */
     public final HashMap<Integer, ObjectInputStream> inputs = new HashMap<Integer, ObjectInputStream>();
     
-    
     /**
      * The UPnP RemoteService being used for UPnP devices
      */
@@ -205,6 +209,11 @@ public class ConnectionNetworking
      * UPnP tool kit
      */
     private UPnPKit upnpKit;
+    
+    /**
+     * Set of all used IDs
+     */
+    public final HashSet<Integer> joinedIDs = new HashSet<Integer>();
     
     
     
@@ -231,6 +240,7 @@ public class ConnectionNetworking
 	serverThread.start();
     }
     
+    
     /**
      * Setup the client to be running locally. Without PublicIP or NAT.
      */
@@ -242,6 +252,7 @@ public class ConnectionNetworking
 	
 	// Do nothing else, we can only use outgoing sockets
     }
+    
     
     /**
      * Makes a connection to specefied IP and port
@@ -285,7 +296,8 @@ public class ConnectionNetworking
     {
 	send(packet, null);
     }
-
+    
+    
     /**
      * Sends a message thrue a specefied socket 
      *
@@ -353,6 +365,7 @@ public class ConnectionNetworking
 	    }
     }
     
+    
     /**
      * Adds the ID that needs to be reconnected to the Reconnector
      *
@@ -362,6 +375,7 @@ public class ConnectionNetworking
     {
 	Reconnector.getInstance(this).addID(id);
     }
+    
     
     /**
      * Removes ID that connected to us from Reconnector
@@ -373,6 +387,7 @@ public class ConnectionNetworking
 	Reconnector.getInstance(this).removeID(id);
     }
 
+    
     /**
      * Check to see if there is any connections to send to
      *
@@ -388,6 +403,7 @@ public class ConnectionNetworking
 	return true;
     }
     
+    
     /**
      * Retrive the internatl IP from the local host.
      *
@@ -400,7 +416,8 @@ public class ConnectionNetworking
 	this.internalIP = (Inet4Address)(InetAddress.getByName(Toolkit.getLocalIP()));
 	return this.internalIP;
     }
-	
+
+    
     /**
      * Retrives the external ip adress by adress lookup.
      *
@@ -413,6 +430,35 @@ public class ConnectionNetworking
 	this.externalIP = (Inet4Address)(Inet4Address.getByName(Toolkit.getPublicIP()));
 	return this.externalIP;	
     }
-
+    
+    
+    /**
+     * Returns the highest known ID
+     * 
+     * @return  The highest known ID
+     */
+    public int getHighestID()
+    {
+	return this.highestID;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	if (message instanceof PlayerJoined)
+        {
+	    final Player player = ((PlayerJoined)message).player;
+	    
+	    if (this.joinedIDs.contains(Integer.valueOf(player.getID())) && (player.equals(this.ocalPlayer) == false))
+		this.highestID++;
+	    
+	    this.joinedIDs.add(Integer.valueOf(player.getID()));
+	}
+	
+    }
+    
 }
 
