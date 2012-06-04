@@ -27,44 +27,69 @@ import java.net.*;
 public class TCPReceiver implements Runnable
 {
 	/**
-	* Constructor - takes the incoming connection and an instance of ObjectNetworking and an instance of ConnectionNetworking
+	* Constructor - takes the incoming connection and an instance of GameNetworking and an instance of ConnectionNetworking
 	*
 	* @param connection the incoming connection as a Socket
-	* @param objectNetworking the ObjectNetworking instance to use for callback
+	* @param gameNetworking the GameNetworking instance to use for callback
 	* @param connectionNetworking the ConnectionNetworking instace to map peer and socket in
 	*/
-	public TCPReceiver(Socket connection, ObjectNetworking objectNetworking, ConnectionNetworking connectionNetworking)
+	public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
 	{
 		this.connection = connection;
-		this.objectNetworking = objectNetworking;
+		this.gameNetworking = gameNetworking;
 		this.connectionNetworking = connectionNetworking;
 
 	}
-	
+
+	/**
+	* Constructor - takes the incoming connection and a an incomming stream and an instance of GameNetworking and an instance of ConnectionNetworking
+	*
+	* @param connection the incoming connection as a Socket
+	* @param stream the ObjectInputStream to use
+	* @param gameNetworking the GameNetworking instance to use for callback
+	* @param connectionNetworking the ConnectionNetworking instace to map peer and socket in
+	*/
+	public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+	{
+		this.connection = connection;
+		this.input = stream;
+		this.gameNetworking = gameNetworking;
+		this.connectionNetworking = connectionNetworking;
+
+	}
 	/**
 	* the Socket to use for incoming streams
 	*/
 	private final Socket connection;
 	
 	/**
-	* the ObjectNetworking instance to send objects to
+	* the GameNetworking instance to send objects to
 	*/
-	private final ObjectNetworking objectNetworking;
+	private final GameNetworking gameNetworking;
 	
 	/**
 	* the ConnectionNetworking instance to map incoming connections to
 	*/
 	private final ConnectionNetworking connectionNetworking;
 
+	/**
+	* the ObjectIntputStream to use
+	*/
+	private final ObjectInputStream input;
+
 	public void run()
 	{
-		ObjectInputStream input = null;
 		try
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Getting something"));
-			input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
-			// Send message to ObjectNetworking layer, and wait for a ID number to be returned
-			Integer peer = this.objectNetworking.receive((Serializable)input.readObject());
+			if (this.input == null)
+				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
+			
+			/**
+			* REWRITE EVERYTHING BELOW HERE!!!
+			*/		
+	
+			 this.gameNetworking.receive((Serializable)input.readObject());
 			// Take ID and map the connection and peer in ConnectionNetworking
 			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
 			if (peer != null) {
@@ -94,7 +119,7 @@ public class TCPReceiver implements Runnable
 					Blackboard.broadcastMessage(new SystemMessage(null, "Connection has alive instream"));
 				Serializable message = (Serializable)input.readObject();
 				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
-				this.objectNetworking.receive(message);
+				this.gameNetworking.receive(message);
 			}
 		} catch (IOException ioe)
 		{

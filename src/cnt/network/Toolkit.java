@@ -83,7 +83,6 @@ public class Toolkit
 		if (!iface.isUp()) // If the interface is not up, then we don't want to use it.
 		    continue;
 		
-		
 		for (InterfaceAddress eth : iface.getInterfaceAddresses()) // Get ALL addresses listed on the interface
 		{
 		    System.err.println("Possible Address: " + eth.getAddress().getHostAddress());

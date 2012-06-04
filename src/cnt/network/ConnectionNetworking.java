@@ -44,89 +44,150 @@ import java.net.*;
 
 public class ConnectionNetworking
 {
-
-	/**
-	* Port tha game clients will be using
-	*/
-	public static final int PORT = 44923;
-
 	/**
 	* Default Constructor
 	* <p>
-	* The default constructor. Will try to make any kind of connection.
-	* Order of connection importance (high -&gt; low):
-	* Public TCP -&gt; Local TCP 
+	* The default constructor will try to start a new cloud and act server.
 	*</p>
 	* 
-	*
-	* @throws IOException Thrown in case of network errors.
+	* @param gameNetworking the GameNetworking instance to send objects to
 	*/
-	public ConnectionNetworking(ObjectNetworking objectNetworking)
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName)
 	{
 	
-		this.objectNetworking = objectNetworking;
+		this.gameNetworking = gameNetworking;
 	
 		Blackboard.broadcastMessage(new SystemMessage(null, "Starting upp sockets..."));
 
 		// Check if public ip is same as internal ip
-		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
-		System.out.println("\n\nExternal IP: [" + getExternalIP() + "]\nInternal IP: [" + getInternalIP() + "]\n");
 		if (!getExternalIP().equals(getInternalIP()))
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
-			if(createPortForward(ConnectionNetworking.PORT))
+			if(createPortForward())
 			{
-				startTCP(ConnectionNetworking.PORT);
+				startTCP();
 			} else 
 			{
-				startLocalTCP();
+				// We are trying to start a cloud, but couldn't. Game exits
+				Blackboard.broadcastMessage(new GameOver());
 			}
 		} else
-			startTCP(ConnectionNetworking.PORT);
+			startTCP();
+
+		this.createPlayer(playerName);
 	}
 	
 	/**
-	* Constructor with non-standard port
+	* Constructor connecting to a cloud
 	* <p>
-	* Constructor taking a non-standard port as port to listen on
+	* Constructor which tries to connect to an already existing cloud.
 	*
-	* @param port port to use as listeningport
+	* @param gameNetworking the gamenetworking instance to send objects to
 	*
-	* @throws IOException Thrown in case of network errors.
+	* @param playerName name of local player
+	*
+	* @param foreignHost string with DNS name or IPv4 address to connect to
+	*
+	* @param port the port to make the connection to
 	*/
-	public ConnectionNetworking(int port, ObjectNetworking objectNetworking) 
+	public serializable ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
 	{
 
-		this.objectNetworking = objectNetworking;
+		this.gameNetworking = gameNetworking;
 
 		// Check if public ip is same as internal ip
-		// The IP service only want us to check every 300 sec. So getExternalIP should make sure to execute the check only every 300 sec. Use local cache instead of constant lookup.
 		if (!getExternalIP().equals(getInternalIP()))
 		{
-			if(createPortForward(port))
+			if(createPortForward())
 			{
-				startTCP(port);
+				startTCP();
 			} else 
 			{
 				startLocalTCP();
 			}
 		} else
-			startTCP(port);
+			startTCP();
+
+		try 
+		{
+			Socket connection = this.connect(foreignHost, port, false);
+			ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
+			ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+
+			// Handshake(ID (0< if asking), urgent?, ObjectOutputStream)
+			this.send( new Handshake(-1), true, output );
+	
+			// Get answer
+			HandshakeAnswer answer = null;
+			try
+			{
+				answer = input.readObject();
+			} catch (Exception err) {
+				if (this.isServer)
+					Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
+				else
+				{
+					Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
+					Blackboard.broadcastMessage(new GameOver());
+				}
+			}
+			
+			
+			// By now we should have our ID and the ID from the host we connected to
+			if (this.foreignID =! null)
+			{
+				this.outputs.put(this.foreignID, output);
+				TCPReceiver receiver = new TCPReceiver(connection, input, this.gameNetworking, this);
+				Thread t = new Thread(receiver);
+				t.start();
+			}
+			
+		} catch (IOException ioe)
+		{
+			// blackboardmessage!
+		}
+		
+		// Create the local player
+		this.createPlayer(playerName);
 		
 	}
 
 	/**
 	* ObjectNetworker to communicate with
 	*/
-	public final ObjectNetworking objectNetworking;
+	public final GameNetworking gameNetworking;
 
 	/**
-	* Public ip. Should not be final since an public ip might change at any time if dynamic
+	* Local player instance
+	*/
+	public final Player localPlayer;
+	
+	/**
+	* Local UUID
+	*/
+	public final UUID localUUID;
+	/**
+	* Local players ID, needed before local Player can be created
+	*/
+	public final int localID;
+
+	/**
+	* Foreign players ID, needed before local Player can be created
+	*/
+	public final int foreignID;
+
+	/**
+	* The randomly picked port the client is running on
+	*/
+	public final int port;
+
+	/**
+	* Public ip. 
 	*/
 	public Inet4Address externalIP;
 
 	/**
-	* Local ip. Not as probable as Public IP, but same reason.
+	* Local ip. 
 	*/
 	public Inet4Address internalIP;
 
@@ -141,19 +202,14 @@ public class ConnectionNetworking
 	final HashMap<Integer, Socket> sockets = new HashMap<Integer, Socket>();
 
 	/**
-	* Map of current threaded connections to use to store ObjectOutputStreams
+	* The output stream to write to
 	*/
-	final HashMap<Integer, ObjectOutputStream> objectOutputs = new HashMap<Integer, ObjectOutputStream>();
+	final HashMap<Integer, ObjectOutputStream> outputs = new HashMap<Integer, ObjectOutputStream>();
 
 	/**
 	* Map of current threaded connections to use to store ObjectInputStremas
 	*/
-	final HashMap<Integer, ObjectInputStream> objectInputs = new HashMap<Integer, ObjectInputStream>();
-
-	/**
-	* The time when we last updated our external ip. Provider ask us not to do so more then every 5min/host.
-	*/
-	private Date lastUpdate;
+	final HashMap<Integer, ObjectInputStream> inputs = new HashMap<Integer, ObjectInputStream>();
 
 	/**
 	* The UPnP RemoteService being used for UPnP devices. 
@@ -163,22 +219,28 @@ public class ConnectionNetworking
 	/**
 	* Make a TCP serversocket to listen on incoming sockets
 	*
-	* @param port Port to listen on
 	*/
-	private void startTCP(int port) 
+	private void startTCP() 
 	{
 		ServerSocket _server = null;
 		try {
-			_server = new ServerSocket(port);
+			if (this.port != null) 
+			{
+				_server = new ServerSocket(this.port);
+			} else 
+			{
+				_server = new ServerSocket(0);
+				this.port = _server.getLocalPort();
+			}
 		} catch (IOException err) 
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Cannot listen to port. Port is busy. Is another game instance running?"));
+			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Cannot start ServerSocket. Something is wrong."));
 			return;
 		}
 		
 		this.isServer = true;
 		
-		final Thread serverThread = new Thread(new TCPServer(_server, this.objectNetworking, this));
+		final Thread serverThread = new Thread(new TCPServer(_server, this.gameNetworking, this));
 		serverThread.setDaemon(true);
 		serverThread.start();
 	}
@@ -199,12 +261,11 @@ public class ConnectionNetworking
 	* Makes a connection to specefied IP and port
 	*
 	* @param host an Inet4Address to connect to
-	* @param port an int to use as portnumber
-	* @param peer the peer to map the connection to
+	* @param port an portnumber to connect to
 	*
 	* @return <code>Socket</code> on successfull connection. <code>null</code> otherwise.
 	*/
-	public final Socket connect(Inet4Address host, int port, int peer)
+	public final Socket connect(Inet4Address host, int port, boolean save)
 	{
 		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating connection to ["+ host + ":" + port + "]"));
 		Socket connection = null;
@@ -216,24 +277,12 @@ public class ConnectionNetworking
 			return null;
 		}
 		
-		// Always save live sockets. TODO: lookup possible security issues with this.
-		this.sockets.put(peer, connection);
-		ObjectOutputStream out; 
-		try
+		if (save) //This is mainly for the first connection out, we don't want to start a listener until we now what ID to map it to 
 		{
-			out = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-			out.flush();
-			this.objectOutputs.put(peer, out);
-		} catch (IOException ioe)
-		{
-			// TODO: fix this
+			TCPReceiver receiver = new TCPReceiver(connection, this.gameNetworking, this);
+			Thread t = new Thread(receiver);
+			t.start();
 		}
-		
-		TCPReceiver receiver = new TCPReceiver(connection, this.objectNetworking, this);
-		Thread t = new Thread(receiver);
-		t.start();
-		
-		Blackboard.broadcastMessage(new SystemMessage(null, "Connected to ID: " + peer));
 
 		Blackboard.broadcastMessage(new SystemMessage(null, "Number of open sockets: " + this.sockets.size()));
 
@@ -241,64 +290,149 @@ public class ConnectionNetworking
 	}
 	
 	/**
-	* Takes a serialized object and sends it to all known remote clients
+	* Sends message that originated on local client
 	*
-	* @param message Serialized object to send as message
+	* @param message Message that should be sent
+	* @param urgent true if it is an urgentmessage, false if it is normal priority
 	*/
-	public void send(Serializable message)
+	public void send(NetworkMessage message, boolean urgent)
 	{ 
+		if (!this.isConnected()) {
+			return
+		}
+		// Get the players we have connections to so we know who we send to
+		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
 		
-		Blackboard.broadcastMessage(new SystemMessage(null, "Initiating send"));
-		if (this.sockets != null && this.sockets.isEmpty() == false)
+		int[] sentTo = Array.copyOf(playerIDs, playerIDs.length + 1);
+		sentTo[sentTo.length - 1] = this.localID;
+		
+		
+		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo)
+
+		for (int id : playerIDs)
 		{
-	
-			for (int peer : this.sockets.keySet())
+			try
 			{
-						
+				this.outputs.get(id).writeObject(packet);
+				this.outputs.get(id).flush();
+			} catch (IOException ioe) {
+				
+				System.err.println("\n\nError sending message to [" + id + "]: Skipping, he will get it in the full update he gets when he reconnects\n");
+				if (id < this.localID)
+					this.reconnect(id);
+		}
+	}
+
+	/**
+	* Sends a message that came from somewhere and should be routed on
+	*
+	* @param message Message that should be sent
+	* @param urgent true if it is an urgentmessage, false if it is normal priority
+	* @param sentTo list of player ID who already gotten the message
+	*/
+	public void send(NetworkMessage message, boolean urgent, int[] sentTo)
+	{
+		if (!this.isConnected()) {
+			return;
+		}
+
+		int[] playerIDs = this.outputs.ketSet().toArray(new int[0]);
+
+		ArrayList<Integer> sendList = new ArrayList<Integer>();
+
+		sendList.addAll(Arrays.asList(sentTo));
+		if (!sendList.contains(Integer(this.localID)))
+			sendList.add(Integer(this.localID));
+
+		for (int id : playerIDs)
+		{
+			if (!sendList.contains(Integer(id)))
+				sendList.add(Integer(id));
+		}
+		
+		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sendList.toArray(new int[0]));
+
+		for (int id : playerIDs)
+		{
+			if (!sentTo.contains(id)) 
+			{
 				try
 				{
-					TCPSender _sender = new TCPSender(this.objectOutputs.get(peer), message);
-					Thread _tmpThread = new Thread(_sender);
-					_tmpThread.start();
-				
+					this.outputs.get(id).writeObject(packet);
+					this.outputs.flush();
 				} catch (IOException ioe)
 				{
-					Socket dead_socket = this.sockets.get(peer);
-					this.sockets.remove(peer);	
-					Socket _socket = this.connect((Inet4Address)dead_socket.getInetAddress(), dead_socket.getPort(), peer);
-					this.sockets.put(peer, _socket);
-					ObjectOutputStream out = null;
-					try {
-						this.objectInputs.put(peer, new ObjectInputStream(new BufferedInputStream(_socket.getInputStream())));
-						out = new ObjectOutputStream(new BufferedOutputStream(_socket.getOutputStream()));
-						out.flush();
-						this.objectOutputs.put(peer, out);
-					} catch(IOException iioe)
-					{
-						// TODO: fix this
-					}
-					if (_socket != null)
-					{
-						try
-						{
-							TCPSender _sender = new TCPSender(out, message);
-							Thread _tmpThread = new Thread(_sender);
-                                        	        _tmpThread.start();
-						} catch (IOException sec_ioe) 
-						{
-							//TODO: Change to correct BlackboardMessage to send a PlayerDroped message
-							Blackboard.broadcastMessage(new SystemMessage(null, "Error sending [ " + message + " ] to " + peer));
-						}
-					} else
-					{
-						//TODO: Change to correct BlackboardMessage to send a PlayerDroped message
-						Blackboard.broadcastMessage(new SystemMessage(null, "Error sending [ " + message + " ] to " + peer));
-					}
+					System.err.println("\n\nErrer routing message to [" + id +"]: Skipping, he will get it in the full update he gets when he reconnects\n");
+					if (id < this.localID)
+						this.reconnect(id);
 				}
 			}
 		}
 	}
+
+	/**
+	* Sends a message thrue a specefied socket 
+	*
+	* @param message Message that should be sent
+	* @param urgent true if it is an urgentmessage, false if it is normal priority
+	* @param connection Socket to use to send thrue
+	*/
+	public void send(NetworkMessage message, boolean urgent, ObjectOutputStream output)
+	{
 		
+		// Get the players we have connections to so we know who we send to
+		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
+		
+		int[] sentTo = Array.copyOf(playerIDs, playerIDs.length + 1);
+		sentTo[sentTo.length - 1] = this.localID;
+
+		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo);
+		try 
+		{
+			output.writeObject(packet);
+			output.flush();
+		
+		} catch (IOException ioe)
+		{
+			Blackboard.broadcastMessage(new SystemMessage(null, "Special Send failed!"));
+		}	
+
+	}
+
+	/**
+	* Adds the ID that needs to be reconnected to the Reconnector
+	*
+	* @param id the player ID that lost connection
+	*/
+	public serializable void reconnect(int id)
+	{
+		Reconnector.getInstance(this).addID(id);
+	}
+
+	/**
+	* Removes ID that connected to us from Reconnector
+	*
+	* @param id the player ID the connected
+	*/
+	public serializable void connected(int id)
+	{
+		Reconnector.getInstance(this).removeID(id);
+	}
+
+	/**
+	* Check to see if there is any connections to send to
+	*
+	* @return true if there is connections false otherwhise
+	*/
+	private boolean isConnected()
+	{
+		if (this.sockets.isEmpty()) {
+			Blackboard.broadcastMessage(new SystemMessage(null, "No connections found"));
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	* Retrive the internatl IP from the local host.
 	*
@@ -308,14 +442,8 @@ public class ConnectionNetworking
 	*/
 	private final Inet4Address getInternalIP()
 	{
-		try
-		{
-			this.internalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getLocalIP());
-		} catch (UnknownHostException uhe)
-		{
-			this.internalIP = null;
-		}
 
+		this.internalIP = Toolkit.getLocalIP();
 		return this.internalIP;
 	}
 	
@@ -328,24 +456,8 @@ public class ConnectionNetworking
 	*/
 	private Inet4Address getExternalIP()
 	{
-		Date current = new Date();
-		// 300'000 seconds = 5 minutes. note parantecis is more for clarity then function
-		if ((this.externalIP != null) && (this.lastUpdate != null) && (current.getTime() < (this.lastUpdate.getTime() + 300000)))
-			return this.externalIP;	
-		else
-		{
-			try {
-			        this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
-				return this.externalIP;
-
-			} catch (Exception err)
-			{
-				this.externalIP = null;
-				Blackboard.broadcastMessage(new SystemMessage(null, "Error: Couldn't retrive external IP address:" + err));
-				return null;
-			}
-			
-		}
+		this.externalIP = (Inet4Address)Inet4Address.getByName(Toolkit.getPublicIP());
+		return this.externalIP;	
 	}
 
 	/**
