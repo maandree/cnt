@@ -7,6 +7,8 @@
  */
 package cnt.network;
 import cnt.messages.*;
+import cnt.game.*;
+import cnt.util.*;
 import cnt.*; //Blackboard class to send messages with
 
 import java.util.*;
@@ -61,10 +63,10 @@ public class Reconnector
 		synchronized (Reconnector.class)
 		{
 		    if (instance == null)
-			this.instance = new Reconnector(connectionNetworking);
+			instance = new Reconnector(connectionNetworking);
 		}
 	    
-	    return this.instance;
+	    return instance;
 	}
 
 	/**

@@ -130,7 +130,7 @@ public class ConnectionNetworking
 			
 			
 			// By now we should have our ID and the ID from the host we connected to
-			if (this.foreignID =! null)
+			if (this.foreignID != null)
 			{
 				this.outputs.put(this.foreignID, output);
 				TCPReceiver receiver = new TCPReceiver(connection, input, this.gameNetworking, this);

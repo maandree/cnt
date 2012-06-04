@@ -7,12 +7,21 @@
  */
 package cnt.network;
 
+import java.io.*;
+
 
 /**
  * Abstract message
  */
-public abstract class NetworkMessage
+public abstract class NetworkMessage implements Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * Constructor
      * 

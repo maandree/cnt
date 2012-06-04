@@ -7,12 +7,21 @@
  */
 package cnt.network;
 
+import java.io.*;
+
 
 /**
  * Message sent to all players
  */
 public class Broadcast extends NetworkMessage
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * Constructor
      * 

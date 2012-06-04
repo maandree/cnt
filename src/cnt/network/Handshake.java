@@ -5,6 +5,8 @@
  * 
  * Project for prutt12 (DD2385), KTH.
  */
+package cnt.network;
+
 public class Handshake extends NetworkMessage
 {
 

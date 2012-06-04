@@ -8,13 +8,21 @@
 package cnt.network;
 
 import java.util.*;
+import java.io.*;
 
 
 /**
  * Packet with a message, urgent flag and infrastructure data
  */
-public class Packet implements Comparable<Packet>
+public class Packet implements Comparable<Packet>, Serializable
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
+    
+    
+    
     /**
      * Constructor
      * 
@@ -24,24 +32,26 @@ public class Packet implements Comparable<Packet>
     public Packet(final NetworkMessage message, final boolean urgent)
     {
 	this.message = message;
-	this.urget = urgent;
+	this.urgent = urgent;
 	this.uuid = UUID.randomUUID();
 	this.sentTo = new int[] { message.getSender() };
     }
+    
     
     /**
      * Constructor
      * 
      * @param  message  The message with sender and possibly receiver or receivers
      * @param  urgent   Whether the message is urgent
-     * @param  sentTo   The ID:s of everyone how have got the packet and is currently getting the packet, the local user should be included
+     * @param  sentTo   The ID:s of everyone how have got the packet and is currently getting the packet
      */
     public Packet(final NetworkMessage message, final boolean urgent, final int... sentTo)
     {
 	this.message = message;
-	this.urget = urgent;
+	this.urgent = urgent;
 	this.uuid = UUID.randomUUID();
 	Arrays.sort(this.sentTo = sentTo);
+	addHasGotPacket(message.getSender());
     }
     
     
@@ -174,10 +184,10 @@ public class Packet implements Comparable<Packet>
 	
 	pos = ~pos;
 	
-	final int[] ids = new int[this.sendTo.length + 1];
-	System.arraycopy(ids, 0, this.sendTo, 0, pos);
-	System.arraycopy(ids, pos + 1, this.sendTo, pos + 1, this.sendTo.length - pos - 1);
-	(this.sendTo = ids)[pos] = id;
+	final int[] ids = new int[this.sentTo.length + 1];
+	System.arraycopy(ids, 0, this.sentTo, 0, pos);
+	System.arraycopy(ids, pos + 1, this.sentTo, pos + 1, this.sentTo.length - pos - 1);
+	(this.sentTo = ids)[pos] = id;
 	
 	return true;
     }
