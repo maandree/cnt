@@ -30,7 +30,9 @@ public class Launcher
      */
     public static void launch(final String... args)
     {
-	//......
+	new PlayerRing();
+	
+	//......... create stack ..........//
     }
     
 }
