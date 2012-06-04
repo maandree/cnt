@@ -108,8 +108,7 @@ public class Reconnector
 				{   return;
 				}
 			    }
-			ACDLinkedList<Player> playerRing = PlayerRing.getRing();
-	
+			
 			if (this.deadIDs.contains(this.connectionNetowkring.foreignID))
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
@@ -119,7 +118,7 @@ public class Reconnector
 				if (connection == null)
 				{
 					//* We couldn't connect so we dop the player
-					Blackboard.broadcastMessage(new PlayerDropped(playerRing.get(id)));
+				        Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
 					this.deadIDs.remove(id);
 					continue;
 				}
@@ -136,7 +135,7 @@ public class Reconnector
 				} catch (Exception err) {
 					if (this.connectionNetworking.isServer)
 					{
-						Blackboard.broadcastMessage(new PlayerDropped(playerRing.get(id)));
+						Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
 						this.deadIDs.remove(id);
 					} else
 					{

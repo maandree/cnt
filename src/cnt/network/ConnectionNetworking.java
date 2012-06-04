@@ -332,8 +332,13 @@ public class ConnectionNetworking
 		if (!this.isConnected()) {
 			return;
 		}
-
-		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
+		
+		final Set<Integer> keySet = this.outputs.keySet();
+		final Integer[] _playerIDs = new Integer[keySet.size()];
+		this.outputs.keySet().toArray(_playerIDs);
+		final int[] playerIDs = new int[_playerIDs.length];
+		for (int i = 0, n = playerIDs.length; i < n; i++)
+		    playerIDs[i] = _playerIDs[i];
 
 		ArrayList<Integer> sendList = new ArrayList<Integer>();
 
@@ -378,7 +383,12 @@ public class ConnectionNetworking
 	{
 		
 		// Get the players we have connections to so we know who we send to
-		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
+		final Set<Integer> keySet = this.outputs.keySet();
+		final Integer[] _playerIDs = new Integer[keySet.size()];
+		this.outputs.keySet().toArray(_playerIDs);
+		final int[] playerIDs = new int[_playerIDs.length];
+		for (int i = 0, n = playerIDs.length; i < n; i++)
+		    playerIDs[i] = _playerIDs[i];
 		
 		int[] sentTo = Array.copyOf(playerIDs, playerIDs.length + 1);
 		sentTo[sentTo.length - 1] = this.localID;
