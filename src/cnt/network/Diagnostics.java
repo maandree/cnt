@@ -21,11 +21,33 @@ import java.util.*;
  */
 public class Diagnostics
 {
-    public static String run()
+    /**
+     * Non-constructor
+     */
+    private Diagnostics()
     {
-	return run(0, 10_000);
+        assert false : "You may not create instances of this class [Diagnostics].";
     }
     
+    
+    
+    /**
+     * Runs a network diagnostics
+     * 
+     * @return  A tree structured string, where each identent is one space
+     */
+    public static String run()
+    {
+	return run(0, 5_000);
+    }
+    
+    /**
+     * Runs a network diagnostics
+     * 
+     * @param   ttl      Connection time to live, 0 for default
+     * @param   timeout  Connection timeout is milliseconds
+     * @return           A tree structured string, where each identent is one space
+     */
     public static String run(final int ttl, final int timeout)
     {
 	final StringBuilder buf = new StringBuilder();
