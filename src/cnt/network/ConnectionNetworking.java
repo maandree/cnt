@@ -110,6 +110,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    HandshakeAnswer answer = null;
 	    try
 	    {   answer = (HandshakeAnswer)(input.readObject());
+		this.foreignID = answer.server;
+		PacketFactory.setID(this.localID = answer.client);
 	    }
 	    catch (Exception err)
 	    {   if (this.isServer)
@@ -140,6 +142,23 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
     
+    
+    /**
+     * Initialiser
+     */
+    {
+	Runtime.getRuntime().addShutdownHook(new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    public void run()
+		    {
+			if (ConnectionNetworking.this.upnpKit == null)
+			    ConnectionNetworking.this.upnpKit.removePortForward();
+		    }
+	        });
+    }
 
 
     /**
@@ -160,7 +179,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * Local players ID, needed before local Player can be created
      */
-    public final int localID;
+    public int localID;
 
     /**
      * Foreign players ID, needed before local Player can be created
@@ -210,7 +229,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * UPnP tool kit
      */
-    private UPnPKit upnpKit;
+    private UPnPKit upnpKit = null;
     
     /**
      * Set of all used IDs
