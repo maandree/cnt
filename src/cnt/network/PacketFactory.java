@@ -70,7 +70,7 @@ public class PacketFactory
      */
     public Packet createUnicast(final int to, final Serializable message, final boolean urgent, final int... sentTo)
     {
-	return new Packet(to, new Whisper(this.id, message), urgent, sentTo);
+	return new Packet(new Whisper(this.id, to, message), urgent, sentTo);
     }
     
 }
