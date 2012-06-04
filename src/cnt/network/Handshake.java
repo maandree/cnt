@@ -1,4 +1,11 @@
-public class Handshake implements NetworkMessage
+/**
+ * Coop Network Tetris — A cooperative tetris over the Internet.
+ * 
+ * Copyright © 2012  Calle Lejdbrandt, Mattias Andrée, Peyman Eshtiagh
+ * 
+ * Project for prutt12 (DD2385), KTH.
+ */
+public class Handshake extends NetworkMessage
 {
 
 	/**

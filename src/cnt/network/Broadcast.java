@@ -1,38 +1,24 @@
-import cnt.Blackboard;
+/**
+ * Coop Network Tetris — A cooperative tetris over the Internet.
+ * 
+ * Copyright © 2012  Calle Lejdbrandt, Mattias Andrée, Peyman Eshtiagh
+ * 
+ * Project for prutt12 (DD2385), KTH.
+ */
+package cnt.network;
 
-public class Broadcast implements NetworkMessage
+
+public class Broadcast extends NetworkMessage
 {
-
-	/**
-	* Constructor encaupsuling a BlackboardMessage as a broadcast to all clients
-	*
-	* @param from ID of sender
-	* @param message the BlackboardMessage to send
-	*/
-	public Broadcast(int from, BlackboardMessage message)
-	{
-		this.from = from;
-		this.message = message;
-		this.messageTxt = message.toString();
-	}
-
-	protected final int from;
-	protected final BlackboardMessage message;
-	public final String messageTxt;
-	
-	public String getMessageTxt()
-	{
-		return this.messageTxt;
-	}
-
-	public int getSender()
-	{
-		return this.from;
-	}
-
-	public BlackboardMessage getMessage()
-	{
-		return this.message;
-	}
-
+    /**
+     * Constructor
+     * 
+     * @param  from     The ID of the player whom sent the message
+     * @param  message  The message
+     */
+    public Broadcast(final int from, final Serializable message)
+    {
+	super(from, message);
+    }
+    
 }

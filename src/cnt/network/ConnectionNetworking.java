@@ -1,14 +1,11 @@
 /**
  * Coop Network Tetris — A cooperative tetris over the Internet.
  * 
- * Copyright Ⓒ 2012  Mattias Andrée, Peyman Eshtiagh,
- *                   Calle Lejdbrandt, Magnus Lundberg
- *
+ * Copyright © 2012  Calle Lejdbrandt, Mattias Andrée, Peyman Eshtiagh
+ * 
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
-
-// Blackboardclass to send messages with
 import cnt.Blackboard;
 import cnt.messages.*;
 import cnt.game.Player;
@@ -33,14 +30,14 @@ import java.net.*;
 
 
 /**
-* Connection Networking layer
-*<p>
-* This class sets up the sockets to be used by the client. 
-* Provides socket sockets for higher levels of networking.
+* <p>Connection Networking layer</p>
+* <p>
+*   This class sets up the sockets to be used by the client. 
+*   Provides socket sockets for higher levels of networking.
+* </p>
 *
-* @author Calle Lejdbrandt, <a href="callel@kth.se">callel@kth.se</a>
+* @author Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
-
 public class ConnectionNetworking
 {
 	/**
@@ -306,7 +303,7 @@ public class ConnectionNetworking
 		sentTo[sentTo.length - 1] = this.localID;
 		
 		
-		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo);
+		Packet packet = new Packet(message, urgent, sentTo);
 
 		for (int id : playerIDs)
 		{
@@ -350,7 +347,7 @@ public class ConnectionNetworking
 				sendList.add(Integer.valueOf(id));
 		}
 		
-		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sendList.toArray(new int[0]));
+		Packet packet = new Packet(message, urgent, 0);
 
 		for (int id : playerIDs)
 		{
@@ -386,7 +383,7 @@ public class ConnectionNetworking
 		int[] sentTo = Array.copyOf(playerIDs, playerIDs.length + 1);
 		sentTo[sentTo.length - 1] = this.localID;
 
-		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo);
+		Packet packet = new Packet(message, urgent, sentTo);
 		try 
 		{
 			output.writeObject(packet);

@@ -1,9 +1,8 @@
 /**
  * Coop Network Tetris — A cooperative tetris over the Internet.
  * 
- * Copyright Ⓒ 2012  Mattias Andrée, Peyman Eshtiagh,
- *                   Calle Lejdbrandt, Magnus Lundberg
- *
+ * Copyright © 2012  Calle Lejdbrandt, Mattias Andrée, Peyman Eshtiagh
+ * 
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
@@ -18,6 +17,7 @@ import java.io.*;
 
 // Classes needed for UDP socket
 import java.net.*;
+
 
 /**
 * The TCP Server listening for inkomming connections

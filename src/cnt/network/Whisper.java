@@ -1,45 +1,45 @@
-import cnt.Blackboard;
+/**
+ * Coop Network Tetris — A cooperative tetris over the Internet.
+ * 
+ * Copyright © 2012  Calle Lejdbrandt, Mattias Andrée, Peyman Eshtiagh
+ * 
+ * Project for prutt12 (DD2385), KTH.
+ */
+package cnt.network;
 
-public class Whisper implements NetworkMessage
+
+public class Whisper extends NetworkMessage
 {
-
-	/**
-	* Constructor encaupsuling a BlackboardMessage as a whisper to a specefic client
-	*
-	* @param from ID of sender
-	* @param to Id of reciver
-	* @param message the BlackboardMessage to send
-	*/
-	public Whisper(int from, int to, BlackboradMessage message)
-	{
-		this.from = from;
-		this.to = to;
-		this.message = message;
-		this.messageTxt = message.toString();
-	}
-
-	protected final int from, to;
-	protected final BlackboardMessage message;
-	public final String messageTxt;
-	
-	public String getMessageTxt()
-	{
-		return this.messageTxt;
-	}
-
-	public int getSender()
-	{
-		return this.from;
-	}
-
-	public int getReciver()
-	{
-		return this.to;
-	}
-
-	public BlackboardMessage getMessage()
-	{
-		return this.message;
-	}
+    /**
+     * Constructor
+     * 
+     * @param  from     The ID of the player whom sent the message
+     * @param  to       The ID of the playerto whom the message is sent
+     * @param  message  The message
+     */
+    public Whisper(final int from, final int to, final Serializable message)
+    {
+	super(from, message);
+	this.to = to;
+    }
+    
+    
+    
+    /**
+     * The ID of the player to whom the message is sent
+     */
+    protected int to;
+    
+    
+    
+    /**
+     * Gets the ID of the player to whom the message is sent
+     * 
+     * @return  The ID of the player to whom the message is sent
+     */
+    public int getReceiver()
+    {
+	return this.to;
+    }
 
 }
