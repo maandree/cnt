@@ -7,7 +7,8 @@
  */
 package cnt.network;
 
-public class Handshake extends NetworkMessage
+
+public class Handshake implements ConnectionMessage
 {
     /**
      * Compatibility versioning for {@link Serializable}
@@ -15,6 +16,13 @@ public class Handshake extends NetworkMessage
     private static final long serialVersionUID = 1L;
 
     
+	/**
+	* Constructor taking an ID as param, ID &lt; 0 is asking for a new id
+	*/
+	public Handshake()
+	{
+	    this(-1);
+	}
     
 	/**
 	* Constructor taking an ID as param, ID &lt; 0 is asking for a new id
@@ -26,20 +34,22 @@ public class Handshake extends NetworkMessage
 		this.id = id;
 		
 		if (id < 0)
-			this.messageTxt = "Asking for new ID";
+			this.messageText = "Asking for new ID";
 		else
-			this.messageTxt = "Telling remote host my ID";
+			this.messageText = "Telling remote host my ID";
 	}
 
     
     
-	public final String messageTxt;
+    public final int id;
+    
+	public final String messageText;
 
     
     
-	public String getMessageTxt()
+    public String toString()
 	{
-		return this.messageTxt;
+		return this.messageText;
 	}
 
 }

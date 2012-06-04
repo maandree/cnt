@@ -109,7 +109,7 @@ public class Reconnector
 				}
 			    }
 			
-			if (this.deadIDs.contains(this.connectionNetowkring.foreignID))
+			if (this.deadIDs.contains(this.connectionNetworking.foreignID))
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
 				

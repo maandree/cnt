@@ -111,7 +111,7 @@ public class ConnectionNetworking
 			ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 
 			// Handshake(ID (0< if asking), urgent?, ObjectOutputStream)
-			this.send( new Handshake(-1), true, output );
+			this.send( new Handshake(), true, output );
 	
 			// Get answer
 			HandshakeAnswer answer = null;
