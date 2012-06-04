@@ -51,17 +51,17 @@ elif [[ $1 = "chat" ]]; then
 #    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
 
 elif [[ $1 = "game" ]]; then
-    stty -icanon
+#    stty -icanon
     javaSeven -ea -cp bin$jars cnt.demo.GameDemo
-    stty icanon
+#    stty icanon
 
 elif [[ $1 = "replay" ]]; then
     javaSeven -ea -cp bin$jars cnt.Replayer /dev/shm/recording.cnt
 
 elif [[ $1 = "peergame" ]]; then
-    stty -icanon
+#    stty -icanon
     javaSeven -ea -cp bin$jars cnt.demo.PeerGameDemo $2 $3 $4 $5 $6
-    stty icanon
+#    stty icanon
 
 #elif [[ $1 = "netgame" ]]; then
 #    stty -icanon

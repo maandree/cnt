@@ -32,7 +32,9 @@ public class Program
      */
     public static void main(final String... args)
     {
-	System.out.println("Not implemented");
+	cnt.game.Launcher.launch(args);
+	cnt.interaction.Launcher.launch(args);
+	//cnt.network.Launcher.launch(args);
     }
     
 }
