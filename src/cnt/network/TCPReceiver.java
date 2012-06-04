@@ -17,61 +17,68 @@ import java.net.*;
 /**
 * The TCP handler for an incoming connection
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 public class TCPReceiver implements Runnable
 {
-	/**
-	* Constructor - takes the incoming connection and an instance of GameNetworking and an instance of ConnectionNetworking
-	*
-	* @param connection the incoming connection as a Socket
-	* @param gameNetworking the GameNetworking instance to use for callback
-	* @param connectionNetworking the ConnectionNetworking instace to map peer and socket in
-	*/
-	public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
-	{
-		this.connection = connection;
-		this.gameNetworking = gameNetworking;
-		this.connectionNetworking = connectionNetworking;
+    /**
+     * Constructor 
+     *
+     * @param  connection            The incoming connection as a socket
+     * @param  gameNetworking        The {@link GameNetworking} instance to use for callback
+     * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
+     */
+    public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+    {
+	this.connection = connection;
+	this.gameNetworking = gameNetworking;
+	this.connectionNetworking = connectionNetworking;
+    }
 
-	}
+    /**
+     * Constructor
+     *
+     * @param  connection            The incoming connection as a socket
+     * @param  stream                The {@link ObjectInputStream} to use
+     * @param  gameNetworking        The {@link GameNetworking} instance to use for callback
+     * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
+     */
+    public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
+    {
+	this.connection = connection;
+	this.input = stream;
+	this.gameNetworking = gameNetworking;
+	this.connectionNetworking = connectionNetworking;
 
-	/**
-	* Constructor - takes the incoming connection and a an incomming stream and an instance of GameNetworking and an instance of ConnectionNetworking
-	*
-	* @param connection the incoming connection as a Socket
-	* @param stream the ObjectInputStream to use
-	* @param gameNetworking the GameNetworking instance to use for callback
-	* @param connectionNetworking the ConnectionNetworking instace to map peer and socket in
-	*/
-	public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
-	{
-		this.connection = connection;
-		this.input = stream;
-		this.gameNetworking = gameNetworking;
-		this.connectionNetworking = connectionNetworking;
-
-	}
-	/**
-	* the Socket to use for incoming streams
-	*/
-	private final Socket connection;
+    }
+    
+    
+    
+    /**
+     * the Socket to use for incoming streams
+     */
+    private final Socket connection;
 	
-	/**
-	* the GameNetworking instance to send objects to
-	*/
-	private final GameNetworking gameNetworking;
+    /**
+     * the GameNetworking instance to send objects to
+     */
+    private final GameNetworking gameNetworking;
 	
-	/**
-	* the ConnectionNetworking instance to map incoming connections to
-	*/
-	private final ConnectionNetworking connectionNetworking;
+    /**
+     * the ConnectionNetworking instance to map incoming connections to
+     */
+    private final ConnectionNetworking connectionNetworking;
 
-	/**
-	* the ObjectIntputStream to use
-	*/
-	private final ObjectInputStream input;
-
+    /**
+     * the ObjectIntputStream to use
+     */
+    private final ObjectInputStream input;
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
 	public void run()
 	{
 		try

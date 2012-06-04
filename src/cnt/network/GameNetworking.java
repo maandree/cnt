@@ -23,22 +23,15 @@ public class GameNetworking
     /**
      * Constructor
      * 
-     * @param  objectNetworking  The next layer in the protocol stack
-     * @param  blackboardNetworkin The previous layer in the protocol stack
+     * @param  blackboardNetworking  The previous layer in the protocol stack
      */
     public GameNetworking(final BlackboardNetworking blackboardNetworking)
     {
 	this.blackboardNetworking = blackboardNetworking;
-	this.objectNetworking = new ObjectNetworking(this);
     }
     
     
     
-    /**
-     * The next layer in the protocol stack
-     */
-    public final ObjectNetworking objectNetworking;
-
     /**
      * The previous layer in the protocol stack
      */
@@ -98,12 +91,11 @@ public class GameNetworking
     public Integer receive(Serializable object)
     {
 	try 
-	{
-        	return this.blackboardNetworking.receiveAndBroadcast(object);
-	} catch (Exception err)
-	{
-		//TODO: fix error handling
-		return null;
+	{   return this.blackboardNetworking.receiveAndBroadcast(object);
+	}
+	catch (Exception err)
+	{   //TODO: fix error handling
+	    return null;
 	}
     }
     

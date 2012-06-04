@@ -17,47 +17,56 @@ import java.net.*;
 /**
 * The TCP handler for sending outgoing serialized objects
 * 
-* @author Calle Lejdbrandt <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
 */
 public class TCPSender implements Runnable
 {
-	/**
-	* Constructor - takes a Socket and a Serialized objcet to send
-	*
-	* @param socket the socket to send to
-	* @param message the serialized object to send
-	*/
-	public TCPSender(ObjectOutputStream out, Serializable message) throws IOException
+    /**
+     * Constructor
+     *
+     * @param  out      The socket output stream to which to send
+     * @param  message  The serialized object to send
+     */
+    public TCPSender(ObjectOutputStream out, Serializable message) throws IOException
+    {
+	this.out = out;
+	this.message = message;
+    }
+    
+    
+    
+    /**
+     * ObjectOutputStream to use for sending
+     */
+    private final ObjectOutputStream out;
+    
+    /**
+     * Message to be sent
+     */
+    private final Serializable message;
+    
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void run()
+    {
+	try
 	{
-		this.out = out;
-		this.message = message;
-		
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Starting output stream"));
+	    ObjectOutputStream out = this.out;
+	     
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Starting wirte"));
+	     
+	    out.writeObject(message);
+	    out.flush();
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Finnished sending"));
 	}
-	
-	/**
-	* ObjectOutputStream to use for sending
-	*/
-	ObjectOutputStream out;
-	
-	/**
-	* Message to be sent
-	*/
-	Serializable message;
-	
-	public void run()
+	catch (Exception err)
 	{
-		try {
-			Blackboard.broadcastMessage(new SystemMessage(null, "Starting output stream"));
-			ObjectOutputStream out = this.out;
-
-			Blackboard.broadcastMessage(new SystemMessage(null, "Starting wirte"));
-	
-			out.writeObject(message);
-			out.flush();
-			Blackboard.broadcastMessage(new SystemMessage(null, "Finnished sending"));
-		} catch (Exception err)
-		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "Error Sending"));
-		}
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Error Sending"));
 	}
+    }
+    
 }	
