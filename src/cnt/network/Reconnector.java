@@ -7,12 +7,12 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
-
-// Blackboardclass to send messages with
-import cnt.Blackboard;
 import cnt.messages.*;
+import cnt.*; //Blackboard class to send messages with
 
-impoty java.util.*;
+import java.util.*;
+import java.io.*;
+
 
 public class Reconnector
 {
@@ -26,6 +26,8 @@ public class Reconnector
 		this.reconnect();
 	}
 	
+    
+    
 	/**
 	* The instance of the Reconnector
 	*/
@@ -35,29 +37,34 @@ public class Reconnector
 	* ConnectionNetworking instance to use
 	*/
 	private final ConnectionNetworking connectionNetworking;
+    
 	/**
 	* Monitor object to use for internal monitoring
 	*/
-	private Object montior = new Object();
+	private final Object montior = new Object();
 
 	/**
 	* Set of IDs for the connections that are dead and we need to reconnect,
 	*/
 	private HashSet<Integer> deadIDs = new HashSet<Integer>();
+    
+    
+    
 	/**
 	* Method to get the instance of Reconnector
 	*
 	* @return the Reconnector instance
 	*/
-	public static getInstance(ConnectionNetworking connectionNetworking)
+	public static Reconnector getInstance(ConnectionNetworking connectionNetworking)
 	{
-		if (instance != null)
-			return this.instance;
-		else
+	    if (instance == null)
+		synchronized (Reconnector.class)
 		{
+		    if (instance == null)
 			this.instance = new Reconnector(connectionNetworking);
-			return this.instance;
 		}
+	    
+	    return this.instance;
 	}
 
 	/**
@@ -65,16 +72,18 @@ public class Reconnector
 	*
 	* @param id Player id to add to the set
 	*/
-	public serializable void addID(int id)
+	public synchronized void addID(int id)
 	{
-		this,deadIDs.add(id);
-		this.monitor.notify();
+		this.deadIDs.add(id);
+		synchronized (monitor)
+		{   this.monitor.notify();
+		}
 	}
 
 	/**
 	* Remove an ID discovered to be connected again.
 	*/
-	public serializable void removeID(int id)
+	public synchronized void removeID(int id)
 	{
 		if (this.deadIDs.contains(id))
 			this.deadIDs.remove(id);
@@ -83,12 +92,20 @@ public class Reconnector
 	/**
 	* Start trying to reconnect to IDs in the list.
 	*/
-	protected serializable void reconnect()
+	protected synchronized void reconnect()
 	{
 		while (true)
 		{
 			if (this.deadIDs.isEmpty())
-				monitor.wait()
+			    synchronized (monitor)
+			    {
+				try
+				{   monitor.wait();
+				}
+				catch (final InterruptedException err)
+				{   return;
+				}
+			    }
 			ACDLinkedList<Player> playerRing = PlayerRing.getRing();
 	
 			if (this.deadIDs.contains(this.connectionNetowkring.foreignID))
@@ -96,12 +113,12 @@ public class Reconnector
 				int id = this.connectionNetworking.foreignID; // less to type
 				
 				Socket dead = this.connectionNetworking.connections.get(id);
-				Socket connection = new this.connectionNetworking.connect(dead.getLocalHostAddress(), dead.getLocalPort(), true);
+				Socket connection = this.connectionNetworking.connect(dead.getLocalHostAddress(), dead.getLocalPort(), true);
 				if (connection == null)
 				{
 					//* We couldn't connect so we dop the player
 					Blackboard.broadcastMessage(new PlayerDroped(playerRing.get(id)));
-					this.deadIDs.remove(id)
+					this.deadIDs.remove(id);
 					continue;
 				}
 				
@@ -122,3 +139,4 @@ public class Reconnector
 					} else
 					{
 						
+}}}}}}

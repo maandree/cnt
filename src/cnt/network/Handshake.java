@@ -13,7 +13,7 @@ public class Handshake implements NetworkMessage
 		if (id < 0)
 			this.messageTxt = "Asking for new ID";
 		else
-			this,messageTxt = "Telling remote host my ID";
+			this.messageTxt = "Telling remote host my ID";
 	}
 
 	public final String messageTxt;

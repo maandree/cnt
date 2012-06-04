@@ -3,10 +3,13 @@ interface NetworkMessage
 	/**
 	* String representation of the message
 	*/
-	String messageTxt;
+	String messageText = null;
 
 	/**
 	* Get human readable version of message
 	*/
-	getMessageTxt();
+        public String getMessageText()
+    {
+	return this.messageText;
+    }
 }

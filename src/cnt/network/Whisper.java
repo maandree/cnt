@@ -10,7 +10,7 @@ public class Whisper implements NetworkMessage
 	* @param to Id of reciver
 	* @param message the BlackboardMessage to send
 	*/
-	public Handshake(int from, int to, BlackboradMessage message)
+	public Whisper(int from, int to, BlackboradMessage message)
 	{
 		this.from = from;
 		this.to = to;

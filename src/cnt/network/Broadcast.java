@@ -9,7 +9,7 @@ public class Broadcast implements NetworkMessage
 	* @param from ID of sender
 	* @param message the BlackboardMessage to send
 	*/
-	public Handshake(int from, BlackboradMessage message)
+	public Broadcast(int from, BlackboradMessage message)
 	{
 		this.from = from;
 		this.message = message;

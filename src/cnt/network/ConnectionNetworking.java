@@ -90,7 +90,7 @@ public class ConnectionNetworking
 	*
 	* @param port the port to make the connection to
 	*/
-	public serializable ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
+	public synchronized ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
 	{
 
 		this.gameNetworking = gameNetworking;
@@ -298,7 +298,7 @@ public class ConnectionNetworking
 	public void send(NetworkMessage message, boolean urgent)
 	{ 
 		if (!this.isConnected()) {
-			return
+		    return;
 		}
 		// Get the players we have connections to so we know who we send to
 		int[] playerIDs = this.outputs.keySet().toArray(new int[0]);
@@ -307,7 +307,7 @@ public class ConnectionNetworking
 		sentTo[sentTo.length - 1] = this.localID;
 		
 		
-		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo)
+		Packet packet = new Packet(message, urgent, UUID.fromString(this.getExternalIP() + this.getInternalIP()), sentTo);
 
 		for (int id : playerIDs)
 		{
@@ -320,6 +320,7 @@ public class ConnectionNetworking
 				System.err.println("\n\nError sending message to [" + id + "]: Skipping, he will get it in the full update he gets when he reconnects\n");
 				if (id < this.localID)
 					this.reconnect(id);
+			}
 		}
 	}
 
@@ -404,7 +405,7 @@ public class ConnectionNetworking
 	*
 	* @param id the player ID that lost connection
 	*/
-	public serializable void reconnect(int id)
+	public synchronized void reconnect(int id)
 	{
 		Reconnector.getInstance(this).addID(id);
 	}
@@ -414,7 +415,7 @@ public class ConnectionNetworking
 	*
 	* @param id the player ID the connected
 	*/
-	public serializable void connected(int id)
+	public synchronized void connected(int id)
 	{
 		Reconnector.getInstance(this).removeID(id);
 	}
@@ -440,7 +441,7 @@ public class ConnectionNetworking
 	*
 	* @return internal ip
 	*/
-	private final Inet4Address getInternalIP()
+	private Inet4Address getInternalIP()
 	{
 
 		this.internalIP = Toolkit.getLocalIP();
