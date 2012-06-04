@@ -8,6 +8,9 @@
 package cnt.network;
 
 
+/**
+ * Message sent to exactly one player
+ */
 public class Whisper extends NetworkMessage
 {
     /**

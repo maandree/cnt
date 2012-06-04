@@ -10,6 +10,9 @@ package cnt.network;
 import java.util.*;
 
 
+/**
+ * Packet with a message, urgent flag and infrastructure data
+ */
 public class Packet implements Comparable<Packet>
 {
     /**

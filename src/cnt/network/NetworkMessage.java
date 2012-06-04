@@ -8,6 +8,9 @@
 package cnt.network;
 
 
+/**
+ * Abstract message
+ */
 public abstract class NetworkMessage
 {
     /**

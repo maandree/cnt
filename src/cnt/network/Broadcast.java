@@ -8,6 +8,9 @@
 package cnt.network;
 
 
+/**
+ * Message sent to all players
+ */
 public class Broadcast extends NetworkMessage
 {
     /**
