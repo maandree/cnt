@@ -71,7 +71,7 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
 	    else if (message instanceof EmergencyPause)     this.gameNetworking.forward(message);
 	    else if (message instanceof EngineShapeUpdate)  this.gameNetworking.forward(message);
 	    else if (message instanceof EngineUpdate)       this.gameNetworking.forward(message);
-	    else if (message instanceof FullUpdate)         this.gameNetworking.forward(message);
+	    else if (message instanceof FullUpdate)         ; /* Do nothing */
 	    else if (message instanceof GameOver)           this.gameNetworking.forward(message);
 	    else if (message instanceof GamePlayCommand)    ; /* Do nothing */
 	    else if (message instanceof GameScore)          this.gameNetworking.forward(message);
