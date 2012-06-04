@@ -34,7 +34,7 @@ public class Program
     {
 	cnt.game.Launcher.launch(args);
 	cnt.interaction.Launcher.launch(args);
-	//cnt.network.Launcher.launch(args);
+	cnt.network.Launcher.launch(args);
     }
     
 }
