@@ -125,7 +125,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    if (this.foreignID != -1)
 	    {
 		this.outputs.put(this.foreignID, output);
-		TCPReceiver receiver = new TCPReceiver(connection, input, this.gameNetworking, this);
+		TCPReceiver receiver = new TCPReceiver(connection, input, this);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
@@ -280,7 +280,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	if (save) //This is mainly for the first connection out, we don't want to start a listener until we now what ID to map it to 
         {
-	    TCPReceiver receiver = new TCPReceiver(connection, this.gameNetworking, this);
+	    TCPReceiver receiver = new TCPReceiver(connection, this);
 	    Thread t = new Thread(receiver);
 	    t.start();
 	}

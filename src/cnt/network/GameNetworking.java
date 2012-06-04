@@ -111,8 +111,8 @@ public class GameNetworking
 	{   this.blackboardNetworking.receiveAndBroadcast(object);
 	}
 	catch (Exception err)
-	{   //TODO: fix error handling
-	    return null;
+	{
+	    return; 
 	}
     }
     

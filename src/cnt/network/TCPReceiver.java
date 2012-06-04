@@ -9,6 +9,7 @@ package cnt.network;
 import cnt.Blackboard;
 import cnt.Blackboard.*;
 import cnt.messages.*;
+import cnt.game.Player;
 
 import java.util.*;
 import java.io.*;
@@ -31,7 +32,7 @@ public class TCPReceiver implements Runnable
     public TCPReceiver(Socket connection, ConnectionNetworking connectionNetworking)
     {
 	
-	    this(connection, null, gameNetworking, connectionNetworking);
+	    this(connection, null, connectionNetworking);
     }
 
     /**
