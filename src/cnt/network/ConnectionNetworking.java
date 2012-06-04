@@ -183,18 +183,19 @@ public class ConnectionNetworking
     /**
      * Map of current threaded connections to use to store sockets
      */
-    final HashMap<Integer, Socket> sockets = new HashMap<Integer, Socket>();
-
+    public final HashMap<Integer, Socket> sockets = new HashMap<Integer, Socket>();
+    
     /**
      * The output stream to write to
      */
-    final HashMap<Integer, ObjectOutputStream> outputs = new HashMap<Integer, ObjectOutputStream>();
-
+    public final HashMap<Integer, ObjectOutputStream> outputs = new HashMap<Integer, ObjectOutputStream>();
+    
     /**
-     * Map of current threaded connections to use to store {@link ObjectInputStream}s
+     * Map of current threaded connections to use to store ObjectInputStremas
      */
-    final HashMap<Integer, ObjectInputStream> inputs = new HashMap<Integer, ObjectInputStream>();
-
+    public final HashMap<Integer, ObjectInputStream> inputs = new HashMap<Integer, ObjectInputStream>();
+    
+    
     /**
      * The UPnP RemoteService being used for UPnP devices
      */

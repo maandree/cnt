@@ -41,7 +41,7 @@ public class Handshake implements ConnectionMessage
 
     
     
-    public final int id;
+    final int id;
     
 	public final String messageText;
 
@@ -51,5 +51,10 @@ public class Handshake implements ConnectionMessage
 	{
 		return this.messageText;
 	}
+
+    public int getID()
+    {
+	    return this.id;
+    }
 
 }
