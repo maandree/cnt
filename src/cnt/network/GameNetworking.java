@@ -53,7 +53,7 @@ public class GameNetworking
      */
     public void forward(final Serializable message) throws IOException
     {
-	this.objectNetworking.send(message);
+	this.connectionNetworking.send(message);
     }
     
     
@@ -88,10 +88,10 @@ public class GameNetworking
      * @throws  IOException             On networking exception
      * @throws  ClassNotFoundException  If the message type is not a part of the program
      */
-    public Integer receive(Serializable object)
+    public void receive(Serializable object)
     {
 	try 
-	{   return this.blackboardNetworking.receiveAndBroadcast(object);
+	{   this.blackboardNetworking.receiveAndBroadcast(object);
 	}
 	catch (Exception err)
 	{   //TODO: fix error handling

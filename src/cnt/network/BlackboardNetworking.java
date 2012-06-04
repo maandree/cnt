@@ -114,25 +114,9 @@ public class BlackboardNetworking implements Blackboard.BlackboardObserver
      * @throws  IOException             On networking exception
      * @throws  ClassNotFoundException  In the message type is not a part of the program
      */
-    public Integer receiveAndBroadcast(final Serializable object) throws IOException, ClassNotFoundException
+    public void receiveAndBroadcast(final Serializable object)
     {
-	System.err.println("Received forward: " + object);
-	if (object instanceof Blackboard.BlackboardMessage)
 	    broadcastMessage((Blackboard.BlackboardMessage)object);
-            
-	// First message should contain a Player object so we can get a color-number
-	if (object instanceof PlayerJoined)
-	{
-	    PlayerJoined message = (PlayerJoined)object;
-	    Player _player = message.player;
-	    return new Integer(_player.getID());
-	} else if (object instanceof ChatMessage)
-	{
-	    ChatMessage message = (ChatMessage)object;
-	    Player _player = message.player;
-	    return new Integer(_player.getID());
-	}else
-	    return null;	
     }
     
     /**

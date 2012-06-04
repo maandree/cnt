@@ -156,14 +156,13 @@ public class TCPReceiver implements Runnable
 		{
 			if (this.foreingID < this.connectionNetworking.localID)
 				this.connectionNetworking.reconnect(this.foreignID);
-		}
 		} catch (Exception err)
 		{
 			Blackboard.boradcastMessage(new PlayerDrop(Player.getInstance(this.foreignID)));
 			try
 			{
 				this.connection.close();
-			} catch (Exception)
+			} catch (Exception ierr)
 			{
 				// Do nothing
 			}
