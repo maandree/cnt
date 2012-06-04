@@ -9,7 +9,13 @@ package cnt.network;
 
 public class Handshake extends NetworkMessage
 {
+    /**
+     * Compatibility versioning for {@link Serializable}
+     */
+    private static final long serialVersionUID = 1L;
 
+    
+    
 	/**
 	* Constructor taking an ID as param, ID &lt; 0 is asking for a new id
 	*
@@ -25,8 +31,12 @@ public class Handshake extends NetworkMessage
 			this.messageTxt = "Telling remote host my ID";
 	}
 
+    
+    
 	public final String messageTxt;
-	
+
+    
+    
 	public String getMessageTxt()
 	{
 		return this.messageTxt;

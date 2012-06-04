@@ -19,7 +19,7 @@ import java.io.*;
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  */
-public class Player implements Serializable
+public class Player implements Comparable<Player>, Serializable
 {
     /**
      * Compatibility versioning for {@link Serializable}
@@ -337,8 +337,18 @@ public class Player implements Serializable
     /**
      * {@inheritDoc}
      */
-    public String toString() {
-	return ((this.name + " (") + (this.id + " → ") + (this.connectedTo + ", ")) + ((this.extip + "/") + (this.locip + ", ") + (this.dnses + ")"));
+    public int compareTo(final Player other)
+    {
+	return this.id < other.id ? -1 : this.id > other.id ? 1 : 0;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+	return this.name + " (" + this.id + " → " + this.connectedTo + ", " + this.extip + "/" + this.locip + ", " + this.dnses + ")";
     }
     
 }
