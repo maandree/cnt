@@ -33,7 +33,7 @@ public class NetworkDialogue extends JDialog
 	super(owner, "Network diagnostics", Dialog.ModalityType.MODELESS);
 	
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	//This.setLocationByPlatform(true);
+	this.setLocationByPlatform(true);
 	
 	this.pack();
 	this.setSize(new Dimension(400, 300));

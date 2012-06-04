@@ -178,6 +178,10 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 		(new FriendDialogue(this)).setVisible(true);
 	        break;
 		
+	    case "dnses":
+		(new DNSDialogue(this)).setVisible(true);
+	        break;
+		
 	    case "netdiag":
 		(new NetworkDialogue(this)).setVisible(true);
 	        break;

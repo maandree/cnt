@@ -7,7 +7,8 @@
        <
 
 "Players" >
-        "Friends"  id="friends"
+        "Friends"    id="friends"
+	"DNS names"  id="dnses"
         <
 
 "Help" >

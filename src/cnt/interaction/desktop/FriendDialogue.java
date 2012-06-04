@@ -34,7 +34,7 @@ public class FriendDialogue extends JDialog
 	super(owner, "Friends", Dialog.ModalityType.MODELESS);
 	
 	this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-	//This.setLocationByPlatform(true);
+	this.setLocationByPlatform(true);
 	
 	this.pack();
 	this.setSize(new Dimension(400, 600));
