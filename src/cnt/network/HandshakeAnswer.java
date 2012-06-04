@@ -34,11 +34,27 @@ public class HandshakeAnswer implements ConnectionMessage
     /**
      * The ID of the peer whom connected
      */
-    public final int client;
+    final int client;
     
     /**
      * The ID of the peer to whom was connected
      */
-    public final int server;
+    final int server;
+
+    /**
+     * Retrive client id
+     */
+    public int getClient()
+    {
+	    return this.client;
+    }
+
+    /**
+     * Retrive server id
+     */
+    public int getServer()
+    {
+	    return this.server;
+    }
 
 }

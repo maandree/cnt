@@ -30,9 +30,8 @@ public class TCPReceiver implements Runnable
      */
     public TCPReceiver(Socket connection, GameNetworking gameNetworking, ConnectionNetworking connectionNetworking)
     {
-	this.connection = connection;
-	this.gameNetworking = gameNetworking;
-	this.connectionNetworking = connectionNetworking;
+	
+	    this(connection, null, gameNetworking, connectionNetworking);
     }
 
     /**
@@ -72,7 +71,12 @@ public class TCPReceiver implements Runnable
     /**
      * the ObjectIntputStream to use
      */
-    private final ObjectInputStream input;
+    private ObjectInputStream input;
+
+    /**
+     * ID of connecting player
+     */
+    private int foreignID;
     
     
     
@@ -81,66 +85,88 @@ public class TCPReceiver implements Runnable
      */
 	public void run()
 	{
+		if (this.input == null)
+			this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
+		
+		/* prepair outgoing stream */
+		ObjectOutputStream output;
+
+		/* prepair id to map sockets and streams to */
+		int peer;
+
+		Packet packet = this.input.readObject();
+
+		/* Start sorting the packet */
 		try
 		{
-			if (this.input == null)
-				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
-			
-			/* prepair outgoing stream */
-			ObjectOutputStream output;
-
-			Packet packet = this.input.readObject();
-
-			/* Start sorting the packet */
 			if (packet.getMessage().getMessage() instanceof Handshake)
 			{
+				output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
+			
 				Handshake message = packet.getMessage().getMessage();
 				if (message.getID() < 0)
 				{
-					output = new ObjectOutpuStream(new BufferedOutputStream(this.connection.getOutputStream()));
-					int id = this.connetionNetworking.getHighestID() + 1;
-
-				
+					peer = this.connetionNetworking.getHighestID() + 1;
+					output.writeObject(new HandshakeAnswer(id, this.connectionNetworking.localID));
+					output.flush();
+				} else
+					peer = message.getID();
+			} else {
+				this.connection.close();
+				return;
 			}
-			
-			// Take ID and map the connection and peer in ConnectionNetworking
-			Blackboard.broadcastMessage(new SystemMessage(null, "Came from ID: " + peer));
-			if (peer != null) {
-				this.connectionNetworking.sockets.put(peer, this.connection);
-				this.connectionNetworking.inputs.put(peer, input);
-				ObjectOutputStream out =  new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
-				out.flush();
-				this.connectionNetworking.outputs.put(peer, out);
-			}
-			
-			Blackboard.broadcastMessage(new SystemMessage(null, "We now have " + this.connectionNetworking.sockets.size() + " connections"));
-
-		} catch (IOException ioe) 
+		} catch (Exception ioe)
 		{
-			// TODO: make some error handling happen
-		} catch (ClassNotFoundException cnfe) 
-		{
-			// TODO: make some error handling happen
+			return;
 		}
-	
+		
+		
+		// Take ID and map the connection and peer in ConnectionNetworking
+		this.connectionNetworking.sockets.put(peer, this.connection);
+		this.connectionNetworking.inputs.put(peer, input);
+		this.connectionNetworking.outputs.put(peer, out);
 		try 
 		{
 			while(true)
 			{
-				Blackboard.broadcastMessage(new SystemMessage(null, "Waiting for next message"));
-				if (!this.connection.isInputShutdown())
-					Blackboard.broadcastMessage(new SystemMessage(null, "Connection has alive instream"));
-				Serializable message = (Serializable)input.readObject();
-				Blackboard.broadcastMessage(new SystemMessage(null, "Receiving new message"));
-				this.gameNetworking.receive(message);
+				Packet packet = (Packet)this.input.readObject();
+				if (packet.getMessage() instanceof Broadcast)
+				{
+					this.connectionNetworking.send(packet);
+					if (packet.getMessage().getMessage() instanceof BlackboardMessage)
+						this.gameNetworking.receive(packet);
+					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
+						System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
+
+				else if (pack.getMessage() instanceof Whisper)
+				{
+					if (pack.getMessage().getReceiver() != this.connectionNetworking.localID)
+						this.connectionNetworking.send(packet);
+					else
+					{
+						if (packet.getMessage().getMessage() instanceof BlackboardMessage)
+							this.gameNetworking.receive(packet);
+						else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
+							System.err.println("\n\nGot a ConnectionMessage in a Whisper while being connected, shouldn't happen\n");
+					}
 			}
+			
 		} catch (IOException ioe)
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "IOException receving messages"));
-			Blackboard.broadcastMessage(new SystemMessage(null, "IOExceotion: " + ioe.getMessage()));
-		} catch (ClassNotFoundException cnfe)
+			if (this.foreingID < this.connectionNetworking.localID)
+				this.connectionNetworking.reconnect(this.foreignID);
+		}
+		} catch (Exception err)
 		{
-			Blackboard.broadcastMessage(new SystemMessage(null, "ClassNotFoundException reading messages"));
+			Blackboard.boradcastMessage(new PlayerDrop(Player.getInstance(this.foreignID)));
+			try
+			{
+				this.connection.close();
+			} catch (Exception)
+			{
+				// Do nothing
+			}
+			return;
 		}
 	}
 }
