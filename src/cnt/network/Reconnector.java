@@ -126,7 +126,7 @@ public class Reconnector
 				ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
 				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 
-				this.connectionNetworking.send(new Handshake(this.connectionNetworking.localID), true, output);
+				this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
 				
 				HandshakeAnswer answer = null;
 				try
