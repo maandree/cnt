@@ -15,6 +15,7 @@ import java.util.*;
 /**
  * Network tool kit
  * 
+ * @author Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class Toolkit
@@ -120,6 +121,24 @@ public class Toolkit
         {   return false;
 	}
     }
+    
+    
+    
+    /**
+     * Gets a random port
+     * 
+     * @return  A random port
+     * 
+     * @throws  IOException  If a port cannot be choosen
+     */
+    public static int getRandomPort() throws IOException
+    {
+	final ServerSocket socket = new ServerSocket();
+	final int port = socket.getLocalPort();
+	socket.close();
+	return port;
+    }
+    
     
 }
 

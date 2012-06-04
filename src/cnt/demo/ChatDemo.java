@@ -61,7 +61,6 @@ public class ChatDemo
 	{
 	    blackboardNetworking.gameNetworking.objectNetworking.connectionNetworking.connect(
                          (Inet4Address)(Inet4Address.getByName(remote)),
-			 ConnectionNetworking.PORT,
 			 args.length > 2 ? Integer.parseInt(args[2]) : 1
 		    );
 	}

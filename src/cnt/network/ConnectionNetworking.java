@@ -36,7 +36,8 @@ import java.net.*;
 *   Provides socket sockets for higher levels of networking.
 * </p>
 *
-* @author Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
+* @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
 */
 public class ConnectionNetworking
 {
@@ -44,22 +45,22 @@ public class ConnectionNetworking
 	* Default Constructor
 	* <p>
 	* The default constructor will try to start a new cloud and act server.
-	*</p>
 	* 
 	* @param gameNetworking the GameNetworking instance to send objects to
 	*/
-	public ConnectionNetworking(GameNetworking gameNetworking, String playerName)
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName) throws IOException
 	{
+	    final int localPort = this.port = Toolkit.getRandomPort();
 	    this.upnpKit = new UPnPKit();
 		this.gameNetworking = gameNetworking;
 	
 		Blackboard.broadcastMessage(new SystemMessage(null, "Starting up sockets..."));
 
 		// Check if public ip is same as internal ip
-		if (!getExternalIP().equals(getInternalIP()))
+		if (getExternalIP().equals(getInternalIP()) == false)
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
-			if(this.upnpKit.createPortForward(PORT))
+			if(this.upnpKit.createPortForward(localPort))
 			{
 				startTCP();
 			} else 
@@ -79,22 +80,20 @@ public class ConnectionNetworking
 	* Constructor which tries to connect to an already existing cloud.
 	*
 	* @param gameNetworking the gamenetworking instance to send objects to
-	*
 	* @param playerName name of local player
-	*
 	* @param foreignHost string with DNS name or IPv4 address to connect to
-	*
 	* @param port the port to make the connection to
 	*/
-	public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) 
+	public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) throws IOException
 	{
+	    final int localPort = this.port = Toolkit.getRandomPort();
 	    this.upnpKit = new UPnPKit();
 		this.gameNetworking = gameNetworking;
 
 		// Check if public ip is same as internal ip
 		if (!getExternalIP().equals(getInternalIP()))
 		{
-			if(this.upnpKit.createPortForward(PORT))
+			if(this.upnpKit.createPortForward(localPort))
 			{
 				startTCP();
 			} else 
@@ -224,14 +223,7 @@ public class ConnectionNetworking
 	{
 		ServerSocket _server = null;
 		try {
-			if (this.port != null) 
-			{
-				_server = new ServerSocket(this.port);
-			} else 
-			{
-				_server = new ServerSocket(0);
-				this.port = _server.getLocalPort();
-			}
+			_server = new ServerSocket(this.port);
 		} catch (IOException err) 
 		{
 			Blackboard.broadcastMessage(new SystemMessage(null, "Error: Cannot start ServerSocket. Something is wrong."));
