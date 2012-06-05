@@ -310,7 +310,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    
 	    System.err.print("\033[1;33mTrying to send Handshake...\033[0m");
 	    this.send(PacketFactory.createConnectionHandshake(), output);
-	    System.err.println("\033[1;33mDone\033[0m");
+	    System.err.println("\033[1;33mAfter handshake\nOutputstream: " + (output == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
 	    
 	    // Get answer
 	    HandshakeAnswer answer = null;
@@ -337,15 +337,16 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    // By now we should have our ID and the ID from the host we connected to
 	    if (this.foreignID != -1)
 	    {
-		System.err.print("\033[1;33mStarting TCPReceiver...\033[0m");
+		System.err.println("\033[1;33mSaving outputstreams\033[0m");
 		this.outputs.put(this.foreignID, output);
+		System.err.println("\033[1;33mOutputstream: " + (this.outputs.get(this.foreignID) == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
+		Thread.sleep(300);
 		receiver = new TCPReceiver(connection, input, this, this.foreignID);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
-	    System.err.println("\033[1;33mDone\033[0m");
 	}
-	catch (IOException ioe)
+	catch (IOException | InterruptedException ioe)
 	{
 		System.err.println("\033[1;33mError starting connection: " + ioe.getMessage() + "\033[0m");
 	}
@@ -355,6 +356,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    System.err.println("\033[1;31mFOREIGN ID IS -1\033[21;39m");
 	    return;
 	}
+	
 	
 	if (receiver != null)
 	{
