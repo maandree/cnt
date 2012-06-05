@@ -124,7 +124,7 @@ public class GameNetworking
 	    //if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
 		//return;
 	    
-	    System.err.println("\033[1;33mGameNetworking:  Correct type: " + (blackboardMessage instanceof FullUpdate ? "\033[1;32mOK\033[0m" : "\033[1;31mNO: " + blackboardMessage.getClass() + "\033[0m"));
+	    System.err.println("\033[1;33mGameNetworking:  Correct type: " + (blackboardMessage instanceof Blackboard.BlackboardMessage ? "\033[1;32mOK\033[0m" : "\033[1;31mNO: " + blackboardMessage.getClass() + "\033[0m"));
 	    if (blackboardMessage instanceof FullUpdate)
 	    {
 		final FullUpdate update = (FullUpdate)blackboardMessage;
