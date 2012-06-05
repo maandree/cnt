@@ -133,7 +133,7 @@ public class Toolkit
      */
     public static int getRandomPort() throws IOException
     {
-	final ServerSocket socket = new ServerSocket();
+	final ServerSocket socket = new ServerSocket(0);
 	final int port = socket.getLocalPort();
 	socket.close();
 	return port;
