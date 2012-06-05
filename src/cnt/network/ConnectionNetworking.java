@@ -626,16 +626,18 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     {
 	if (message instanceof PlayerRejoined)
 	{
-		final Player player = ((PlayerRejoined)message).player;
+	    final Player player = ((PlayerRejoined)message).player;
+	    System.err.println("\033[33mPlayer rejoined: " + player + "\033[39m");
 
-		this.joinedIDs.add(Integer.valueOf(player.getID()));
-		this.connectedIDs.add(Integer.valueOf(player.getID()));
+	    this.joinedIDs.add(Integer.valueOf(player.getID()));
+	    this.connectedIDs.add(Integer.valueOf(player.getID()));
 	}
 	else if (message instanceof PlayerJoined)
         {
 	    final Player player = ((PlayerJoined)message).player;
+	    System.err.println("\033[33mPlayer joined: " + player + "\033[39m");
 	    
-	    if (this.joinedIDs.contains(Integer.valueOf(player.getID())) && (player.equals(this.localPlayer) == false))
+	    if ((this.joinedIDs.contains(Integer.valueOf(player.getID()))) == false && (player.equals(this.localPlayer) == false))
 		this.highestID++;
 	    
 	    this.joinedIDs.add(Integer.valueOf(player.getID()));
@@ -644,6 +646,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	else if (message instanceof PlayerDropped)
 	{
 	    final Player player = ((PlayerDropped)message).player;
+	    System.err.println("\033[33mPlayer dropped: " + player + "\033[39m");
 	    this.connectedIDs.remove(Integer.valueOf(player.getID()));
 	}
 	
