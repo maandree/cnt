@@ -166,7 +166,7 @@ public class TCPReceiver implements Runnable
 		{   this.notify();
 		}
 
-		System.err.println("\033[1;33mTCPReceiver: Streams are:\nInput:  " + (this.connectionNetworking.inputs.get(peer) == null ? "\033[1;31mNull\033[1;33m" : "\033[1;32mOK\033[1;33m") + "\nOutput " + (this.connectionNetworking.outputs.get(peer) == null ?  "\033[1;31mNull\033[1;33m" : "\033[1;32OK\033[1;33m"));
+		System.err.println("\033[1;33mTCPReceiver: Streams are:\nInput:  " + (this.connectionNetworking.inputs.get(peer) == null ? "\033[1;31mNull\033[1;33m" : "\033[1;32mOK\033[1;33m") + "\nOutput: " + (this.connectionNetworking.outputs.get(peer) == null ?  "\033[1;31mNull\033[1;33m" : "\033[1;32mOK\033[1;33m") + "\033[0m");
 		try 
 		{
 			while(true)
