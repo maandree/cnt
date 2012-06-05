@@ -322,7 +322,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		this.foreignID = answer.server;
 		PacketFactory.setID(this.localID = answer.client);
 		FullUpdate update = (FullUpdate)(input.readObject());
-		Blackboard.broadcastMessage(update);
+		this.gameNetworking.receive(PacketFactory.createBroadcast(update, true));
 	    }
 	    catch (Exception err)
 	    {   if (this.isServer)

@@ -117,17 +117,19 @@ public class GameNetworking
 		    message = packet.getMessage();
 	    else if (packet.getMessage() instanceof Whisper)
 		    message = packet.getMessage();
-		
-	    //Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
+	    
+	    Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
 	    //if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
 		//return;
 	    
+	    System.err.println("\033[1;33mGameNetworking:  Correct type: " + (blackboardMessage instanceof FullUpdate ? "\033[1;32mOK\033[0m" : "\033[1;31mNO: " + blackboardMessage.getClass() + "\033[0m"));
 	    if (blackboardMessage instanceof FullUpdate)
 	    {
-		final FullUpdate update = (FullUpdate)object;
+		final FullUpdate update = (FullUpdate)blackboardMessage;
 		if (update.isGathering() == false)
 		{
 		    for (final Player player : (Iterable<Player>)(update.data.get(PlayerRing.class)))
+			System.err.println("\033[1;33mGameNetworking: Sending PlayerJoineds\033[0m");
 			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
 		}
 	    }
@@ -136,6 +138,7 @@ public class GameNetworking
 	}
 	catch (Exception err)
 	{
+	    System.err.println("\033[1;33mGameNetworking recived EXCEPTION!\033[0m");
 	    return; 
 	}
     }
