@@ -477,6 +477,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      */
     public void send(final Packet packet, final ObjectOutputStream output)
     {
+	System.out.println("\033[1;33msending: " + packet.getMessage().getClass() + "#" + packet.getMessage().getMessage() + "\033[0m");
 	final int[] playerIDs;
 	//if (packet.getMessage() instanceof Broadcast)
 	if (packet.getMessage() instanceof Anycast == false)
