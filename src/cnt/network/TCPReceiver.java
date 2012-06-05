@@ -37,6 +37,18 @@ public class TCPReceiver implements Runnable
     }
 
     /**
+     * Constructor 
+     *
+     * @param  connection            The incoming connection as a socket
+     * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
+     */
+    public TCPReceiver(Socket connection, ConnectionNetworking connectionNetworking)
+    {
+	
+	    this(connection, null, connectionNetworking, -1);
+    }
+
+    /**
      * Constructor
      *
      * @param  connection            The incoming connection as a socket
@@ -90,44 +102,48 @@ public class TCPReceiver implements Runnable
 	{
 		
 		/* prepair outgoing stream */
-		ObjectOutputStream output;
+		ObjectOutputStream output = null;
 
 		/* prepair id to map sockets and streams to */
-		int peer;
+		int peer = 0;
 		
-		Packet packet;
+		Packet packet = null;
 		    
 		try
 		{
-		if (this.input == null)
-			this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
-
-		packet = (Packet)(this.input.readObject());
-
-		/* Start sorting the packet */
-			if (packet.getMessage().getMessage() instanceof Handshake)
+			if (this.input == null)
 			{
-				output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
-			
-				Handshake message = (Handshake)packet.getMessage().getMessage();
-				if (message.getID() < 0)
+				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
+	
+				packet = (Packet)(this.input.readObject());
+	
+				/* Start sorting the packet */
+				if (packet.getMessage().getMessage() instanceof Handshake)
 				{
-					peer = this.connectionNetworking.getHighestID() + 1;
-					output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
-					output.flush();
-					
-				} else
-					peer = message.getID();
+					output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
+				
+					Handshake message = (Handshake)packet.getMessage().getMessage();
+					if (message.getID() < 0)
+					{
+						peer = this.connectionNetworking.getHighestID() + 1;
+						output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
+						output.flush();
+						
+					} else
+						peer = message.getID();
 
-				FullUpdate update = new FullUpdate();
-				Blackboard.broadcastMessage(update);
-				output.writeObject(update);
-				output.flush();
-			
-			} else {
-				this.connection.close();
-				return;
+					this.foreignID = peer;
+					FullUpdate update = new FullUpdate();
+					Blackboard.broadcastMessage(update);
+					output.writeObject(update);
+					output.flush();
+				
+				} else {
+					this.connection.close();
+					return;
+				}
 			}
+
 		} catch (Exception ioe)
 		{
 			return;
