@@ -57,6 +57,7 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	startButton  .addActionListener(this);
 	diagnosButton.addActionListener(this);
 	
+	nameField  .getDocument().addDocumentListener(this);
 	remoteField.getDocument().addDocumentListener(this);
 	portField  .getDocument().addDocumentListener(this);
 	
@@ -220,6 +221,8 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	buttonPanel.add(this.startButton, BorderLayout.EAST);
 	buttonPanel.add(this.diagnosButton, BorderLayout.WEST);
 	this.add(buttonPanel, DockLayout.BOTTOM);
+	
+	this.startButton.setEnabled(false);
     }
     
     
@@ -249,6 +252,7 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	ok &= port != 49152;
 	ok &= port < 65535;
 	ok &= (port != 0) || newGame;
+	ok &= this.nameField.getText().isEmpty() == false;
 	
 	if (source == this.diagnosButton)
 	{   (new NetworkDialogue(this)).setVisible(true);
@@ -290,14 +294,11 @@ public class LoginFrame extends JFrame implements ActionListener, DocumentListen
 	ok &= port != 49152;
 	ok &= port < 65535;
 	ok &= (port != 0) || newGame;
-	    
+	ok &= this.nameField.getText().isEmpty() == false;
+	
 	if (e.getDocument() == this.remoteField.getDocument())
-	{   this.startButton.setText(newGame ? "Create" : "Join");
-	    this.startButton.setEnabled(ok);
-	}
-	else if (e.getDocument() == this.portField.getDocument())
-	{   this.startButton.setEnabled(ok);
-	}
+	    this.startButton.setText(newGame ? "Create" : "Join");
+	this.startButton.setEnabled(ok);
     }
     
     /**
