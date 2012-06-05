@@ -51,7 +51,7 @@ public class PeerGameDemo
 	final String remote = args[4];
 	
 	int id = args[0].hashCode() & 0xFFF;
-	final Player me = new Player(args[0], null, id, null, null, serverauth ? id : ~id);
+	final Player me = new Player(args[0], null, id, null, null, 0, serverauth ? id : ~id);
 	
 	Blackboard.registerObserver(new Blackboard.BlackboardObserver()
 	        {
