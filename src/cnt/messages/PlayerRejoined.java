@@ -30,7 +30,7 @@ public final class PlayerRejoined extends PlayerJoined
      * 
      * @param  player  The player
      */
-    public PlayerJoined(final Player player)
+    public PlayerRejoined(final Player player)
     {
 	assert player != null : "Null is not allowed";
 	this.player = player;

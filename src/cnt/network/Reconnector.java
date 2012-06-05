@@ -196,7 +196,7 @@ public class Reconnector
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					Socket connection = this.connectionNetworking.connect(((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
 					if (connection != null)
 					{
 						handleConnection(connection, plauer.getID());
@@ -252,7 +252,7 @@ public class Reconnector
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					Socket connection = this.connectionNetworking.connect(((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
 					if (connection != null)
 					{
 						handleConnection(connection, plauer.getID());
@@ -328,7 +328,7 @@ public class Reconnector
 	{
 		if (message instanceof PlayerRejoined)
 		{
-			serializable (joined)
+			synchronized (joined)
 			{
 				try
 				{
