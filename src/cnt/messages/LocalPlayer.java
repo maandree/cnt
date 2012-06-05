@@ -15,7 +15,7 @@ import cnt.*;
  * 
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
-public final class LocalPlayer implements Blackboard.BlackboardMessage
+public final class LocalPlayer implements Blackboard.PersistantMessage
 {
     /**
      * Compatibility versioning for {@link java.io.Serializable}

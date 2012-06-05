@@ -35,11 +35,12 @@ public class Player implements Comparable<Player>, Serializable
      * @param  id           The ID of the player
      * @param  extip        The public IP address of the player
      * @param  locip        The local IP address of the player
+     * @param  port         The port used by the player's server socket
      * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
      */
-    public Player(final String name, final int id, final String extip, final String locip, final int connectedTo)
+    public Player(final String name, final int id, final String extip, final String locip, final int port, final int connectedTo)
     {
-	this(name, Friends.getPersonalUUID(), id, extip, locip, connectedTo, Friends.getPersonalDNSes());
+	this(name, Friends.getPersonalUUID(), id, extip, locip, port, connectedTo, Friends.getPersonalDNSes());
     }
     
     
@@ -51,10 +52,11 @@ public class Player implements Comparable<Player>, Serializable
      * @param  id           The ID of the player
      * @param  extip        The public IP address of the player
      * @param  locip        The local IP address of the player
+     * @param  port         The port used by the player's server socket
      * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
      * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int connectedTo, final String... dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int port, final int connectedTo, final String... dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
@@ -67,6 +69,7 @@ public class Player implements Comparable<Player>, Serializable
 	this.uuid = uuid;
 	this.extip = extip;
 	this.locip = locip;
+	this.port = port;
 	this.connectedTo = connectedTo;
 	this.dnses = new ArrayList<String>();
 	for (final String dns : dnses)
@@ -82,10 +85,11 @@ public class Player implements Comparable<Player>, Serializable
      * @param  id           The ID of the player
      * @param  extip        The public IP address of the player
      * @param  locip        The local IP address of the player
+     * @param  port         The port used by the player's server socket
      * @param  connectedTo  The ID of the player to which this player is connected, loop (this player's ID) if none
      * @param  dnses        The player's DNS names
      */
-    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int connectedTo, final ArrayList<String> dnses)
+    public Player(final String name, final UUID uuid, final int id, final String extip, final String locip, final int port, final int connectedTo, final ArrayList<String> dnses)
     {
 	assert name != null : "Players must be named";
 	//assert uuid != null : "UUID cannot be null";
@@ -98,6 +102,7 @@ public class Player implements Comparable<Player>, Serializable
 	this.uuid = uuid;
 	this.extip = extip;
 	this.locip = locip;
+	this.port = port;
 	this.connectedTo = connectedTo;
 	this.dnses = dnses;
     }
@@ -155,6 +160,11 @@ public class Player implements Comparable<Player>, Serializable
      * The local IP address of the player
      */
     protected String locip;
+    
+    /**
+     * The port used by the player's server socket
+     */
+    protected int port;
     
     /**
      * The ID of the player to which this player is connected, loop (this player's ID) if none
@@ -216,6 +226,7 @@ public class Player implements Comparable<Player>, Serializable
 		override.uuid = this.uuid;
 		override.extip = this.extip;
 		override.locip = this.locip;
+		override.port = this.port;
 		override.connectedTo = this.connectedTo;
 		override.dnses = this.dnses;
 	    }
@@ -297,6 +308,16 @@ public class Player implements Comparable<Player>, Serializable
      */
     public String getLocalIP() {
 	return this.locip;
+    }
+    
+    
+    /**
+     * Gets the port used by the player's server socket
+     * 
+     * @return  The port used by the player's server socket
+     */
+    public int getPort() {
+	return this.port;
     }
     
     

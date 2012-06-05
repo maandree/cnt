@@ -15,7 +15,6 @@ import se.kth.maandree.jmenumaker.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.IOError;
@@ -81,6 +80,21 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
      */
     private Player localPlayer = null;
     
+    /**
+     * Label displaying your public IP address
+     */
+    private JLabel xipLabel;
+    
+    /**
+     * Label displaying your LAN private IP address
+     */
+    private JLabel lipLabel;
+    
+    /**
+     * Label displaying your game port
+     */
+    private JLabel portLabel;
+    
     
     
     /**
@@ -106,33 +120,20 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	
 	final StatusPane status = new StatusPane();
 	
-	String xip = "?", lip = "?";
-	try
-	{   xip = Toolkit.getPublicIP();
-	    xip = xip == null ? "?" : xip.isEmpty() ? "?" : xip;
-	}
-	catch (final Throwable err)
-	    { /* Do nothing */ }
-	try
-	{   lip = Toolkit.getLocalIP();
-	    lip = lip == null ? "?" : lip.isEmpty() ? "?" : lip;
-	}
-	catch (final Throwable err)
-	    { /* Do nothing */ }
-	
-	final JLabel xipLabel, lipLabel;
-	status.add(xipLabel = new JLabel("WAN: " + xip), "LEFT");
-	status.add(lipLabel = new JLabel("LAN: " + lip), "LEFT");
+	status.add(xipLabel = new JLabel(), "LEFT");
+	status.add(lipLabel = new JLabel(), "LEFT");
+	status.add(portLabel = new JLabel(), "LEFT");
 	status.add(new ScoreLabel(), "RIGHT");
 	status.add(new JPanel(), "FILL");
 	status.setPreferredSize(new Dimension(0, 20));
 	
 	xipLabel.setFont(xipLabel.getFont().deriveFont(Font.PLAIN));
 	lipLabel.setFont(xipLabel.getFont());
+	portLabel.setFont(xipLabel.getFont());
 	
-	final JPanel gamePanel   = new GamePanel();
-	final JPanel playerPanel = new UserList();
-	final JPanel chatPanel   = new ChatPanel();
+	final GamePanel gamePanel   = new GamePanel();
+	final UserList  playerPanel = new UserList();
+	final ChatPanel chatPanel   = new ChatPanel();
 	
 	final JSplitPane hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, SPLIT_LAYOUT_POLICY, gamePanel, playerPanel);
 	final JSplitPane vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, SPLIT_LAYOUT_POLICY, hSplit, chatPanel);
@@ -153,6 +154,9 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 	    if (message instanceof LocalPlayer)
 	    {
 		this.localPlayer = ((LocalPlayer)message).player;
+		this. xipLabel.setText("WAN: "  + this.localPlayer.getPublicIP());
+		this. lipLabel.setText("LAN: "  + this.localPlayer.getLocalIP());
+		this.portLabel.setText("Port: " + this.localPlayer.getPort());
 	    } 
 	    else if (message instanceof PlayerPause)
 	    {
@@ -166,15 +170,6 @@ public class GameFrame extends JFrame implements UpdateListener, Blackboard.Blac
 		    ((JCheckBoxMenuItem)(ref.get())).setState(((EmergencyPause)message).paused);
 	    }
 	}
-    }
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    protected void processKeyEvent(final KeyEvent e)
-    {
-	System.out.println(e);
     }
     
     

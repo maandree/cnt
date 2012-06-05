@@ -69,7 +69,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	else
 	    startTCP();
 	
-	this.localPlayer = new Player(playerName, this.localID = 0, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), this.foreignID = 0);
+	this.localPlayer = new Player(playerName, this.localID = 0, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID = 0);
 	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
     
@@ -140,7 +140,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	}
 	
 	// Create the local player
-	this.localPlayer = new Player(playerName, this.localID, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), this.foreignID);
+	this.localPlayer = new Player(playerName, this.localID, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID);
 	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
     

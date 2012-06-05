@@ -50,18 +50,18 @@ elif [[ $1 = "chat" ]]; then
 #    javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
 #    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
 
-elif [[ $1 = "game" ]]; then
-    stty -icanon
-    javaSeven -ea -cp bin$jars cnt.demo.GameDemo
-    stty icanon
+#elif [[ $1 = "game" ]]; then
+#    stty -icanon
+#    javaSeven -ea -cp bin$jars cnt.demo.GameDemo
+#    stty icanon
 
 elif [[ $1 = "replay" ]]; then
     javaSeven -ea -cp bin$jars cnt.Replayer /dev/shm/recording.cnt
 
 elif [[ $1 = "peergame" ]]; then
-    stty -icanon
+#    stty -icanon
     javaSeven -ea -cp bin$jars cnt.demo.PeerGameDemo $2 $3 $4 $5 $6
-    stty icanon
+#    stty icanon
 
 #elif [[ $1 = "netgame" ]]; then
 #    stty -icanon
@@ -83,7 +83,7 @@ elif [[ $1 = "--completion--" ]]; then
 	    #COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat netgame' -- "$cur" ) \
 	    #            $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
 	    
-	    COMPREPLY=( $( compgen -W 'main main-da chat game replay peergame' -- "$cur" ) )
+	    COMPREPLY=( $( compgen -W 'main main-da chat replay peergame' -- "$cur" ) )
 	fi
     }
     
