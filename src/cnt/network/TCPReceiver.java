@@ -119,6 +119,7 @@ public class TCPReceiver implements Runnable
 				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 	
 				packet = (Packet)(this.input.readObject());
+				this.connectionNetworking.oldMessages.add(packet.getUUID());
 	
 				/* Start sorting the packet */
 				if (packet.getMessage().getMessage() instanceof Handshake)
@@ -172,6 +173,12 @@ public class TCPReceiver implements Runnable
 			while(true)
 			{
 				packet = (Packet)this.input.readObject();
+
+				if (this.connectionNetworking.oldMessages.contains(packet.getUUID()))
+				{
+					continue;
+				}
+
 				if (packet.getMessage() instanceof Broadcast)
 				{
 					this.connectionNetworking.send(packet); // ROUTING, DO NOT DELETE!

@@ -139,7 +139,7 @@ public class GameNetworking
 		    }
 		}
 	    }
-	    else if (blackboardMessage instanceof PlayerJoined)
+	    else if (blackboardMessage instanceof Blackboard.BlackboardMessage)
 		    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
 	    
 	    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
