@@ -104,23 +104,23 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 			{   
 				try
 			    	{   
-					System.out.print("Starting upp ConnectionNetworking...");
+					System.err.print("\033[1;33mStarting upp ConnectionNetworking...\033[0m");
 					ConnectionNetworking.this.startMonitor.wait();
-					System.out.print("Done");
+					System.err.print("\033[1;33mDone\033[0m");
 			    	}
 			    catch (final InterruptedException err)
 			    {   
-				    System.out.println("Error starting Networking");
+				    System.err.println("\033[1;33mError starting Networking\033[0m");
 			}   }
 			
 			try
 			{
-				System.out.print("Trying startJoin...");
+				System.err.print("\033[1;33mTrying startJoin...\033[0m");
 				ConnectionNetworking.this.startJoin(playerName, foreignHost, port);
-				System.out.println("Done");
+				System.err.println("\033[1;33mDone\033[0m");
 			} catch (IOException ioe)
 			{
-				System.out.println("Error on startJoin");
+			    System.err.println("\033[1;33mError on startJoin\033[0m");
 				Blackboard.broadcastMessage(new GameOver());
 			}
 		    }
@@ -300,23 +300,23 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	try 
 	{
-	    System.out.print("Trying to establish connections and streams...");
+	    System.err.print("\033[1;33mTrying to establish connections and streams...\033[0m");
 	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
 	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-	    System.out.println("Done");
+	    System.err.println("\033[1;33mDone\033[0m");
 	    
-	    System.out.print("Trying to send Handshake...");
+	    System.err.print("\033[1;33mTrying to send Handshake...\033[0m");
 	    this.send(PacketFactory.createConnectionHandshake(), output);
-	    System.out.println("Done");
+	    System.err.println("\033[1;33mDone\033[0m");
 	    
 	    // Get answer
 	    HandshakeAnswer answer = null;
 	    try
 	    {  
-		System.out.print("Getting HandshakeAnswer...");
+		System.err.print("\033[1;33mGetting HandshakeAnswer...\033[0m");
 		answer = (HandshakeAnswer)(input.readObject());
-		System.out.println("Done");
+		System.err.println("\033[1;33mDone\033[0m");
 		this.foreignID = answer.server;
 		PacketFactory.setID(this.localID = answer.client);
 		FullUpdate update = (FullUpdate)(input.readObject());
@@ -324,28 +324,28 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    }
 	    catch (Exception err)
 	    {   if (this.isServer)
-		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
+		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend."));
 		else
 		{
 		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
 		    Blackboard.broadcastMessage(new GameOver());
 	    }   }
 	    
-	    System.out.print("Starting listening thread...");
+	    System.err.print("\033[1;33mStarting listening thread...\033[0m");
 	    // By now we should have our ID and the ID from the host we connected to
 	    if (this.foreignID != -1)
 	    {
-		System.out.print("Starting...");
+		System.err.print("\033[1;33mStarting TCPReceiver...\033[0m");
 		this.outputs.put(this.foreignID, output);
 		TCPReceiver receiver = new TCPReceiver(connection, input, this, this.foreignID);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
-	    System.out.println("Done");
+	    System.err.println("\033[1;33mDone\033[0m");
 	}
 	catch (IOException ioe)
 	{
-		System.out.println("Error starting connection: " + ioe.getMessage());
+		System.err.println("\033[1;33mError starting connection: " + ioe.getMessage() + "\033[0m");
 	}
 	
 	// Create the local player
@@ -549,7 +549,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     {
 	if (this.sockets.isEmpty())
 	{
-	    System.out.println("Checking to see if we have connections to send to in ConectionNetworking, no connections");
+	    System.err.println("\033[1;33mChecking to see if we have connections to send to in ConectionNetworking, no connections\033[0m");
 	    return false;
 	}
 	return true;
