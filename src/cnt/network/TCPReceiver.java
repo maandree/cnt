@@ -137,11 +137,12 @@ public class TCPReceiver implements Runnable
 						peer = message.getID();
 
 					this.foreignID = peer;
+					this.connectionNetworking.outputs.put(peer, output);
 					System.err.println("\033[1;33mTCPReceiver: Prepairing for FullUpdate\033[0m");
 					FullUpdate update = new FullUpdate();
 					Blackboard.broadcastMessage(update);
 					System.err.println("\033[1;33mTCPReceiver: FullUpdate object done ==> " + update + "\033[0m");
-					output.writeObject(update);
+					output.writeObject(update.getDistributable());
 					output.flush();
 					System.err.println("\033[1;33mTCPReceiver: Sent FullUpdate to client\033[0m");
 				
@@ -160,7 +161,6 @@ public class TCPReceiver implements Runnable
 		// Take ID and map the connection and peer in ConnectionNetworking
 		this.connectionNetworking.sockets.put(peer, this.connection);
 		this.connectionNetworking.inputs.put(peer, input);
-		this.connectionNetworking.outputs.put(peer, output);
 		try 
 		{
 			while(true)
