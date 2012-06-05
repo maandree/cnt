@@ -173,10 +173,13 @@ public class TCPReceiver implements Runnable
 			while(true)
 			{
 				packet = (Packet)this.input.readObject();
-
-				if (this.connectionNetworking.oldMessages.contains(packet.getUUID()))
+				synchronized (this.connectionNetworking.oldMessages)
 				{
-					continue;
+					if (this.connectionNetworking.oldMessages.contains(packet.getUUID()))
+					{	
+						System.err.println("\033[1;31mTCPReceiver: OLD PACKAGE\033[0m");
+						continue;
+					}
 				}
 
 				if (packet.getMessage() instanceof Broadcast)
@@ -185,6 +188,7 @@ public class TCPReceiver implements Runnable
 
 					if (packet.getMessage().getMessage() instanceof BlackboardMessage)
 						this.gameNetworking.receive(packet);
+					
 					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
 						System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
 
