@@ -109,13 +109,20 @@ public class GameNetworking
     {
 	try
 	{
-	    if (object instanceof Blackboard.BlackboardMessage == false)
+	    if (object instanceof Packet == false)
+		return;
+	   NetworkMessage message = null; 
+	    Packet packet = (Packet)object;
+	    if (packet.getMessage() instanceof Broadcast)
+		    message = packet.getMessage();
+	    else if (packet.getMessage() instanceof Whisper)
+		    message = packet.getMessage();
+		
+	    Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
+	    if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
 		return;
 	    
-	    if (((Blackboard.BlackboardMessage)object).checkIntegrity() == Boolean.FALSE)
-		return;
-	    
-	    if (object instanceof FullUpdate)
+	    if (blackboardMessage instanceof FullUpdate)
 	    {
 		final FullUpdate update = (FullUpdate)object;
 		if (update.isGathering() == false)
@@ -125,7 +132,7 @@ public class GameNetworking
 		}
 	    }
 	    
-	    this.blackboardNetworking.receiveAndBroadcast(object);
+	    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
 	}
 	catch (Exception err)
 	{
