@@ -118,9 +118,9 @@ public class GameNetworking
 	    else if (packet.getMessage() instanceof Whisper)
 		    message = packet.getMessage();
 		
-	    Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
-	    if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
-		return;
+	    //Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
+	    //if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
+		//return;
 	    
 	    if (blackboardMessage instanceof FullUpdate)
 	    {

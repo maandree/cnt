@@ -1,6 +1,6 @@
 "Game" >
        "Pause"           id="pause"    type=check
-       "Emegency Pause"  id="empause"  type=check   hidden
+       "Emegency Pause"  id="empause"  type=check
        -
        "Audiable Bell"   id="abell"    type=CHECK   hidden
        "Visual Bell"     id="vbell"    type=CHECK   hidden
