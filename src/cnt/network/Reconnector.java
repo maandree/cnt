@@ -126,6 +126,9 @@ public class Reconnector implements BlackboardObserver
 				{   return;
 				}
 			    }
+			
+			Blackboard.broadcastMessage(new EmergencyPause(true));
+			
 			/* Check if selfdead */
 			try
 			{
@@ -136,7 +139,7 @@ public class Reconnector implements BlackboardObserver
 				Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(this.connectionNetworking.localID)));
 				return;
 			}
-
+			
 			if (this.deadIDs.contains(this.connectionNetworking.foreignID))
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
