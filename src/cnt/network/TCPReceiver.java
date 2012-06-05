@@ -161,6 +161,8 @@ public class TCPReceiver implements Runnable
 		// Take ID and map the connection and peer in ConnectionNetworking
 		this.connectionNetworking.sockets.put(peer, this.connection);
 		this.connectionNetworking.inputs.put(peer, input);
+
+		System.err.println("\033[1;33mTCPReceiver: Streams are:\nInput:  " + (this.connectionNetworking.inputs.get(peer) == null ? "\033[1;31mNull\033[1;33m" : "\033[1;32OK\033[1;33m") + "\nOutput " + (this.connectionNetworking.outputs.get(peer) == null ?  "\033[1;31mNull\033[1;33m" : "\033[1;32OK\033[1;33m"));
 		try 
 		{
 			while(true)
