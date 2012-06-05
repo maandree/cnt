@@ -16,17 +16,12 @@ import java.io.*;
 /**
  * Game networking layer object
  *
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class GameNetworking
 {
-    /**
-     * Constructor
-     * 
-     * @param  blackboardNetworking  The previous layer in the protocol stack
-     */
-    public GameNetworking(final BlackboardNetworking blackboardNetworking)
-    { }
+    //Has default constructor
     
     
     
@@ -45,21 +40,25 @@ public class GameNetworking
      */
     private Player player = null;
     
+    
+    
     /**
-     * Set BlackboardNetworking instance to use
+     * Set {@link BlackboardNetworking} instance to use
      */
     public void setBlackboardNetworking(BlackboardNetworking blackboardNetworking)
     {
 	    this.blackboardNetworking = blackboardNetworking;
     }
-
+    
+    
     /**
-     * Set ConnectionNetwroking instance to use
+     * Set {@link ConnectionNetworking} instance to use
      */
     public void setConnectionNetworking(ConnectionNetworking connectionNetworking)
     {
 	    this.connectionNetworking = connectionNetworking;
     }
+    
     
     /**
      * Forward a message to the next layer in the protocol stack

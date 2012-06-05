@@ -44,105 +44,78 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * Constructor starting a cloud
      * 
-     * @param  gameNetworking  The {@link GameNetworking} instance to send objects to
+     * @param  playerName  The local player's display bane
      */
-    public ConnectionNetworking(GameNetworking gameNetworking, String playerName) throws IOException
+    public ConnectionNetworking(final String playerName) throws IOException
     {
-	final int localPort = this.port = Toolkit.getRandomPort();
-	this.upnpKit = new UPnPKit();
-	this.gameNetworking = gameNetworking;
+	final Thread thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			synchronized (ConnectionNetworking.this.startMonitor)
+			{   try
+			    {   ConnectionNetworking.this.startMonitor.wait();
+			    }
+			    catch (final InterruptedException err)
+			    {   //Do nothing
+			}   }
+			
+			ConnectionNetworking.this.startCreate(playerName);
+		    }
+	        };
 	
-	Blackboard.broadcastMessage(new SystemMessage(null, "Starting up sockets..."));
-	
-	// Check if public ip is same as internal ip
-	if (getExternalIP().equals(getInternalIP()) == false)
-	{
-	    Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
-	    if(this.upnpKit.createPortForward(localPort))
-		startTCP();
-	    else 
-	    {
-		// We are trying to start a cloud, but couldn't. Game exits
-		Blackboard.broadcastMessage(new GameOver());
-	    }
+	thread.start();
+	try
+	{   Thread.sleep(75);
 	}
-	else
-	    startTCP();
-	
-	this.localPlayer = new Player(playerName, this.localID = 0, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID = 0);
-	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
+	catch (final InterruptedException err)
+	{   //Do nothing
+	}
     }
     
     
     /**
      * Constructor connecting to a cloud
      * 
-     * @param  gameNetworking  The gamenetworking instance to send objects to
-     * @param  playerName      Name of local player
-     * @param  foreignHost     String with DNS name or IPv4 address to connect to
-     * @param  port            The port to make the connection to
+     * @param  playerName   The local player's display bane
+     * @param  foreignHost  String with DNS name or IPv4 address to connect to
+     * @param  port         The port to make the connection to
      */
-    public ConnectionNetworking(GameNetworking gameNetworking, String playerName, String foreignHost, int port) throws IOException
+    public ConnectionNetworking(final String playerName, final String foreignHost, final int port) throws IOException
     {
-	final int localPort = this.port = Toolkit.getRandomPort();
-	this.upnpKit = new UPnPKit();
-	this.gameNetworking = gameNetworking;
+	final Thread thread = new Thread()
+	        {
+		    /**
+		     * {@inheritDoc}
+		     */
+		    @Override
+		    public void run()
+		    {
+			synchronized (ConnectionNetworking.this.startMonitor)
+			{   try
+			    {   ConnectionNetworking.this.startMonitor.wait();
+			    }
+			    catch (final InterruptedException err)
+			    {   //Do nothing
+			}   }
+			
+			ConnectionNetworking.this.startJoin(playerName, foreignHost, port);
+		    }
+	        };
 	
-	// Check if public ip is same as internal ip
-	if (getExternalIP().equals(getInternalIP()) == false)
-	    if (this.upnpKit.createPortForward(localPort))
-		startTCP();
-	    else
-		startLocalTCP();
-	else
-	    startTCP();
-	
-	try 
-	{
-	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
-	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
-	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-	    
-	    // Handshake(ID (0< if asking), urgent?, ObjectOutputStream)
-	    this.send(PacketFactory.createConnectionHandshake(), output);
-	    
-	    // Get answer
-	    HandshakeAnswer answer = null;
-	    try
-	    {   answer = (HandshakeAnswer)(input.readObject());
-		this.foreignID = answer.server;
-		PacketFactory.setID(this.localID = answer.client);
-		FullUpdate update = (FullUpdate)(input.readObject());
-		Blackboard.broadcastMessage(update);
-	    }
-	    catch (Exception err)
-	    {   if (this.isServer)
-		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
-		else
-		{
-		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
-		    Blackboard.broadcastMessage(new GameOver());
-	    }   }
-	    
-	    
-	    // By now we should have our ID and the ID from the host we connected to
-	    if (this.foreignID != -1)
-	    {
-		this.outputs.put(this.foreignID, output);
-		TCPReceiver receiver = new TCPReceiver(connection, input, this);
-		Thread t = new Thread(receiver);
-		t.start();
-	    }
+	thread.start();
+	try
+	{   Thread.sleep(75);
 	}
-	catch (IOException ioe)
-	{
-	    // blackboardmessage!
+	catch (final InterruptedException err)
+	{   //Do nothing
 	}
-	
-	// Create the local player
-	this.localPlayer = new Player(playerName, this.localID, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID);
-	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
     }
+    
     
     
     /**
@@ -166,14 +139,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 
 
     /**
-     * ObjectNetworker to communicate with
+     * {@link GameNetworking} to communicate with
      */
-    public final GameNetworking gameNetworking;
+    public GameNetworking gameNetworking = null;
 
     /**
      * Local player instance
      */
-    public final Player localPlayer;
+    public Player localPlayer;
     
     /**
      * The highest known ID
@@ -193,7 +166,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * The randomly picked port the client is running on
      */
-    public final int port;
+    public int port;
 
     /**
      * Public ip. 
@@ -244,6 +217,125 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      * Set of currently joined IDs
      */
     public final HashSet<Integer> connectedIDs = new Hashset<Integer>();
+    
+    /**
+     * Start monitor
+     */
+    public final Object startMonitor = new Object();
+    
+    
+    
+    
+    /**
+     * Starts a cloud
+     * 
+     * @param  playerName  The local player's display bane
+     */
+    void startCreate(final String playerName) throws IOException
+    {
+	final int localPort = this.port = Toolkit.getRandomPort();
+	this.upnpKit = new UPnPKit();
+	
+	Blackboard.broadcastMessage(new SystemMessage(null, "Starting up sockets..."));
+	
+	// Check if public ip is same as internal ip
+	if (getExternalIP().equals(getInternalIP()) == false)
+	{
+	    Blackboard.broadcastMessage(new SystemMessage(null, "Public and Local ip differ. Trying UPnP"));
+	    if(this.upnpKit.createPortForward(localPort))
+		startTCP();
+	    else 
+	    {
+		// We are trying to start a cloud, but couldn't. Game exits
+		Blackboard.broadcastMessage(new GameOver());
+	    }
+	}
+	else
+	    startTCP();
+	
+	this.localPlayer = new Player(playerName, this.localID = 0, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID = 0);
+	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
+    }
+    
+    /**
+     * Connects to a cloud
+     * 
+     * @param  playerName   The local player's display bane
+     * @param  foreignHost  String with DNS name or IPv4 address to connect to
+     * @param  port         The port to make the connection to
+     */
+    void startJoin(final String playerName, final String foreignHost, final int port) throws IOException
+    {
+	final int localPort = this.port = Toolkit.getRandomPort();
+	this.upnpKit = new UPnPKit();
+	
+	// Check if public ip is same as internal ip
+	if (getExternalIP().equals(getInternalIP()) == false)
+	    if (this.upnpKit.createPortForward(localPort))
+		startTCP();
+	    else
+		startLocalTCP();
+	else
+	    startTCP();
+	
+	try 
+	{
+	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
+	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
+	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+	    
+	    this.send(PacketFactory.createConnectionHandshake(), output);
+	    
+	    // Get answer
+	    HandshakeAnswer answer = null;
+	    try
+	    {   answer = (HandshakeAnswer)(input.readObject());
+		this.foreignID = answer.server;
+		PacketFactory.setID(this.localID = answer.client);
+		FullUpdate update = (FullUpdate)(input.readObject());
+		Blackboard.broadcastMessage(update);
+	    }
+	    catch (Exception err)
+	    {   if (this.isServer)
+		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to conact friend."));
+		else
+		{
+		    Blackboard.broadcastMessage(new SystemMessage(null, "Unable to contact friend, and we are local. Game Over"));
+		    Blackboard.broadcastMessage(new GameOver());
+	    }   }
+	    
+	    
+	    // By now we should have our ID and the ID from the host we connected to
+	    if (this.foreignID != -1)
+	    {
+		this.outputs.put(this.foreignID, output);
+		TCPReceiver receiver = new TCPReceiver(connection, input, this);
+		Thread t = new Thread(receiver);
+		t.start();
+	    }
+	}
+	catch (IOException ioe)
+	{
+	    // blackboardmessage!
+	}
+	
+	// Create the local player
+	this.localPlayer = new Player(playerName, this.localID, getExternalIP().getHostAddress(), getInternalIP().getHostAddress(), localPort, this.foreignID);
+	Blackboard.broadcastMessage(new LocalPlayer(this.localPlayer));
+    }
+    
+    
+    /**
+     * Set {@link GameNetworking} instance to use
+     */
+    public void setGameNetworking(GameNetworking gameNetworking)
+    {
+	this.gameNetworking = gameNetworking;
+	synchronized (this.startMonitor)
+	{   this.startMonitor.notify();
+	}
+    }
+    
     
     /**
      * Make a TCP serversocket to listen on incoming sockets
@@ -488,11 +580,9 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    this.joinedIDs.add(Integer.valueOf(player.getID()));
 	    this.connectedIDs.add(Integer.valueOf(player.getID()));
 	} 
-	
 	else if (message instanceof PlayerDropped)
 	{
 		final Player player = (PlayerDropped)message.player;
-
 		this.connectedIDs.remove(Integer.valueOf(player.getID()));
 	}
 	
