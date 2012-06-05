@@ -174,6 +174,8 @@ public class TCPReceiver implements Runnable
 				packet = (Packet)this.input.readObject();
 				if (packet.getMessage() instanceof Broadcast)
 				{
+					this.connectionNetworking.send(packet); // ROUTING, DO NOT DELETE!
+
 					if (packet.getMessage().getMessage() instanceof BlackboardMessage)
 						this.gameNetworking.receive(packet);
 					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
