@@ -543,8 +543,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		else
 		{
 		    System.out.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
-		    if (sendToID[i] < this.localID)
-			this.reconnect(sendToID[i]);
+		    try
+		    {
+		    	this.sockets.get(sendToID[i]).close();
+		    } catch (Exception err) {
+			    System.err.println("\033[1;33miConnectionNetworking: Couldn't close socket on faulty connection\033[0m");
+		    }
+		    this.sockets.remove(sendToID[i]);
+		    this.outputs.remove(sendToID[i]);
 		}
 	    }
     }
