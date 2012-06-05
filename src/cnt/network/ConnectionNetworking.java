@@ -149,6 +149,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      * Initialiser
      */
     {
+	Blackboard.registerObserver(this);
+
 	Runtime.getRuntime().addShutdownHook(new Thread()
 	        {
 		    /**
@@ -231,14 +233,17 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * UPnP tool kit
      */
-    private UPnPKit upnpKit = null;
+    UPnPKit upnpKit = null;
     
     /**
      * Set of all used IDs
      */
     public final HashSet<Integer> joinedIDs = new HashSet<Integer>();
     
-    
+    /**
+     * Set of currently joined IDs
+     */
+    public final HashSet<Integer> connectedIDs = new Hashset<Integer>();
     
     /**
      * Make a TCP serversocket to listen on incoming sockets
@@ -481,6 +486,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		this.highestID++;
 	    
 	    this.joinedIDs.add(Integer.valueOf(player.getID()));
+	    this.connectedIDs.add(Integer.valueOf(player.getID()));
+	} 
+	
+	else if (message instanceof PlayerDropped)
+	{
+		final Player player = (PlayerDropped)message.player;
+
+		this.connectedIDs.remove(Integer.valueOf(player.getID()));
 	}
 	
     }
