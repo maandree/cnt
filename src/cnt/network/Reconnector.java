@@ -356,6 +356,7 @@ public class Reconnector implements BlackboardObserver
 		try
 		{	
 	    		ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+			output.flush();
 	    		ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 				    		
 	    		this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
