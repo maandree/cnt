@@ -6,6 +6,7 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt;
+import cnt.local.*;
 
 
 /**
@@ -32,6 +33,14 @@ public class Program
      */
     public static void main(final String... args)
     {
+	for (final String arg : args)
+	    if (arg.startsWith("h="))
+	    {
+		Friends.home = arg.substring(2);
+		break;
+	    }
+	Friends.load();
+	
 	cnt.interaction.Launcher.launch(args);
 	cnt.game.Launcher.launch(args);
 	cnt.network.Launcher.launch(args);

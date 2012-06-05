@@ -88,8 +88,6 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 					   ,NextPlayer.class
 					   );
 	
-	Blackboard.broadcastMessage(new GameScore(this.data.score = 0));
-	
 	this.data.thread = new Thread()
 	        {
 		    /**
@@ -111,7 +109,9 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			    catch (final InterruptedException err)
 			    {   return;
 			}   }
-			    
+			
+			Blackboard.broadcastMessage(new GameScore(Engine.this.data.score = 0));
+			
 			for (;;)
 			{
 			    synchronized (Engine.this.gameMonitor)

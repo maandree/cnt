@@ -6,6 +6,8 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.interaction.desktop;
+import cnt.game.*;
+import cnt.game.enginehelp.*;
 import cnt.messages.*;
 import cnt.*;
 
@@ -39,6 +41,12 @@ public class ScoreLabel extends JLabel implements Blackboard.BlackboardObserver
 	{
 	    final GameScore msg = (GameScore)message;
 	    this.setText("Score: " + msg.score);
+	}
+	else if (message instanceof FullUpdate)
+	{
+	    final FullUpdate fullUpdate = (FullUpdate)message;
+	    if (fullUpdate.isGathering() == false)
+		this.setText("Score: " + ((EngineData)(fullUpdate.data.get(Engine.class))).score);
 	}
     }
     

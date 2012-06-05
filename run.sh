@@ -17,10 +17,10 @@ if [[ $# = 0 ]]; then
     javaSeven -ea -cp bin$jars cnt.Program
 
 elif [[ $1 = "main" ]]; then
-    javaSeven -ea -cp bin$jars cnt.Program
+    javaSeven -ea -cp bin$jars cnt.Program $@
 
 elif [[ $1 = "main-da" ]]; then
-    javaSeven -da -cp bin$jars cnt.Program
+    javaSeven -da -cp bin$jars cnt.Program $@
 
 elif [[ $1 = "--completion--" ]]; then
     _run()

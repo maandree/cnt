@@ -30,20 +30,9 @@ public class Friends
     
     
     /**
-     * Class initialiser
-     */
-    static
-    {
-	monitor = new Object();
-	load();
-    }
-    
-    
-    
-    /**
      * Synchronisation monitor
      */
-    private static final Object monitor;
+    private static final Object monitor = new Object();
     
     /**
      * The local user's UUIḌ
@@ -70,18 +59,23 @@ public class Friends
      */
     private static String friendFile;
     
+    /**
+     * The home catalogue
+     */
+    public static String home = System.getProperty("user.home");
+    
     
     
     /**
      * Loads everything
      */
-    private static void load()
+    public static void load()
     {
 	synchronized (monitor)
 	{
 	    myDNSes = new ArrayList<String>();
 	
-	    String dir = System.getProperty("user.home");
+	    String dir = home;
 	    final String dirsep = System.getProperty("file.separator");
 	    
 	    if (dir.endsWith(dirsep) == false)
