@@ -17,33 +17,35 @@ import java.io.*;
 /**
  * Blackboard networking layer
  *
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class BlackboardNetworking implements Blackboard.BlackboardObserver
 {
-    /**
-     * Constructor
-     * 
-     */
-    public BlackboardNetworking()
-    {
-	Blackboard.registerObserver(this);
-
-	this.gameNetworking = new GameNetworking(this);
-    }
+    //Has default constructor
     
     
     
     /**
      * The next layer the networking stack
      */
-    public final GameNetworking gameNetworking;
+    public GameNetworking gameNetworking;
     
     /**
      * Blackboard message to ignore (with how many times) to prevent an infinite resonance loop
      */
     private final HashMap<Blackboard.BlackboardMessage, Integer> ignore = new HashMap<Blackboard.BlackboardMessage, Integer>();
     
+    
+    
+    /**
+     * Set {@link GameNetworking} instance to use
+     */
+    public void setGameNetworking(GameNetworking gameNetworking)
+    {
+	this.gameNetworking = gameNetworking;
+	Blackboard.registerObserver(this);
+    }
     
     
     /**

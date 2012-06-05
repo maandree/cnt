@@ -16,17 +16,12 @@ import java.io.*;
 /**
  * Game networking layer object
  *
+ * @author  Calle Lejdbrandt, <a href="mailto:callel@kth.se">callel@kth.se</a>
  * @author  Mattias Andrée, <a href="mailto:maandree@kth.se">maandree@kth.se</a>
  */
 public class GameNetworking
 {
-    /**
-     * Constructor
-     * 
-     * @param  blackboardNetworking  The previous layer in the protocol stack
-     */
-    public GameNetworking(final BlackboardNetworking blackboardNetworking)
-    { }
+    //Has default constructor
     
     
     
@@ -45,21 +40,25 @@ public class GameNetworking
      */
     private Player player = null;
     
+    
+    
     /**
-     * Set BlackboardNetworking instance to use
+     * Set {@link BlackboardNetworking} instance to use
      */
     public void setBlackboardNetworking(BlackboardNetworking blackboardNetworking)
     {
 	    this.blackboardNetworking = blackboardNetworking;
     }
-
+    
+    
     /**
-     * Set ConnectionNetwroking instance to use
+     * Set {@link ConnectionNetworking} instance to use
      */
     public void setConnectionNetworking(ConnectionNetworking connectionNetworking)
     {
 	    this.connectionNetworking = connectionNetworking;
     }
+    
     
     /**
      * Forward a message to the next layer in the protocol stack
@@ -108,7 +107,24 @@ public class GameNetworking
     public void receive(Serializable object)
     {
 	try 
-	{   this.blackboardNetworking.receiveAndBroadcast(object);
+	{
+	    if (object instanceof Blackboard.BlackboardMessage == false)
+		return;
+	    
+	    if (((Blackboard.BlackboardMessage)object).checkIntegrity() == Boolean.FALSE)
+		return;
+	    
+	    if (object instanceof FullUpdate)
+	    {
+		final FullUpdate update = (FullUpdate)object;
+		if (update.isGathering() == false)
+		{
+		    for (final Player player : (Iterateable<Player>)(update.data.get(PlayerRing.class)))
+			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
+		}
+	    }
+	    
+	    this.blackboardNetworking.receiveAndBroadcast(object);
 	}
 	catch (Exception err)
 	{
