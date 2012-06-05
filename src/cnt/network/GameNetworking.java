@@ -108,7 +108,24 @@ public class GameNetworking
     public void receive(Serializable object)
     {
 	try 
-	{   this.blackboardNetworking.receiveAndBroadcast(object);
+	{
+	    if (object instanceof Blackboard.BlackboardMessage == false)
+		return;
+	    
+	    if (((Blackboard.BlackboardMessage)object).checkIntegrity() == Boolean.FALSE)
+		return;
+	    
+	    if (object instanceof FullUpdate)
+	    {
+		final FullUpdate update = (FullUpdate)object;
+		if (update.isGathering() == false)
+		{
+		    for (final Player player : (Iterateable<Player>)(update.data.get(PlayerRing.class)))
+			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
+		}
+	    }
+	    
+	    this.blackboardNetworking.receiveAndBroadcast(object);
 	}
 	catch (Exception err)
 	{
