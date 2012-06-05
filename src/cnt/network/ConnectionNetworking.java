@@ -534,9 +534,12 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	{
 	 	   try
 	 	   {
+			if (this.oldMessages.contains(packet.getUUID()) == false)
+			{
 				sendTo[i].writeObject(packet);
 				sendTo[i].flush();
 				this.oldMessages.add(packet.getUUID());
+			}
 		    }
 		    catch (IOException ioe)
 		    {
