@@ -108,11 +108,14 @@ public class TCPReceiver implements Runnable
 		int peer = 0;
 		
 		Packet packet = null;
-		    
+		System.err.println("\033[1;33mStarting TCPReceiver\033[0m");
 		try
 		{
 			if (this.input == null)
 			{
+				output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
+				output.flush();
+				System.err.println("\033[1;33mTCPReceiver: Getting new conection from outside\033[0m");
 				this.input = new ObjectInputStream(new BufferedInputStream(this.connection.getInputStream()));
 	
 				packet = (Packet)(this.input.readObject());
@@ -120,23 +123,27 @@ public class TCPReceiver implements Runnable
 				/* Start sorting the packet */
 				if (packet.getMessage().getMessage() instanceof Handshake)
 				{
-					output = new ObjectOutputStream(new BufferedOutputStream(this.connection.getOutputStream()));
 				
 					Handshake message = (Handshake)packet.getMessage().getMessage();
+					System.err.println("\033[1;33mTCPReceiver: connecting player ID: " + message.getID() + "\033[0m");
 					if (message.getID() < 0)
 					{
 						peer = this.connectionNetworking.getHighestID() + 1;
 						output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
 						output.flush();
+						System.err.println("\033[1;33mTCPReceiver: Sent HandshakeAnswer\033[0m");
 						
 					} else
 						peer = message.getID();
 
 					this.foreignID = peer;
+					System.err.println("\033[1;33mTCPReceiver: Prepairing for FullUpdate\033[0m");
 					FullUpdate update = new FullUpdate();
 					Blackboard.broadcastMessage(update);
+					System.err.println("\033[1;33mTCPReceiver: FullUpdate object done ==> " + update + "\033[0m");
 					output.writeObject(update);
 					output.flush();
+					System.err.println("\033[1;33mTCPReceiver: Sent FullUpdate to client\033[0m");
 				
 				} else {
 					this.connection.close();
