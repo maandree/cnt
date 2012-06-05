@@ -76,6 +76,9 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	{
 	    final Player player = ((LocalPlayer)message).player;
 	    this.localPlayer = player;
+	    if (this.ring.contains(player))
+		return;
+	    this.ring.insertBefore(player);
 	}
 	else if (message instanceof FullUpdate)
 	{
