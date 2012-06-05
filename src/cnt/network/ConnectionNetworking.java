@@ -46,7 +46,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      * 
      * @param  playerName  The local player's display bane
      */
-    public ConnectionNetworking(final String playerName) throws IOException
+    public ConnectionNetworking(final String playerName) 
     {
 	final Thread thread = new Thread()
 	        {
@@ -63,8 +63,13 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 			    catch (final InterruptedException err)
 			    {   //Do nothing
 			}   }
-			
-			ConnectionNetworking.this.startCreate(playerName);
+			try
+			{
+				ConnectionNetworking.this.startCreate(playerName);
+			} catch (IOException ioe)
+			{
+				Blackboard.broadcastMessage(new GameOver());
+			}
 		    }
 	        };
 	
@@ -85,7 +90,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      * @param  foreignHost  String with DNS name or IPv4 address to connect to
      * @param  port         The port to make the connection to
      */
-    public ConnectionNetworking(final String playerName, final String foreignHost, final int port) throws IOException
+    public ConnectionNetworking(final String playerName, final String foreignHost, final int port) 
     {
 	final Thread thread = new Thread()
 	        {
@@ -103,7 +108,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 			    {   //Do nothing
 			}   }
 			
-			ConnectionNetworking.this.startJoin(playerName, foreignHost, port);
+			try
+			{
+				
+				ConnectionNetworking.this.startJoin(playerName, foreignHost, port);
+			} catch (IOException ioe)
+			{
+				Blackboard.broadcastMessage(new GameOver());
+			}
 		    }
 	        };
 	
@@ -309,7 +321,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    if (this.foreignID != -1)
 	    {
 		this.outputs.put(this.foreignID, output);
-		TCPReceiver receiver = new TCPReceiver(connection, input, this);
+		TCPReceiver receiver = new TCPReceiver(connection, input, this, this.foreignID);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
@@ -398,7 +410,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	if (save) //This is mainly for the first connection out, we don't want to start a listener until we now what ID to map it to 
         {
-	    TCPReceiver receiver = new TCPReceiver(connection, this);
+	    TCPReceiver receiver = new TCPReceiver(connection, this, this.foreignID);
 	    Thread t = new Thread(receiver);
 	    t.start();
 	}

@@ -151,13 +151,19 @@ public class Reconnector implements BlackboardObserver
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
 					Player player = Player.getInstance(playerID);
-					if (this.deadIDs.contains(playerID) == false && 
-					    this.connectionNetworking.localID != playerID && 
-					    playerID < this.connectionNetworking.localID && 
-					    player.getConnectedTo() == this.connectionNetworking.foreignID && 
-					    player.getPublicIP() == Toolkit.getPublicIP())
+					try
 					{
-						players.add(player);
+						if (this.deadIDs.contains(playerID) == false && 
+						    this.connectionNetworking.localID != playerID && 
+						    playerID < this.connectionNetworking.localID && 
+						    player.getConnectedTo() == this.connectionNetworking.foreignID && 
+						    player.getPublicIP() == Toolkit.getPublicIP())
+						{
+							players.add(player);
+						}
+					} catch (IOException ioe)
+					{
+						continue;
 					}
 				}
 				
@@ -165,12 +171,23 @@ public class Reconnector implements BlackboardObserver
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					try
+					{
+						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					} catch (Exception e)
+					{ 
+						connection = null;
+					}
 					if (connection != null && handleConnection(connection, player.getID()))
 						continue;
 					else
 					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						try
+						{
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						} catch (Exception e) {
+							connection = null;
+						}
 						if (connection != null)
 						{
 							handleConnection(connection, player.getID());
@@ -182,13 +199,19 @@ public class Reconnector implements BlackboardObserver
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
 					Player player = Player.getInstance(playerID);
-					if (this.deadIDs.contains(playerID) == false &&
-					    this.connectionNetworking.localID != playerID &&
-					    playerID < this.connectionNetworking.localID &&
-					    player.getConnectedTo() == this.connectionNetworking.foreignID &&
-					    player.getPublicIP() != Toolkit.getPublicIP())
+					try
 					{
-						players.add(player);
+						if (this.deadIDs.contains(playerID) == false &&
+						    this.connectionNetworking.localID != playerID &&
+						    playerID < this.connectionNetworking.localID &&
+						    player.getConnectedTo() == this.connectionNetworking.foreignID &&
+						    player.getPublicIP() != Toolkit.getPublicIP())
+						{
+							players.add(player);
+						}
+					} catch (IOException ioe)
+					{
+						continue;
 					}
 				}
 
@@ -196,7 +219,13 @@ public class Reconnector implements BlackboardObserver
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					try
+					{
+						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					} catch (Exception e)
+					{
+						connection = null;
+					}
 					if (connection != null)
 					{
 						handleConnection(connection, player.getID());
@@ -207,13 +236,19 @@ public class Reconnector implements BlackboardObserver
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
 					Player player = Player.getInstance(playerID);
-					if (this.deadIDs.contains(playerID) == false && 
-					    this.connectionNetworking.localID != playerID && 
-					    playerID < this.connectionNetworking.localID && 
-					    player.getConnectedTo() != this.connectionNetworking.foreignID && 
-					    player.getPublicIP() == Toolkit.getPublicIP())
+					try
 					{
-						players.add(player);
+						if (this.deadIDs.contains(playerID) == false && 
+						    this.connectionNetworking.localID != playerID && 
+						    playerID < this.connectionNetworking.localID && 
+						    player.getConnectedTo() != this.connectionNetworking.foreignID && 
+						    player.getPublicIP() == Toolkit.getPublicIP())
+						{
+							players.add(player);
+						}
+					} catch (IOException ioe)
+					{
+						continue;
 					}
 				}
 				
@@ -221,12 +256,24 @@ public class Reconnector implements BlackboardObserver
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					try
+					{
+						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					} catch (Exception e)
+					{
+						connection = null;
+					}
 					if (connection != null && handleConnection(connection, player.getID()))
 						continue;
 					else
 					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						try
+						{
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						} catch (Exception e)
+						{
+							connection = null;
+						}
 						if (connection != null)
 						{
 							handleConnection(connection, player.getID());
@@ -238,13 +285,19 @@ public class Reconnector implements BlackboardObserver
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
 					Player player = Player.getInstance(playerID);
-					if (this.deadIDs.contains(playerID) == false &&
-					    this.connectionNetworking.localID != playerID &&
-					    playerID < this.connectionNetworking.localID &&
-					    player.getConnectedTo() != this.connectionNetworking.foreignID &&
-					    player.getPublicIP() != Toolkit.getPublicIP())
+					try
 					{
-						players.add(player);
+						if (this.deadIDs.contains(playerID) == false &&
+						    this.connectionNetworking.localID != playerID &&
+						    playerID < this.connectionNetworking.localID &&
+						    player.getConnectedTo() != this.connectionNetworking.foreignID &&
+						    player.getPublicIP() != Toolkit.getPublicIP())
+						{
+							players.add(player);
+						}
+					} catch (IOException ioe)
+					{
+						continue;
 					}
 				}
 
@@ -252,7 +305,13 @@ public class Reconnector implements BlackboardObserver
 				{
 					Collections.sort(players);
 					Player player = players.get(0);
-					connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					try
+					{
+						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					} catch (Exception e)
+					{
+						connection = null;
+					}
 					if (connection != null)
 					{
 						handleConnection(connection, player.getID());
@@ -266,7 +325,13 @@ public class Reconnector implements BlackboardObserver
 				synchronized (joined)
 				{
 					this.playerJoined = false;
-					joined.wait(2000);
+					try
+					{
+						joined.wait(2000);
+					} catch (InterruptedException ie)
+					{
+						return;
+					}
 					if (this.playerJoined == false)
 					{
 						synchronized (this.deadIDs)
@@ -330,13 +395,7 @@ public class Reconnector implements BlackboardObserver
 		{
 			synchronized (joined)
 			{
-				try
-				{
-					joined.notifyAll();
-				} catch (InterruptedException ie)
-				{
-					return;
-				}
+				joined.notifyAll();
 			}
 		}
 	}
