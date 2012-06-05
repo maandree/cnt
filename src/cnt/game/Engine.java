@@ -75,6 +75,8 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
      */
     public void start()
     {
+	System.out.println("\033[1;34mEngine.this.start();\033[0m");
+	
 	this.data.gameOver = false;
 	this.data.sleepTime = INITIAL_SLEEP_TIME / SLEEP_TIME_MULTIPLER; //the division will be nullified when the games starts by nextTurn()
 	this.data.board = new Board();
