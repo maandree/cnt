@@ -244,7 +244,6 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     
     
     
-    
     /**
      * Starts a cloud
      * 
@@ -302,8 +301,10 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	{
 	    System.err.print("\033[1;33mTrying to establish connections and streams...\033[0m");
 	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
-	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
+	    System.err.println(connection == null ? "\033[1;31mnull check\033[0m" : "\033[1;32mnull check\033[0m");
 	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+	    output.flush();
+	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 	    System.err.println("\033[1;33mDone\033[0m");
 	    
 	    System.err.print("\033[1;33mTrying to send Handshake...\033[0m");
@@ -494,6 +495,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		if (packet.addHasGotPacket(player))
 		{
 		    sendToID[ptr] = player;
+		    System.out.println("\033[1;33msendTo[" + ptr + "] := outputs[" + player + "] = " + this.outputs.get(player) + "\033[0m");
 		    sendTo[ptr++] = this.outputs.get(player);
 		}
 	}
