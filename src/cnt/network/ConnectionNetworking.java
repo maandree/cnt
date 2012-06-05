@@ -495,7 +495,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		if (packet.addHasGotPacket(player))
 		{
 		    sendToID[ptr] = player;
-		    System.out.println("\033[1;31msendTo[" + ptr + "] := outputs[" + player + "] = " + this.outputs.get(player) + "\033[0m");
+		    System.out.println("\033[1;33msendTo[" + ptr + "] := outputs[" + player + "] = " + this.outputs.get(player) + "\033[0m");
 		    sendTo[ptr++] = this.outputs.get(player);
 		}
 	}
