@@ -92,8 +92,8 @@ public class Reconnector implements BlackboardObserver
 	{
 		synchronized (this.deadIDs)
 		{   	
-			this.reconnect();
 			this.deadIDs.add(id);
+			this.reconnect();
 			
 		}
 	}

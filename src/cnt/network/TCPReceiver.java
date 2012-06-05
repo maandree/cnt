@@ -162,6 +162,10 @@ public class TCPReceiver implements Runnable
 		// Take ID and map the connection and peer in ConnectionNetworking
 		this.connectionNetworking.sockets.put(peer, this.connection);
 		this.connectionNetworking.inputs.put(peer, input);
+		
+		synchronized (this)
+		{ this.notifyAll();
+		}
 
 		System.err.println("\033[1;33mTCPReceiver: Streams are:\nInput:  " + (this.connectionNetworking.inputs.get(peer) == null ? "\033[1;31mNull\033[1;33m" : "\033[1;32mOK\033[1;33m") + "\nOutput: " + (this.connectionNetworking.outputs.get(peer) == null ?  "\033[1;31mNull\033[1;33m" : "\033[1;32mOK\033[1;33m") + "\033[0m");
 		try 
@@ -169,41 +173,39 @@ public class TCPReceiver implements Runnable
 			while(true)
 			{
 				packet = (Packet)this.input.readObject();
-					
 				synchronized (this.connectionNetworking.oldMessages)
 				{
 					if (this.connectionNetworking.oldMessages.contains(packet.getUUID()))
 					{	
-					
-						System.err.println("\033[1;31mTCPReceiver: OLD PACKAGE\033[0m");
-					
-					} else 
+						System.err.println("\033[1;31mTCPReceiver: OLD PACKEt: " + packet.getMessage().getClass() + "#" + packet.getMessage().getMessage() + " UUID: " + packet.getUUID() + "\033[0m");
+						continue;
+					} else
 					{
-				
+						this.connectionNetworking.oldMessages.add(packet.getUUID());
+					}
+				}
 
-						if (packet.getMessage() instanceof Broadcast)
-						{
-							this.connectionNetworking.send(packet); // ROUTING, DO NOT DELETE!
-		
-							if (packet.getMessage().getMessage() instanceof BlackboardMessage)
-								this.gameNetworking.receive(packet);
-							
-							else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
-								System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
-		
-						} else if (packet.getMessage() instanceof Whisper)
-						{
-							Whisper message = (Whisper)packet.getMessage();
-							if (message.getReceiver() != this.connectionNetworking.localID)
-								this.connectionNetworking.send(packet);
-							else
-							{
-								if (packet.getMessage().getMessage() instanceof BlackboardMessage)
-									this.gameNetworking.receive(packet);
-								else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
-									System.err.println("\n\nGot a ConnectionMessage in a Whisper while being connected, shouldn't happen\n");
-							}
-						}
+				if (packet.getMessage() instanceof Broadcast)
+				{
+					this.connectionNetworking.send(packet); // ROUTING, DO NOT DELETE!
+
+					if (packet.getMessage().getMessage() instanceof BlackboardMessage)
+						this.gameNetworking.receive(packet);
+					
+					else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
+						System.err.println("\n\nGot a ConnectionMessage in a Broadcast while being connected, shouldn't happen\n");
+
+				} else if (packet.getMessage() instanceof Whisper)
+				{
+					Whisper message = (Whisper)packet.getMessage();
+					if (message.getReceiver() != this.connectionNetworking.localID)
+						this.connectionNetworking.send(packet);
+					else
+					{
+						if (packet.getMessage().getMessage() instanceof BlackboardMessage)
+							this.gameNetworking.receive(packet);
+						else if (packet.getMessage().getMessage() instanceof ConnectionMessage)
+							System.err.println("\n\nGot a ConnectionMessage in a Whisper while being connected, shouldn't happen\n");
 					}
 				}
 			}
