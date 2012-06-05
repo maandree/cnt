@@ -101,19 +101,26 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    public void run()
 		    {
 			synchronized (ConnectionNetworking.this.startMonitor)
-			{   try
-			    {   ConnectionNetworking.this.startMonitor.wait();
-			    }
+			{   
+				try
+			    	{   
+					System.out.print("Starting upp ConnectionNetworking...");
+					ConnectionNetworking.this.startMonitor.wait();
+					System.out.print("Done");
+			    	}
 			    catch (final InterruptedException err)
-			    {   //Do nothing
+			    {   
+				    System.out.println("Error starting Networking");
 			}   }
 			
 			try
 			{
-				
+				System.out.print("Trying startJoin...");
 				ConnectionNetworking.this.startJoin(playerName, foreignHost, port);
+				System.out.println("Done");
 			} catch (IOException ioe)
 			{
+				System.out.println("Error on startJoin");
 				Blackboard.broadcastMessage(new GameOver());
 			}
 		    }
@@ -293,16 +300,23 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	
 	try 
 	{
+	    System.out.print("Trying to establish connections and streams...");
 	    Socket connection = this.connect((Inet4Address)(InetAddress.getByName(foreignHost)), port, false);
 	    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
 	    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+	    System.out.println("Done");
 	    
+	    System.out.print("Trying to send Handshake...");
 	    this.send(PacketFactory.createConnectionHandshake(), output);
+	    System.out.println("Done");
 	    
 	    // Get answer
 	    HandshakeAnswer answer = null;
 	    try
-	    {   answer = (HandshakeAnswer)(input.readObject());
+	    {  
+		System.out.print("Getting HandshakeAnswer...");
+		answer = (HandshakeAnswer)(input.readObject());
+		System.out.println("Done");
 		this.foreignID = answer.server;
 		PacketFactory.setID(this.localID = answer.client);
 		FullUpdate update = (FullUpdate)(input.readObject());
@@ -317,19 +331,21 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    Blackboard.broadcastMessage(new GameOver());
 	    }   }
 	    
-	    
+	    System.out.print("Starting listening thread...");
 	    // By now we should have our ID and the ID from the host we connected to
 	    if (this.foreignID != -1)
 	    {
+		System.out.print("Starting...");
 		this.outputs.put(this.foreignID, output);
 		TCPReceiver receiver = new TCPReceiver(connection, input, this, this.foreignID);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
+	    System.out.println("Done");
 	}
 	catch (IOException ioe)
 	{
-	    // blackboardmessage!
+		System.out.println("Error starting connection: " + ioe.getMessage());
 	}
 	
 	// Create the local player
@@ -417,7 +433,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    t.start();
 	}
 	
-	Blackboard.broadcastMessage(new SystemMessage(null, "Number of open sockets: " + this.sockets.size()));
+	Blackboard.broadcastMessage(new SystemMessage(null, "Opened Socket"));
 	
 	return connection;
     }
@@ -494,7 +510,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    Blackboard.broadcastMessage(new SystemMessage(null, "Special Send failed!"));
 		else
 		{
-		    System.err.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
+		    System.out.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
 		    if (sendToID[i] < this.localID)
 			this.reconnect(sendToID[i]);
 		}
@@ -533,7 +549,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     {
 	if (this.sockets.isEmpty())
 	{
-	    System.err.println("Checking to see if we have connections to send to in ConectionNetworking, no connections");
+	    System.out.println("Checking to see if we have connections to send to in ConectionNetworking, no connections");
 	    return false;
 	}
 	return true;
