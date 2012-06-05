@@ -11,9 +11,6 @@ import cnt.game.*;
 import cnt.messages.*;
 import cnt.*;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 
 /**
  * The ring with all players
@@ -42,25 +39,12 @@ public class PlayerRing implements Blackboard.BlackboardObserver
      */
     private Player localPlayer = null;
     
-    /**
-     * Player comparator, comparing by colour
-     */
-    private final Comparator<Player> comparator = new Comparator<Player>()
-            {
-		/**
-		 * {@inheritDoc}
-		 */
-		public int compare(final Player p, final Player q)
-		{
-		    return p.getID() - q.getID();
-		}
-	    };
-    
     
     
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public synchronized void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
 	if (message instanceof PlayerJoined)
@@ -69,8 +53,6 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    if (this.ring.contains(player))
 		return;
 	    this.ring.insertBefore(player);
-	    if (player.equals(this.localPlayer) == false)
-		Blackboard.broadcastMessage(new PlayerOrder(this.ring));
 	}
 	else if (message instanceof PlayerDropped)
 	{
@@ -95,13 +77,13 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    final Player player = ((LocalPlayer)message).player;
 	    this.localPlayer = player;
 	}
-	else if (message instanceof PlayerOrder)
+	else if (message instanceof FullUpdate)
 	{
-	    final ACDLinkedList<Player> newRing = ((PlayerOrder)message).order;
-	    if (newRing == this.ring)
-		return;
-	    System.err.println("\033[1;32mGot new player ring\033[0m");
-	    this.ring = newRing;
+	    final FullUpdate update = (FullUpdate)message;
+	    if (update.isGathering())
+		update.data.put(PlayerRing.class, this.ring);
+	    else
+		this.ring = (ACDLinkedList<Player>)(update.data.get(PlayerRing.class));
 	}
     }
     
