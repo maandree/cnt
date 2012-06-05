@@ -82,6 +82,7 @@ public class Reconnector implements BlackboardObserver
 	 */
 	{
 		Blackboard.registerObserver(this);
+		this.reconnect();
 	}
 
 	/**
@@ -116,16 +117,21 @@ public class Reconnector implements BlackboardObserver
 	{
 		while (true)
 		{
-			if (this.deadIDs.isEmpty())
 			    synchronized (this.deadIDs)
 			    {
-				try
-				{   this.deadIDs.wait();
-				}
-				catch (final InterruptedException err)
-				{   return;
-				}
+				if (this.deadIDs.isEmpty())
+				{
+					System.err.println("\033[1;33mReconnector: deadIDs is Empty\033[0m");
+					try
+					{   this.deadIDs.wait();
+					}
+					catch (final InterruptedException err)
+					{   return;
+					}
+				 }
+				System.err.println("\033[1;33mReconnector: DeadIDs is NOT empty\033[0m");
 			    }
+		
 			
 			Blackboard.broadcastMessage(new EmergencyPause(true));
 			
@@ -352,8 +358,8 @@ public class Reconnector implements BlackboardObserver
 			}
 
 		}
-	}
 
+	}
 	private boolean handleConnection(Socket connection, int id)
 	{
 		try

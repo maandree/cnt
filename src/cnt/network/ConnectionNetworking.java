@@ -551,6 +551,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    }
 		    this.sockets.remove(sendToID[i]);
 		    this.outputs.remove(sendToID[i]);
+		    Blackboard.broadcastMessage(new EmergencyPause(true));
+		    this.reconnect(sendToID[i]);
 		}
 	    }
     }
