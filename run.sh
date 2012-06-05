@@ -22,69 +22,13 @@ elif [[ $1 = "main" ]]; then
 elif [[ $1 = "main-da" ]]; then
     javaSeven -da -cp bin$jars cnt.Program
 
-#elif [[ $1 = "engine" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.EngineDemo $2
-
-#elif [[ $1 = "frame" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.GameFrameDemo
-
-#elif [[ $1 = "network" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.NetworkingDemo
-
-#elif [[ $1 = "peernetwork" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.PeerNetworkingDemo $2 $3 $4 $5 $6
-
-elif [[ $1 = "chat" ]]; then
-    javaSeven -ea -cp bin$jars cnt.demo.ChatDemo $2 $3 $4 $5 $6
-
-#elif [[ $1 = "upnp" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.UPnPDemo
-
-#elif [[ $1 = "shape" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.test.ShapeTest
-
-#elif [[ $1 = "pipe" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.test.PipeTest
-
-#elif [[ $1 = "linkedlist" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.test.CDLinkedListTest
-#    javaSeven -ea -cp bin$jars cnt.test.ACDLinkedListTest
-
-#elif [[ $1 = "game" ]]; then
-#    stty -icanon
-#    javaSeven -ea -cp bin$jars cnt.demo.GameDemo
-#    stty icanon
-
-elif [[ $1 = "replay" ]]; then
-    javaSeven -ea -cp bin$jars cnt.Replayer /dev/shm/recording.cnt
-
-elif [[ $1 = "peergame" ]]; then
-#    stty -icanon
-    javaSeven -ea -cp bin$jars cnt.demo.PeerGameDemo $2 $3 $4 $5 $6
-#    stty icanon
-
-#elif [[ $1 = "netgame" ]]; then
-#    stty -icanon
-#    javaSeven -ea -cp bin$jars cnt.demo.NetGameDemo $2 $3 $4 $5 $6
-#    stty icanon
-
-#elif [[ $1 = "connection" ]]; then
-#    javaSeven -ea -cp bin$jars cnt.demo.ConnectionDemo $2 $3 $4 $5 $6
-
 elif [[ $1 = "--completion--" ]]; then
     _run()
     {
 	local cur prev words cword
 	_init_completion -n = || return
 	
-	if [[ "$prev" = "engine" ]]; then
-	    COMPREPLY=( $( compgen -W 'clockwise anti-clockwise' -- "$cur" ) )
-	else
-	    #COMPREPLY=( $( compgen -W 'main main-da engine frame network peernetwork chat netgame' -- "$cur" ) \
-	    #            $( compgen -W 'upnp shape pipe linkedlist game replay peergame connection' -- "$cur" ))
-	    
-	    COMPREPLY=( $( compgen -W 'main main-da chat replay peergame' -- "$cur" ) )
-	fi
+	COMPREPLY=( $( compgen -W 'main main-da' -- "$cur" ) )
     }
     
     complete -o default -F _run run
