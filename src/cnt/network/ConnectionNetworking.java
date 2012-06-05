@@ -485,7 +485,6 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     public void send(final Packet packet, final ObjectOutputStream output)
     {
 	System.out.println("\033[1;33msending: " + packet.getMessage().getClass() + "#" + packet.getMessage().getMessage() + "\033[0m");
-	this.oldMessages.add(packet.getUUID());
 	final int[] playerIDs;
 	//if (packet.getMessage() instanceof Broadcast)
 	if (packet.getMessage() instanceof Anycast == false)
@@ -531,28 +530,36 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	}
 	    
 	for (int i = 0; i < ptr; i++)
-	    try
-	    {
-		sendTo[i].writeObject(packet);
-		sendTo[i].flush();
-	    }
-	    catch (IOException ioe)
-	    {
-		if (output != null)
-		    Blackboard.broadcastMessage(new SystemMessage(null, "Special Send failed!"));
-		else
-		{
-		    System.out.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
-		    try
-		    {
-		    	this.sockets.get(sendToID[i]).close();
-		    } catch (Exception err) {
-			    System.err.println("\033[1;33miConnectionNetworking: Couldn't close socket on faulty connection\033[0m");
+	synchronized (this.oldMessages)
+	{
+	 	   try
+	 	   {
+			if (this.oldMessages.contains(packet.getUUID()) == false)
+			{
+				sendTo[i].writeObject(packet);
+				sendTo[i].flush();
+				this.oldMessages.add(packet.getUUID());
+			}
 		    }
-		    this.outputs.remove(sendToID[i]);
-		    this.reconnect(sendToID[i]);
-		}
-	    }
+		    catch (IOException ioe)
+		    {
+	
+			if (output != null)
+			    Blackboard.broadcastMessage(new SystemMessage(null, "Special Send failed!"));
+			else
+			{
+			    System.out.println("\033[1;31mError routing message to [" + sendToID[i] + "]: Skipping, he will get it in the full update he gets when he reconnects\033[21;39m");
+			    try
+			    {
+		    		this.sockets.get(sendToID[i]).close();
+		    	} catch (Exception err) {
+				    System.err.println("\033[1;33miConnectionNetworking: Couldn't close socket on faulty connection\033[0m");
+			    }
+			    this.outputs.remove(sendToID[i]);
+			    this.reconnect(sendToID[i]);
+			}
+	    	}
+	}
     }
     
     

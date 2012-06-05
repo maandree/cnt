@@ -107,49 +107,54 @@ public class GameNetworking
      * @throws  ClassNotFoundException  If the message type is not a part of the program
      */
     @SuppressWarnings("unchecked")
-    public void receive(Serializable object)
-    {
-	try
-	{
-	    if (object instanceof Packet == false)
-		return;
-	   NetworkMessage message = null; 
-	    Packet packet = (Packet)object;
-	    if (packet.getMessage() instanceof Broadcast)
-		    message = packet.getMessage();
-	    else if (packet.getMessage() instanceof Whisper)
-		    message = packet.getMessage();
-	    
-	    Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
-	    //if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
-		//return;
-	    
-	    System.err.println("\033[1;33mGameNetworking:  Correct type: " + (blackboardMessage instanceof Blackboard.BlackboardMessage ? "\033[1;32mOK\033[0m" : "\033[1;31mNO: " + blackboardMessage.getClass() + "\033[0m"));
-	    if (blackboardMessage instanceof FullUpdate)
-	    {
-		final FullUpdate update = (FullUpdate)blackboardMessage;
-		System.err.println("\033[1;33mGameNetworking: PlayerRing: " + (update.data.get(PlayerRing.class) == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
-		if (update.isGathering() == false)
+	public void receive(Packet object)
+  	{
+		try
 		{
-		    System.err.println("\033[1;33mGameNetworking: Sending PlayerJoineds\033[0m");
-		    for (final Player player : (Iterable<Player>)(update.data.get(PlayerRing.class)))
-		    {	
-			System.err.println("\033[1;33mGameNetworking: Player: " + (player == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
-			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
-		    }
-		}
-	    }
-	    else if (blackboardMessage instanceof Blackboard.BlackboardMessage)
-		    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
+			if (object instanceof Packet == false)
+				return;
+
+			NetworkMessage message = null; 
+	  
+			if (object.getMessage() instanceof Broadcast)
+				message = object.getMessage();
 	    
-	    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
+			else if (object.getMessage() instanceof Whisper)
+				message = object.getMessage();
+	    
+	    		Blackboard.BlackboardMessage blackboardMessage = (Blackboard.BlackboardMessage)message.getMessage();
+			
+			if(blackboardMessage.checkIntegrity() == Boolean.FALSE)
+				return;
+	    
+			System.err.println("\033[1;33mGameNetworking:  Correct type: " + (blackboardMessage instanceof Blackboard.BlackboardMessage ? "\033[1;32mOK\033[0m" : "\033[1;31mNO: " + blackboardMessage.getClass() + "\033[0m"));
+			if (blackboardMessage instanceof FullUpdate)
+	    		{
+				final FullUpdate update = (FullUpdate)blackboardMessage;
+				System.err.println("\033[1;33mGameNetworking: PlayerRing: " + (update.data.get(PlayerRing.class) == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
+				if (update.isGathering() == false)
+				{
+		    			System.err.println("\033[1;33mGameNetworking: Sending PlayerJoineds\033[0m");
+		    			for (final Player player : (Iterable<Player>)(update.data.get(PlayerRing.class)))
+		    			{	
+						System.err.println("\033[1;33mGameNetworking: Player: " + (player == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
+						this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
+		    			}
+				}
+	    		}
+			
+			else if (blackboardMessage instanceof Blackboard.BlackboardMessage)
+				this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
+
+			else
+				System.err.println("\033[1;33mGameNetworking: \033[1;31mError! \033[1;33m Received message type: \033[1;34M" + blackboardMessage.getClass() + "\033[0m");
+	    
+		} catch (Exception err)
+		{
+	    		System.err.println("\033[1;33mGameNetworking recived EXCEPTION!\033[0m");
+	    		return; 
+		}
 	}
-	catch (Exception err)
-	{
-	    System.err.println("\033[1;33mGameNetworking recived EXCEPTION!\033[0m");
-	    return; 
-	}
-    }
     
 }
 
