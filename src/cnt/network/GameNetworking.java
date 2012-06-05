@@ -107,7 +107,7 @@ public class GameNetworking
     @SuppressWarnings("unchecked")
     public void receive(Serializable object)
     {
-	try 
+	try
 	{
 	    if (object instanceof Blackboard.BlackboardMessage == false)
 		return;

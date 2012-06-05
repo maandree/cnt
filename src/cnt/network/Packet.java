@@ -186,7 +186,8 @@ public class Packet implements Comparable<Packet>, Serializable
 	
 	final int[] ids = new int[this.sentTo.length + 1];
 	System.arraycopy(ids, 0, this.sentTo, 0, pos);
-	System.arraycopy(ids, pos + 1, this.sentTo, pos + 1, this.sentTo.length - pos - 1);
+	if (this.sentTo.length - pos - 1 > 0)
+	    System.arraycopy(ids, pos + 1, this.sentTo, pos + 1, this.sentTo.length - pos - 1);
 	(this.sentTo = ids)[pos] = id;
 	
 	return true;
