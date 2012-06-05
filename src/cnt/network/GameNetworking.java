@@ -125,13 +125,19 @@ public class GameNetworking
 	    if (blackboardMessage instanceof FullUpdate)
 	    {
 		final FullUpdate update = (FullUpdate)blackboardMessage;
+		System.err.println("\033[1;33mGameNetworking: PlayerRing: " + (update.data.get(PlayerRing.class) == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
 		if (update.isGathering() == false)
 		{
+		    System.err.println("\033[1;33mGameNetworking: Sending PlayerJoineds\033[0m");
 		    for (final Player player : (Iterable<Player>)(update.data.get(PlayerRing.class)))
-			System.err.println("\033[1;33mGameNetworking: Sending PlayerJoineds\033[0m");
+		    {	
+			System.err.println("\033[1;33mGameNetworking: Player: " + (player == null ? "\033[1;31mNull\033[0m" : "\033[1;32mOK\033[0m"));
 			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
+		    }
 		}
 	    }
+	    else if (blackboardMessage instanceof PlayerJoined)
+		    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
 	    
 	    this.blackboardNetworking.receiveAndBroadcast(blackboardMessage);
 	}
