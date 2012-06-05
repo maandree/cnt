@@ -294,7 +294,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
 			erase[y][x] = true;
 		update(erase, matrix, 0, 0);
 		final Block[][] blocks = shape.getBlockMatrix();
-		update(null, blocks, 0, 0);
+		update(null, blocks, shape.getX(), shape.getY());
 	    }
 	}
     }
