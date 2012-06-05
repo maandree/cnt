@@ -533,7 +533,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     {
 	if (this.sockets.isEmpty())
 	{
-	    Blackboard.broadcastMessage(new SystemMessage(null, "No connections found"));
+	    System.err.println("Checking to see if we have connections to send to in ConectionNetworking, no connections");
 	    return false;
 	}
 	return true;
