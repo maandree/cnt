@@ -9,6 +9,7 @@ package cnt.interaction.desktop;
 import cnt.interaction.*;
 import cnt.messages.*;
 import cnt.game.*;
+import cnt.game.Shape; //Explicit
 import cnt.game.enginehelp.*;
 import cnt.*;
 
@@ -283,6 +284,7 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
 	    if (fullUpdate.isGathering() == false)
 	    {
 		final Board board = ((EngineData)(fullUpdate.data.get(Engine.class))).board;
+		final Shape shape = ((EngineData)(fullUpdate.data.get(Engine.class))).fallingShape;
 		if (board == null)
 		    return;
 		final Block[][] matrix = board.getMatrix();
@@ -291,6 +293,8 @@ public class GamePanel extends JPanel implements Blackboard.BlackboardObserver, 
 		    for (int x = 0; x < 10; x++)
 			erase[y][x] = true;
 		update(erase, matrix, 0, 0);
+		final Block[][] blocks = shape.getBlockMatrix();
+		update(null, blocks, 0, 0);
 	    }
 	}
     }
