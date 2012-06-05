@@ -122,13 +122,17 @@ public class Blackboard
     /**
      * Registrered observers
      */
-    private static /*Weak*/HashMap<BlackboardObserver, Void> observers = new /*Weak*/HashMap<BlackboardObserver, Void>(); /*//simulate the missing cass: WeakHashSet*/
+    private static /*Weak*/HashMap<BlackboardObserver, Void> observers = new /*Weak*/HashMap<>(); /*//simulate the missing cass: WeakHashSet*/
     
     /**
      * How to thread message observations
      */
-    private static /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading =
-	       new /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>>();
+    private static /*Weak*/HashMap<BlackboardObserver, HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy>> observationThreading = new /*Weak*/HashMap<>();
+    
+    /**
+     * Persistant messages
+     */
+    private static HashMap<Class<? extends PersistantMessage>, PersistantMessage> persistants = new HashMap<>();
     
     /**
      * Concurrency monitor
@@ -138,7 +142,7 @@ public class Blackboard
     
     
     /**
-     * This interface is used for all event handled by the enclosing class
+     * This interface is used for all event
      */
     public static interface BlackboardMessage extends Serializable
     {
@@ -158,6 +162,16 @@ public class Blackboard
 	 *          <code>null</code> if external examination is required.
 	 */
 	public Boolean checkIntegrity();
+    }
+    
+    
+    /**
+     * Persisrant message are sent to new observers, until a new
+     * instance is created of the same class.
+     */
+    public static interface PersistantMessage extends BlackboardMessage
+    {
+	//Marker interface
     }
     
     
@@ -202,6 +216,32 @@ public class Blackboard
 	{
 	    System.err.println("BLACKBOARD.registerObserver(" + observer + ")");
 	    observers.put(observer, null);
+	    
+	    final ArrayList<Thread> threads = new ArrayList<Thread>();
+	    
+	    for (final PersistantMessage message : persistants.values())
+	    {
+		final ThreadingPolicy policy;
+		final Runnable runnable = new Runnable()
+		    {
+			/**
+			 * {@inheritDoc}
+			 */
+			public void run()
+			{   observer.messageBroadcasted(message);
+			}
+		    };
+		
+		final HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
+		if (map == null)  policy = null;
+		else              policy = map.get(message.getClass());
+		
+		if (policy == null)  runnable.run();
+		else                 threads.add(policy.createThread(runnable));
+	    }
+	    
+	    for (final Thread thread : threads)
+		thread.start();
 	}
     }
     
@@ -271,6 +311,9 @@ public class Blackboard
     {
 	synchronized (monitor)
 	{
+	    if (message instanceof PersistantMessage)
+		persistants.put(((PersistantMessage)message).getClass(), (PersistantMessage)message);
+	    
 	    System.err.println("BLACKBOARD.broadcastMessage(" + message.toString() + ")");
 	    final ArrayList<Thread> threads = new ArrayList<Thread>();
 	    
@@ -293,15 +336,11 @@ public class Blackboard
 		    };
 		
 		final HashMap<Class<? extends BlackboardMessage>, ThreadingPolicy> map = observationThreading.get(observer);
-		if (map == null)
-		    policy = null;
-		else
-		    policy = map.get(message.getClass());
+		if (map == null)  policy = null;
+		else              policy = map.get(message.getClass());
 		
-		if (policy == null)
-		    runnable.run();
-		else
-		    threads.add(policy.createThread(runnable));
+		if (policy == null)  runnable.run();
+		else                  threads.add(policy.createThread(runnable));
 	    }
 	    
 	    for (final Thread thread : threads)
