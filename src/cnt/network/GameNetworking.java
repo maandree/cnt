@@ -69,7 +69,9 @@ public class GameNetworking
      */
     public void forward(final Serializable message) throws IOException
     {
-	this.connectionNetworking.send(PacketFactory.createBroadcast(message, false));
+	final boolean urgent = (message instanceof EmergencyPause) && ((EmergencyPause)message).paused;
+	
+	this.connectionNetworking.send(PacketFactory.createBroadcast(message, urgent));
     }
     
     
