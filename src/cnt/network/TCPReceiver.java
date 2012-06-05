@@ -205,7 +205,6 @@ public class TCPReceiver implements Runnable
 			
 		} catch (IOException ioe)
 		{
-			if (this.foreignID < this.connectionNetworking.localID)
 				this.connectionNetworking.reconnect(this.foreignID);
 		} catch (Exception err)
 		{
