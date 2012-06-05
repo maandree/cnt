@@ -6,6 +6,9 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
+
+import cnt.Blackboard;
+import cnt.Blackboard.*;
 import cnt.messages.*;
 import cnt.game.*;
 import cnt.util.*;
@@ -41,14 +44,19 @@ public class Reconnector
 	private final ConnectionNetworking connectionNetworking;
     
 	/**
-	* Monitor object to use for internal monitoring
-	*/
-	private final Object monitor = new Object();
+	 * Monitor object to use for internal monitoring of PlayerRejoins
+	 */
+	private final Object joined = new Object();
 
 	/**
 	* Set of IDs for the connections that are dead and we need to reconnect,
 	*/
 	private HashSet<Integer> deadIDs = new HashSet<Integer>();
+
+	/**
+	 * Checks if a player has joined in a specefic timeframe
+	 */
+	private boolean playerJoined = false;
     
     
     
@@ -70,25 +78,35 @@ public class Reconnector
 	}
 
 	/**
+	 * Initializer
+	 */
+	{
+		Blackboard.registerObserver(this);
+	}
+
+	/**
 	* Add an ID discovered to be dead and send notify to monitor to start reconnecting
 	*
 	* @param id Player id to add to the set
 	*/
-	public synchronized void addID(int id)
+	public void addID(int id)
 	{
-		this.deadIDs.add(id);
-		synchronized (monitor)
-		{   monitor.notify();
+		synchronized (this.deadIDs)
+		{   	
+			this.deadIDs.add(id);
+			this.deadIDs.notify();
 		}
 	}
 
 	/**
 	* Remove an ID discovered to be connected again.
 	*/
-	public synchronized void removeID(int id)
+	public void removeID(int id)
 	{
-	    if (this.deadIDs.contains(id))
-		this.deadIDs.remove(id);
+		synchronized (this.deadIDs)
+		{
+			this.deadIDs.remove(id);
+		}
 	}
 
 	/**
@@ -99,10 +117,10 @@ public class Reconnector
 		while (true)
 		{
 			if (this.deadIDs.isEmpty())
-			    synchronized (monitor)
+			    synchronized (this.deadIDs)
 			    {
 				try
-				{   monitor.wait();
+				{   this.deadIDs.wait();
 				}
 				catch (final InterruptedException err)
 				{   return;
@@ -127,51 +145,147 @@ public class Reconnector
 				Socket connection = this.connectionNetworking.connect((Inet4Address)(dead.getInetAddress()), dead.getPort(), true);
 				if (connection != null && handleConnection(connection, id))
 					continue;
-			}
 			
-			ArrayList<Player> players = new ArrayList<Player>();
-			for (int playerID : this.connectionNetworking.connectedIDs)
-			{
-				Player player = Player.getInstance(playerID);
-				if (this.deadIDs.contains(playerID) == false && 
-				    this.connectionNetworking.localID != playerID && 
-				    playerID < this.connectionNetworking.localID && 
-				    player.getConnectedTo() == this.connectionNetworking.foreignID && 
-				    player.getPublicIP() == Toolkit.getPublicIP())
+			
+				ArrayList<Player> players = new ArrayList<Player>();
+				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
-					players.add(player);
+					Player player = Player.getInstance(playerID);
+					if (this.deadIDs.contains(playerID) == false && 
+					    this.connectionNetworking.localID != playerID && 
+					    playerID < this.connectionNetworking.localID && 
+					    player.getConnectedTo() == this.connectionNetworking.foreignID && 
+					    player.getPublicIP() == Toolkit.getPublicIP())
+					{
+						players.add(player);
+					}
 				}
-			}
-			
-			if (players.isEmpty() == false)
-			{
-				Collections.sort(players);
-				Player player = players.get(0);
-				Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
-				if (connection != null && handleConnection(connection, player.getID()))
-					continue;
-				else
+				
+				if (players.isEmpty() == false)
 				{
-					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+					Collections.sort(players);
+					Player player = players.get(0);
+					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
 					if (connection != null && handleConnection(connection, player.getID()))
 						continue;
+					else
+					{
+						Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						if (connection != null)
+						{
+							handleConnection(connection, player.getID());
+							continue;
+						}
+					}
+				}
+				
+				for (int playerID : this.connectionNetworking.connectedIDs)
+				{
+					Player player = Player.getInstance(playerID);
+					if (this.deadIDs.contains(playerID) == false &&
+					    this.connectionNetworking.localID != playerID &&
+					    playerID < this.connectionNetworking.localID &&
+					    player.getConnectedTo() == this.connectionNetworking.connectionNetworking.foreignID &&
+					    player.getPublicIP() != Toolkit.getPublicIP())
+					{
+						players.add(player);
+					}
+				}
+
+				if (players.isEmpty() == false)
+				{
+					Collections.sort(players);
+					Player player = players.get(0);
+					Socket connection = this.connectionNetworking.connect(((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					if (connection != null)
+					{
+						handleConnection(connection, plauer.getID());
+						continue;
+					}
+				}
+
+				for (int playerID : this.connectionNetworking.connectedIDs)
+				{
+					Player player = Player.getInstance(playerID);
+					if (this.deadIDs.contains(playerID) == false && 
+					    this.connectionNetworking.localID != playerID && 
+					    playerID < this.connectionNetworking.localID && 
+					    player.getConnectedTo() != this.connectionNetworking.foreignID && 
+					    player.getPublicIP() == Toolkit.getPublicIP())
+					{
+						players.add(player);
+					}
+				}
+				
+				if (players.isEmpty() == false)
+				{
+					Collections.sort(players);
+					Player player = players.get(0);
+					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					if (connection != null && handleConnection(connection, player.getID()))
+						continue;
+					else
+					{
+						Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+						if (connection != null)
+						{
+							handleConnection(connection, player.getID());
+							continue;
+						}
+					}
+				}
+
+				for (int playerID : this.connectionNetworking.connectedIDs)
+				{
+					Player player = Player.getInstance(playerID);
+					if (this.deadIDs.contains(playerID) == false &&
+					    this.connectionNetworking.localID != playerID &&
+					    playerID < this.connectionNetworking.localID &&
+					    player.getConnectedTo() != this.connectionNetworking.connectionNetworking.foreignID &&
+					    player.getPublicIP() != Toolkit.getPublicIP())
+					{
+						players.add(player);
+					}
+				}
+
+				if (players.isEmpty() == false)
+				{
+					Collections.sort(players);
+					Player player = players.get(0);
+					Socket connection = this.connectionNetworking.connect(((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+					if (connection != null)
+					{
+						handleConnection(connection, plauer.getID());
+						continue;
+					}
 				}
 			}
 			
-			for (int playerID : this.connectionNetworking.connectedIDs)
+			for(;;)
 			{
-				Player player = Player.getInstance(playerID);
-				if (this.deadIDs.contains(playerID) == false &&
-				    this.connectionNetworking.localID != playerID &&
-				    playerID < this.connectionNetworking.localID &&
-				    player.getConnectedTo() == this.connectionNetworking.connectionNetworking.foreignID &&
-				    player.getPublicIP() != Toolkit.getPublicIP())
+				synchronized (joined)
 				{
-					players.add(player);
+					this.playerJoined = false;
+					joined.wait(2000);
+					if (this.playerJoined == false)
+					{
+						synchronized (this.deadIDS)
+						{
+							for (int playerID : this.deadIDs)
+							{
+								Blackboard.broadcaseMessage(new PlayerDropped(Player.getInstance(playerID)));
+							}
+
+							this.deadIDs.clear();
+						}
+						break;
+					}
 				}
 			}
+
 		}
 	}
+
 	private boolean handeConnection(Socket connection, int id)
 	{
 		try
@@ -196,6 +310,8 @@ public class Reconnector
 	    		Thread t = new Thread(receiver);
 	    		t.start();
 
+			Blackboard.broadcastMessage(new PlayerRejoined(Player.getInstance(id)));
+
 			this.deadIDs.remove(id);
 			return true;
 
@@ -207,4 +323,22 @@ public class Reconnector
 
 		return false;
 	}
+
+	public void messageBroadcasted(final BlackboardMessage message)
+	{
+		if (message instanceof PlayerRejoined)
+		{
+			serializable (joined)
+			{
+				try
+				{
+					joined.notifyAll();
+				} catch (InterruptedException ie)
+				{
+					return;
+				}
+			}
+		}
+	}
+
 }

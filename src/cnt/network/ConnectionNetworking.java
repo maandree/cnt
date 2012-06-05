@@ -478,7 +478,14 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      */
     public void messageBroadcasted(final Blackboard.BlackboardMessage message)
     {
-	if (message instanceof PlayerJoined)
+	if (message instanceof PlayerRejoined)
+	{
+		final Player player = ((PlayerRejoined)message).player;
+
+		this.joinedIDs.add(Integer.valueOf(player.getID()));
+		this.connectedIDs.add(Integer.valueOf(player.getID()));
+	}
+	else if (message instanceof PlayerJoined)
         {
 	    final Player player = ((PlayerJoined)message).player;
 	    
