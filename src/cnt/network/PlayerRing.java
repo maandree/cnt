@@ -49,10 +49,12 @@ public class PlayerRing implements Blackboard.BlackboardObserver
     {
 	if (message instanceof PlayerJoined)
         {
+	    System.err.println("\033[35m" + this.ring.toString() + "\033[0m");
 	    final Player player = ((PlayerJoined)message).player;
 	    if (this.ring.contains(player))
 		return;
 	    this.ring.insertBefore(player);
+	    System.err.println("\033[1;35m" + this.ring.toString() + "\033[0m");
 	}
 	else if (message instanceof PlayerDropped)
 	{
@@ -66,8 +68,8 @@ public class PlayerRing implements Blackboard.BlackboardObserver
 	    final Player player = ((NextPlayer)message).player;
 	    if (player == null)
 	    {
-		Blackboard.broadcastMessage(new NextPlayer(this.ring.get()));
 		this.ring.next();
+		Blackboard.broadcastMessage(new NextPlayer(this.ring.get()));
 	    }
 	    else
 		this.ring.jump(this.ring.find(player));

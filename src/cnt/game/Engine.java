@@ -104,7 +104,8 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 		    {   
 			synchronized (Engine.this.startMonitor)
 			{   try
-			    {   Engine.this.startMonitor.wait();
+			    {   System.out.println("\033[1;34mEngine.this.startMonitor.wait();\033[0m");
+				Engine.this.startMonitor.wait();
 			    }
 			    catch (final InterruptedException err)
 			    {   return;
@@ -122,7 +123,8 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 				if (firstTurn)
 				    firstTurn = false;
 				try
-				{   Engine.this.gameMonitor.wait();
+				{   System.out.println("\033[1;34mEngine.this.gameMonitor.wait();\033[0m");
+				    Engine.this.gameMonitor.wait();
 				}
 				catch (final InterruptedException err)
 				{   return;
@@ -293,6 +295,7 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			synchronized (this.gameMonitor)
 			{
 			    newTurn(player);
+			    System.err.println("\033[1;34mEngine.this.gameMonitor.noify();\033[0m");
 			    this.gameMonitor.notify();
 			}
 		}
@@ -303,7 +306,8 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 	    {
 		this.data.localPlayer = ((LocalPlayer)message).player;
 		synchronized (Engine.this.startMonitor)
-		{   Engine.this.startMonitor.notifyAll();
+		{   System.out.println("\033[1;34mEngine.this.startMonitor.notifyAll();\033[0m");
+		    Engine.this.startMonitor.notifyAll();
 		}
 	    }
 	    else if (message instanceof PlayerPause)
