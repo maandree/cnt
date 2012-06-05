@@ -108,36 +108,103 @@ public class Reconnector
 				{   return;
 				}
 			    }
-			
+			/* Check if selfdead */
+			try
+			{
+				Toolkit.getPublicIP();
+			} catch (IOException err)
+			{
+				Blackboard.broadcastMessage(new GameOver());
+				Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(this.connectionNetworking.localID)));
+				return;
+			}
+
 			if (this.deadIDs.contains(this.connectionNetworking.foreignID))
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
 				
 				Socket dead = this.connectionNetworking.sockets.get(id);
 				Socket connection = this.connectionNetworking.connect((Inet4Address)(dead.getInetAddress()), dead.getPort(), true);
-				if (connection == null)
-				{
-					//* We couldn't connect so we dop the player
-				        Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
-					this.deadIDs.remove(id);
+				if (connection != null && handleConnection(connection, id))
 					continue;
-				}
-				
-				try
+			}
+			
+			ArrayList<Player> players = new ArrayList<Player>();
+			for (int playerID : this.connectionNetworking.connectedIDs)
+			{
+				Player player = Player.getInstance(playerID);
+				if (this.deadIDs.contains(playerID) == false && 
+				    this.connectionNetworking.localID != playerID && 
+				    playerID < this.connectionNetworking.localID && 
+				    player.getConnectedTo() == this.connectionNetworking.foreignID && 
+				    player.getPublicIP() == Toolkit.getPublicIP())
 				{
-				    ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-				    ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
-				    
-				    this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
-				    
-				    HandshakeAnswer answer = null;
-				    answer = (HandshakeAnswer)(input.readObject());
-				} catch (Exception err) {
-				    if (this.connectionNetworking.isServer)
-					{
-						Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
-						this.deadIDs.remove(id);
-					} else
-					{
-						
-}}}}}}
+					players.add(player);
+				}
+			}
+			
+			if (players.isEmpty() == false)
+			{
+				Collections.sort(players);
+				Player player = players.get(0);
+				Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+				if (connection != null && handleConnection(connection, player.getID()))
+					continue;
+				else
+				{
+					Socket connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+					if (connection != null && handleConnection(connection, player.getID()))
+						continue;
+				}
+			}
+			
+			for (int playerID : this.connectionNetworking.connectedIDs)
+			{
+				Player player = Player.getInstance(playerID);
+				if (this.deadIDs.contains(playerID) == false &&
+				    this.connectionNetworking.localID != playerID &&
+				    playerID < this.connectionNetworking.localID &&
+				    player.getConnectedTo() == this.connectionNetworking.connectionNetworking.foreignID &&
+				    player.getPublicIP() != Toolkit.getPublicIP())
+				{
+					players.add(player);
+				}
+			}
+		}
+	}
+	private boolean handeConnection(Socket connection, int id)
+	{
+		try
+		{	
+	    		ObjectOutputStream output = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+	    		ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(connection.getInputStream()));
+				    		
+	    		this.connectionNetworking.send(PacketFactory.createReconnectionHandshake(id), output);
+				    		
+	    		HandshakeAnswer answer = null;
+	    		answer = (HandshakeAnswer)(input.readObject());
+
+			FullUpdate update = (FullUpdate)(input.readObject());
+			Blackboard.broadcastMessage(update);
+
+			this.connectionNetworking.sockets.put(id, connection);
+			this.connectionNetworking.inputs.put(id, input);
+			this.connectionNetworking.outputs.put(id, output);
+			this.connectionNetworking.foreignID = id;
+
+			TCPReceiver receiver = new TCPReceiver(connection, input, this.connectionNetworking, id);
+	    		Thread t = new Thread(receiver);
+	    		t.start();
+
+			this.deadIDs.remove(id);
+			return true;
+
+		} catch (Exception err) {
+			Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(id)));
+			if (deadIDs.contains(id) == false)
+				deadIDs.add(id);
+		}
+
+		return false;
+	}
+}

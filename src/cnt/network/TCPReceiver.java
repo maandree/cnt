@@ -28,11 +28,12 @@ public class TCPReceiver implements Runnable
      *
      * @param  connection            The incoming connection as a socket
      * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
+     * @param foreignID The ID of the remote player
      */
-    public TCPReceiver(Socket connection, ConnectionNetworking connectionNetworking)
+    public TCPReceiver(Socket connection, ConnectionNetworking connectionNetworking, int foreignID)
     {
 	
-	    this(connection, null, connectionNetworking);
+	    this(connection, null, connectionNetworking, foreignID);
     }
 
     /**
@@ -41,13 +42,15 @@ public class TCPReceiver implements Runnable
      * @param  connection            The incoming connection as a socket
      * @param  stream                The {@link ObjectInputStream} to use
      * @param  connectionNetworking  The {@link ConnectionNetworking} instace to map peer and socket in
+     * @param foreignID The ID of the remote player
      */
-    public TCPReceiver(Socket connection, ObjectInputStream stream, ConnectionNetworking connectionNetworking)
+    public TCPReceiver(Socket connection, ObjectInputStream stream, ConnectionNetworking connectionNetworking, int foreignID)
     {
 	this.connection = connection;
 	this.input = stream;
 	this.gameNetworking = connectionNetworking.gameNetworking;
 	this.connectionNetworking = connectionNetworking;
+	this.foreignID = foreignID;
 
     }
     
@@ -112,8 +115,15 @@ public class TCPReceiver implements Runnable
 					peer = this.connectionNetworking.getHighestID() + 1;
 					output.writeObject(new HandshakeAnswer(peer, this.connectionNetworking.localID));
 					output.flush();
+					
 				} else
 					peer = message.getID();
+
+				FullUpdate update = new FullUpdate();
+				Blackboard.broadcastMessage(update);
+				output.writeObject(update);
+				output.flush();
+			
 			} else {
 				this.connection.close();
 				return;
