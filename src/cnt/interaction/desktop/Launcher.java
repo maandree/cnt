@@ -61,6 +61,12 @@ public class Launcher implements Blackboard.BlackboardObserver
 	{
 	    loginFrame.setVisible(false);
 	    (gameFrame = new GameFrame()).setVisible(true);
+	    try
+	    {   Thread.sleep(75);
+	    }
+	    catch (final InterruptedException err)
+	    {   //Do nothing
+	    }
 	}
     }
     
