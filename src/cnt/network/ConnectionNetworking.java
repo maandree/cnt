@@ -549,9 +549,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 		    } catch (Exception err) {
 			    System.err.println("\033[1;33miConnectionNetworking: Couldn't close socket on faulty connection\033[0m");
 		    }
-		    this.sockets.remove(sendToID[i]);
 		    this.outputs.remove(sendToID[i]);
-		    Blackboard.broadcastMessage(new EmergencyPause(true));
 		    this.reconnect(sendToID[i]);
 		}
 	    }
@@ -563,9 +561,12 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      *
      * @param  id  the player ID that lost connection
      */
-    public synchronized void reconnect(int id)
+    public void reconnect(int id)
     {
+	System.err.println("\033[1;33mConnectionNetworking: Adding ID to list\033[m");
 	Reconnector.getInstance(this).addID(id);
+	Reconnector.getInstance(this).deadIDs.notifyAll();
+	System.err.println("\033[1;33mConectionNetworking: Done adding ID to list\033[m");
     }
     
     
@@ -574,7 +575,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
      *
      * @param id the player ID the connected
      */
-    public synchronized void connected(int id)
+    public void connected(int id)
     {
 	Reconnector.getInstance(this).removeID(id);
     }

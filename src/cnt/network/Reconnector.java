@@ -28,7 +28,6 @@ public class Reconnector implements BlackboardObserver
 	private Reconnector(ConnectionNetworking connectionNetworking)
 	{
 		this.connectionNetworking = connectionNetworking;
-		this.reconnect();
 	}
 	
     
@@ -51,7 +50,7 @@ public class Reconnector implements BlackboardObserver
 	/**
 	* Set of IDs for the connections that are dead and we need to reconnect,
 	*/
-	private HashSet<Integer> deadIDs = new HashSet<Integer>();
+	public HashSet<Integer> deadIDs = new HashSet<Integer>();
 
 	/**
 	 * Checks if a player has joined in a specefic timeframe
@@ -82,7 +81,6 @@ public class Reconnector implements BlackboardObserver
 	 */
 	{
 		Blackboard.registerObserver(this);
-		this.reconnect();
 	}
 
 	/**
@@ -94,8 +92,9 @@ public class Reconnector implements BlackboardObserver
 	{
 		synchronized (this.deadIDs)
 		{   	
+			this.reconnect();
 			this.deadIDs.add(id);
-			this.deadIDs.notify();
+			
 		}
 	}
 
@@ -113,7 +112,7 @@ public class Reconnector implements BlackboardObserver
 	/**
 	* Start trying to reconnect to IDs in the list.
 	*/
-	protected synchronized void reconnect()
+	protected void reconnect()
 	{
 		while (true)
 		{
@@ -126,14 +125,15 @@ public class Reconnector implements BlackboardObserver
 					{   this.deadIDs.wait();
 					}
 					catch (final InterruptedException err)
-					{   return;
+					{   
+						System.err.println("\033[1;31mReconnector: EXCEPTION ENCOUNTERED\033[0m");
 					}
 				 }
 				System.err.println("\033[1;33mReconnector: DeadIDs is NOT empty\033[0m");
 			    }
 		
 			
-			Blackboard.broadcastMessage(new EmergencyPause(true));
+			System.err.println("\033[1;33mReconnector: EmergencyPause in effect\033[0m");
 			
 			/* Check if selfdead */
 			try
@@ -145,16 +145,24 @@ public class Reconnector implements BlackboardObserver
 				Blackboard.broadcastMessage(new PlayerDropped(Player.getInstance(this.connectionNetworking.localID)));
 				return;
 			}
+			System.err.println("\033[1;33mReconnector:Not selfdead \033[0m");
 			
 			if (this.deadIDs.contains(this.connectionNetworking.foreignID))
 			{
 				int id = this.connectionNetworking.foreignID; // less to type
+				Socket connection = null;
 				
 				Socket dead = this.connectionNetworking.sockets.get(id);
-				Socket connection = this.connectionNetworking.connect((Inet4Address)(dead.getInetAddress()), dead.getPort(), true);
-				if (connection != null && handleConnection(connection, id))
-					continue;
-			
+				System.err.println("\033[1;33mDead socket is " + (dead == null ? "\033[1;31mNull\033m" : "\033[1;32mOK\033[0m"));
+				if (dead != null)
+				{
+					connection = this.connectionNetworking.connect((Inet4Address)(dead.getInetAddress()), dead.getPort(), true);
+
+					if (connection != null && handleConnection(connection, id))
+						continue;
+				}
+
+				System.err.println("\033[1;33mReconnector: Couldn't connect back to our server\033[0m");
 			
 				ArrayList<Player> players = new ArrayList<Player>();
 				for (int playerID : this.connectionNetworking.connectedIDs)
@@ -175,36 +183,44 @@ public class Reconnector implements BlackboardObserver
 						continue;
 					}
 				}
-				
+
+				System.err.println("\033[1;33mReconnector: Trying own network\033[0m");
+				System.err.println("\033[1;33mReconnector: Players empty: " + (players.isEmpty() ? "\033[1,31mEmpty\033[m" : "\033[1;32OK\033[0m"));
 				if (players.isEmpty() == false)
 				{
+					
 					Collections.sort(players);
-					Player player = players.get(0);
-					try
-					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
-					} catch (Exception e)
-					{ 
-						connection = null;
-					}
-					if (connection != null && handleConnection(connection, player.getID()))
-						continue;
-					else
+					
+					for (Player player : players)
 					{
 						try
 						{
-							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
-						} catch (Exception e) {
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+						} catch (Exception e)
+						{ 
 							connection = null;
 						}
-						if (connection != null)
-						{
-							handleConnection(connection, player.getID());
+						if (connection != null && handleConnection(connection, player.getID()))
 							continue;
+						else
+						{
+							try
+							{
+								connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+							} catch (Exception e) {
+								connection = null;
+							}
+							if (connection != null)
+							{
+								handleConnection(connection, player.getID());
+								continue;
+							}
 						}
 					}
 				}
-				
+
+				System.err.println("\033[1;33mReconnector: Couldn't connect on my network\033[0m");
+
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
 					Player player = Player.getInstance(playerID);
@@ -223,24 +239,30 @@ public class Reconnector implements BlackboardObserver
 						continue;
 					}
 				}
-
+				
+				System.err.println("\033[1;33mReconnector: Trying other networks\033[0m");	
+				System.err.println("\033[1;33mReconnector: Players empty: " + (players.isEmpty() ? "\033[1,31mEmpty\033[m" : "\033[1;32OK\033[0m"));
 				if (players.isEmpty() == false)
 				{
 					Collections.sort(players);
-					Player player = players.get(0);
-					try
-					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
-					} catch (Exception e)
-					{
-						connection = null;
-					}
-					if (connection != null)
-					{
-						handleConnection(connection, player.getID());
-						continue;
+					for (Player player : players)
+					{	
+						try
+						{
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+						} catch (Exception e)
+						{
+							connection = null;
+						}
+						if (connection != null)
+						{
+							handleConnection(connection, player.getID());
+							continue;
+						}
 					}
 				}
+				
+				System.err.println("\033[1;33mReconnector: Couldnt connect to neighbour on other network\033[0m");
 
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
@@ -260,36 +282,43 @@ public class Reconnector implements BlackboardObserver
 						continue;
 					}
 				}
+
+				System.err.println("\033[1;33mReconnector: Trying strangers on my network\033[0m");	
+				System.err.println("\033[1;33mReconnector: Players empty: " + (players.isEmpty() ? "\033[1,31mEmpty\033[m" : "\033[1;32OK\033[0m"));
 				
 				if (players.isEmpty() == false)
 				{
 					Collections.sort(players);
-					Player player = players.get(0);
-					try
-					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
-					} catch (Exception e)
-					{
-						connection = null;
-					}
-					if (connection != null && handleConnection(connection, player.getID()))
-						continue;
-					else
+					for (Player player : players)
 					{
 						try
 						{
-							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
 						} catch (Exception e)
 						{
 							connection = null;
 						}
-						if (connection != null)
-						{
-							handleConnection(connection, player.getID());
+						if (connection != null && handleConnection(connection, player.getID()))
 							continue;
+						else
+						{
+							try
+							{
+								connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getPublicIP())), player.getPort(), false);
+							} catch (Exception e)
+							{
+								connection = null;
+							}
+							if (connection != null)
+							{
+								handleConnection(connection, player.getID());
+								continue;
+							}
 						}
 					}
 				}
+				
+				System.err.println("\033[1;33mReconnector: Couldn't connect to NON neighbour on other network\033[0m");
 
 				for (int playerID : this.connectionNetworking.connectedIDs)
 				{
@@ -309,24 +338,32 @@ public class Reconnector implements BlackboardObserver
 						continue;
 					}
 				}
+	
+				System.err.println("\033[1;33mReconnector: Trying total strangers\033[0m");	
+				System.err.println("\033[1;33mReconnector: Players empty: " + (players.isEmpty() ? "\033[1,31mEmpty\033[m" : "\033[1;32OK\033[0m"));
 
 				if (players.isEmpty() == false)
 				{
 					Collections.sort(players);
-					Player player = players.get(0);
-					try
+					for (Player player : players)
 					{
-						connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
-					} catch (Exception e)
-					{
-						connection = null;
-					}
-					if (connection != null)
-					{
-						handleConnection(connection, player.getID());
-						continue;
+						try
+						{
+							connection = this.connectionNetworking.connect((Inet4Address)(InetAddress.getByName(player.getLocalIP())), player.getPort(), false);
+						} catch (Exception e)
+						{
+							connection = null;
+						}
+						if (connection != null)
+						{
+							handleConnection(connection, player.getID());
+							continue;
+						}
 					}
 				}
+				
+				System.err.println("\033[1;33mReconnector: All is lost\033[0m");
+					
 			}
 			
 			for(;;)
@@ -336,6 +373,7 @@ public class Reconnector implements BlackboardObserver
 					this.playerJoined = false;
 					try
 					{
+						System.err.println("\033[1;33mReconnector: timeout 2 sec in effect\033[0m");
 						joined.wait(2000);
 					} catch (InterruptedException ie)
 					{
@@ -356,6 +394,7 @@ public class Reconnector implements BlackboardObserver
 					}
 				}
 			}
+			System.err.println("\033[1;33mReconnector: We are done\033[0m");
 
 		}
 
