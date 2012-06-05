@@ -32,7 +32,6 @@ public final class PlayerRejoined extends PlayerJoined
      */
     public PlayerRejoined(final Player player)
     {
-	assert player != null : "Null is not allowed";
-	this.player = player;
+	super(player);
     }
 }
