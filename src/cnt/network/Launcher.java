@@ -6,19 +6,21 @@
  * Project for prutt12 (DD2385), KTH.
  */
 package cnt.network;
+import cnt.messages.*;
+import cnt.*;
 
 
 /**
  * Launcher for this package
  */
-public class Launcher
+public class Launcher implements Blackboard.BlackboardObserver
 {
     /**
-     * Non-constructor
+     * Constructor
      */
     private Launcher()
     {
-	assert false : "You may not create instances of this class [cnt.network.Launcher].";
+	//Privatise default constructor
     }    
     
     
@@ -31,8 +33,33 @@ public class Launcher
     public static void launch(final String... args)
     {
 	new PlayerRing();
-	
-	//......... create stack ..........//
+	Blackboard.registerObserver(new Launcher());
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void messageBroadcasted(final Blackboard.BlackboardMessage message)
+    {
+	if (message instanceof JoinGame)
+	{
+	    final JoinGame game = (JoinGame)message;
+	    
+	    final BlackboardNetworking bn = new BlackboardNetworking();
+	    final GameNetworking gn = new GameNetworking();
+	    final ConnectionNetworking cn;
+	    
+	    if (game.remote == null)
+		cn = new ConnectionNetworking(game.name);
+	    else
+		cn = new ConnectionNetworking(game.name, game.remote, game.port);
+	    
+	    bn.setGameNetworking(gn);
+	    gn.setBlackboardNetworking(bn);
+	    gn.setConnectionNetworking(cn);
+	    cn.setGameNetworking(gn);
+	}
     }
     
 }
