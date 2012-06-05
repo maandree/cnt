@@ -297,6 +297,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	else
 	    startTCP();
 	
+	TCPReceiver receiver = null;
 	try 
 	{
 	    System.err.print("\033[1;33mTrying to establish connections and streams...\033[0m");
@@ -338,7 +339,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	    {
 		System.err.print("\033[1;33mStarting TCPReceiver...\033[0m");
 		this.outputs.put(this.foreignID, output);
-		TCPReceiver receiver = new TCPReceiver(connection, input, this, this.foreignID);
+		receiver = new TCPReceiver(connection, input, this, this.foreignID);
 		Thread t = new Thread(receiver);
 		t.start();
 	    }
@@ -347,6 +348,26 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	catch (IOException ioe)
 	{
 		System.err.println("\033[1;33mError starting connection: " + ioe.getMessage() + "\033[0m");
+	}
+	
+	if (this.foreignID == -1)
+	{
+	    System.err.println("\033[1;31mFOREIGN ID IS -1\033[21;39m");
+	    return;
+	}
+	
+	if (receiver != null)
+	{
+	    final TCPReceiver _receiver = receiver;
+	    synchronized (_receiver)
+	    {   try
+		{
+		    _receiver.wait();
+		}
+		catch (final InterruptedException err)
+		{
+		    //Do nothing
+	    }   }
 	}
 	
 	// Create the local player
