@@ -327,6 +327,14 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 		this.data.fallingShape = ((EngineShapeUpdate)message).shape;
 	    else if (message instanceof EngineUpdate)
 		this.data.update(((EngineUpdate)message).data);
+	    else if (message instanceof FullUpdate)
+	    {
+		final FullUpdate update = (FullUpdate)message;
+		if (update.isGathering())
+		    update.data.put(Engine.class, this.data);
+		else
+		    this.data.update((EngineData)(update.data.get(Engine.class)));
+	    }
 	}
 	catch (final InterruptedException err)
 	{
