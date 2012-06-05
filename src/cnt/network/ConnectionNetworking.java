@@ -216,7 +216,7 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
     /**
      * Set of currently joined IDs
      */
-    public final HashSet<Integer> connectedIDs = new Hashset<Integer>();
+    public final HashSet<Integer> connectedIDs = new HashSet<Integer>();
     
     /**
      * Start monitor
@@ -589,8 +589,8 @@ public class ConnectionNetworking implements Blackboard.BlackboardObserver
 	} 
 	else if (message instanceof PlayerDropped)
 	{
-		final Player player = (PlayerDropped)message.player;
-		this.connectedIDs.remove(Integer.valueOf(player.getID()));
+	    final Player player = ((PlayerDropped)message).player;
+	    this.connectedIDs.remove(Integer.valueOf(player.getID()));
 	}
 	
     }

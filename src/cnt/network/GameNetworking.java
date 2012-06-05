@@ -104,6 +104,7 @@ public class GameNetworking
      * @throws  IOException             On networking exception
      * @throws  ClassNotFoundException  If the message type is not a part of the program
      */
+    @SuppressWarnings("unchecked")
     public void receive(Serializable object)
     {
 	try 
@@ -119,7 +120,7 @@ public class GameNetworking
 		final FullUpdate update = (FullUpdate)object;
 		if (update.isGathering() == false)
 		{
-		    for (final Player player : (Iterateable<Player>)(update.data.get(PlayerRing.class)))
+		    for (final Player player : (Iterable<Player>)(update.data.get(PlayerRing.class)))
 			this.blackboardNetworking.receiveAndBroadcast(new PlayerJoined(player));
 		}
 	    }
