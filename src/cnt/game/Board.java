@@ -43,7 +43,7 @@ public class Board implements Serializable
     /**
      * The game board matrix with a stationed blocks
      */
-    private final Block[][] blocks = new Block[HEIGHT][WIDTH];
+    public Block[][] blocks = new Block[HEIGHT][WIDTH];
     
     
     

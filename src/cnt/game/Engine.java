@@ -64,6 +64,11 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
     public final Object gameMonitor = new Object();
     
     /**
+     * Update monitor
+     */
+    public final Object updateMonitor = new Object();
+    
+    /**
      * Start monitor
      */
     public final Object startMonitor = new Object();
@@ -122,11 +127,22 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 				{   Engine.this.data.patcher.dispatch();
 				    Engine.this.nextTurn();
 				}
+				else
+				    synchronized (updateMonitor)
+				    {   try
+					{   System.out.println("\033[1;34mEngine.this.updateMonitor.wait();\033[0m");
+					    Engine.this.updateMonitor.wait();
+					    System.out.println("\033[1;36mMy turn!\033[0m");
+					}
+					catch (final InterruptedException err)
+					{   return;
+				    }   }
 				if (firstTurn)
 				    firstTurn = false;
 				try
 				{   System.out.println("\033[1;34mEngine.this.gameMonitor.wait();\033[0m");
 				    Engine.this.gameMonitor.wait();
+				    System.out.println("\033[1;36mReally mmy turn!\033[0m");
 				}
 				catch (final InterruptedException err)
 				{   return;
@@ -297,10 +313,9 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 			synchronized (this.gameMonitor)
 			{
 			    newTurn(player);
-			    System.err.println("\033[1;34mEngine.this.gameMonitor.noify();\033[0m");
+			    System.err.println("\033[1;34mEngine.this.gameMonitor.notify();\033[0m");
 			    this.gameMonitor.notify();
-			}
-		}
+		}       }
 	    }
 	    else if (message instanceof PlayerDropped)
 		playerDropped(((PlayerDropped)message).player);
@@ -332,7 +347,14 @@ public strictfp class Engine implements Blackboard.BlackboardObserver
 	    else if (message instanceof EngineShapeUpdate)
 		this.data.fallingShape = ((EngineShapeUpdate)message).shape;
 	    else if (message instanceof EngineUpdate)
+	    {
 		this.data.update(((EngineUpdate)message).data);
+		synchronized (this.updateMonitor)
+		{
+		    System.err.println("\033[1;34mEngine.this.updateMonitor.notify();\033[0m");
+		    this.updateMonitor.notify();
+		}
+	    }
 	    else if (message instanceof FullUpdate)
 	    {
 		final FullUpdate update = (FullUpdate)message;
